@@ -205,6 +205,7 @@ export default function Invitation() {
 
         <div className="festones sandy" style={{ backgroundColor: "var(--sand)" }} aria-hidden="true" />
         <section className="arena">
+          <img className="florArena" src="/images/azaleas.png" alt="" aria-hidden="true" />
           <div className="bloque">
             <h2 className="titulo">No Niños</h2>
             <p>
