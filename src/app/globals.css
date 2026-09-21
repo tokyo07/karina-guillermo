@@ -145,16 +145,39 @@ section, header { position: relative; text-align: center; }
 .festones.sandy { background: radial-gradient(circle at 14px 0, var(--sand) 13px, transparent 14px) 0 0/28px 22px repeat-x; }
 .festones.cielo { background: radial-gradient(circle at 14px 0, var(--cream) 13px, transparent 14px) 0 0/28px 22px repeat-x; }
 
-/* ---- portada ---- */
-.hero { background-color: var(--terra); color: var(--cream); padding: 44px 30px 34px; }
-.arcoMarco { position: relative; width: 78%; margin: 0 auto; }
-.arcoMarco::before { content: ""; position: absolute; inset: -11px -11px 0 -11px; border: 1px solid rgba(248, 241, 229, .7); border-bottom: 0; border-radius: 999px 999px 0 0; }
-.arco { aspect-ratio: 4 / 5.3; border-radius: 999px 999px 0 0; box-shadow: 0 18px 30px rgba(40, 10, 0, .35); overflow: hidden; }
-.arco img { width: 100%; height: 100%; object-fit: cover; }
-.hero .casamos { font-family: var(--titulo); letter-spacing: .16em; font-size: 14px; margin-top: 26px; color: #f6dcc6; }
-.hero h1 { font-family: var(--script); font-weight: 400; font-size: 58px; line-height: 1.02; margin: 6px 0 12px; }
-.hero h1 span { display: block; font-size: .56em; color: #f0b892; line-height: .9; }
-.hero .cuando { font-size: 18px; letter-spacing: .04em; }
+/* ---- portada: hero con scroll bloqueado (estilo "scroll-locked hero") ---- */
+.pinHero { position: relative; height: 220vh; background: var(--terra-deep); }
+.pinHero__stage {
+  position: sticky; top: 0; height: 100vh; max-height: 100dvh; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.pinHero__media { position: absolute; inset: 0; }
+.pinHero__media img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 20%;
+  animation: kenburns 16s ease-in-out infinite alternate;
+}
+.pinHero__scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(60, 20, 8, .35) 0%, rgba(60, 20, 8, .35) 55%, var(--terra-deep) 100%);
+}
+.pinHero__content { position: relative; z-index: 2; text-align: center; color: var(--cream); padding: 0 30px; will-change: transform, opacity; }
+.pinHero__content .casamos { font-family: var(--titulo); letter-spacing: .16em; font-size: 14px; color: #f6dcc6; }
+.pinHero__content h1 { font-family: var(--script); font-weight: 400; font-size: 58px; line-height: 1.02; margin: 6px 0 12px; text-shadow: 0 4px 18px rgba(20, 5, 0, .5); }
+.pinHero__content h1 span { display: block; font-size: .56em; color: #f0b892; line-height: .9; }
+.pinHero__content .cuando { font-size: 18px; letter-spacing: .04em; }
+.pinHero__hint { position: absolute; bottom: 26px; left: 0; right: 0; display: flex; justify-content: center; z-index: 2; transition: opacity .3s ease; }
+.pinHero__hint span { width: 22px; height: 34px; border: 1.5px solid rgba(248, 241, 229, .75); border-radius: 12px; position: relative; }
+.pinHero__hint span::before {
+  content: ""; position: absolute; top: 6px; left: 50%; width: 4px; height: 8px; border-radius: 2px;
+  background: rgba(248, 241, 229, .9); transform: translateX(-50%);
+  animation: scrollHint 1.6s ease-in-out infinite;
+}
+@keyframes kenburns { from { transform: scale(1.06); } to { transform: scale(1.16); } }
+@keyframes scrollHint { 0%, 100% { top: 6px; opacity: 1; } 60% { top: 18px; opacity: .3; } }
+
+/* ---- revelado al llegar con scroll (repartido por toda la invitación) ---- */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s ease var(--reveal-delay, 0s), transform .8s ease var(--reveal-delay, 0s); }
+.reveal.inView { opacity: 1; transform: none; }
 
 /* ---- flor 3D ---- */
 .flor3d { background: var(--cream); padding: .6rem 1.6rem 1.8rem; display: flex; flex-direction: column; align-items: center; }
@@ -283,7 +306,11 @@ section, header { position: relative; text-align: center; }
 .cierre .mono { font-family: var(--titulo); letter-spacing: .2em; font-size: 13px; margin-top: 6px; color: #f0dcc8; }
 
 @media (prefers-reduced-motion: reduce) {
-  .stage, .sobreWrap, .card, .flap, .sello, .rev, .visible .rev { transition-duration: .01s !important; transition-delay: 0s !important; animation: none !important; }
-  .rev { opacity: 1; transform: none; }
+  .stage, .sobreWrap, .card, .flap, .sello, .rev, .visible .rev, .reveal { transition-duration: .01s !important; transition-delay: 0s !important; animation: none !important; }
+  .rev, .reveal { opacity: 1; transform: none; }
   .petal { display: none; }
+  .pinHero__media img { animation: none; }
+  .pinHero { height: auto; }
+  .pinHero__stage { position: relative; height: 70vh; }
+  .pinHero__content { opacity: 1 !important; transform: none !important; }
 }
