@@ -144,7 +144,7 @@ section, header { position: relative; text-align: center; }
 .festones.cielo { background: radial-gradient(circle at 14px 0, var(--cream) 13px, transparent 14px) 0 0/28px 22px repeat-x; }
 
 /* ---- portada: hero con scroll bloqueado (estilo "scroll-locked hero") ---- */
-.pinHero { position: relative; height: 170vh; background: var(--terra-deep); }
+.pinHero { position: relative; height: 130vh; background: var(--terra-deep); }
 .pinHero__stage {
   position: sticky; top: 0; height: 100vh; max-height: 100dvh; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
