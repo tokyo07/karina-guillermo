@@ -137,8 +137,6 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--cream); outline
    ===================================================== */
 .invite { max-width: 480px; margin: 0 auto; position: relative; background: var(--cream); overflow: hidden; box-shadow: 0 0 60px rgba(20, 5, 0, .5); }
 section, header { position: relative; text-align: center; }
-.rev { opacity: 0; transform: translateY(16px); }
-.visible .rev { opacity: 1; transform: none; transition: opacity .9s ease var(--d, 0s), transform .9s ease var(--d, 0s); }
 
 .flor { position: absolute; width: 130px; height: auto; pointer-events: none; }
 .festones { height: 22px; background: radial-gradient(circle at 14px 0, var(--terra) 13px, transparent 14px) 0 0/28px 22px repeat-x; }
@@ -146,7 +144,7 @@ section, header { position: relative; text-align: center; }
 .festones.cielo { background: radial-gradient(circle at 14px 0, var(--cream) 13px, transparent 14px) 0 0/28px 22px repeat-x; }
 
 /* ---- portada: hero con scroll bloqueado (estilo "scroll-locked hero") ---- */
-.pinHero { position: relative; height: 220vh; background: var(--terra-deep); }
+.pinHero { position: relative; height: 170vh; background: var(--terra-deep); }
 .pinHero__stage {
   position: sticky; top: 0; height: 100vh; max-height: 100dvh; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
@@ -175,8 +173,11 @@ section, header { position: relative; text-align: center; }
 @keyframes kenburns { from { transform: scale(1.06); } to { transform: scale(1.16); } }
 @keyframes scrollHint { 0%, 100% { top: 6px; opacity: 1; } 60% { top: 18px; opacity: .3; } }
 
-/* ---- revelado al llegar con scroll (repartido por toda la invitación) ---- */
-.reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s ease var(--reveal-delay, 0s), transform .8s ease var(--reveal-delay, 0s); }
+/* ---- revelado al llegar con scroll (repartido por toda la invitación) ----
+   Se dispara con margen de anticipación (ver useInView) para que termine
+   de aparecer antes de que la sección sea realmente visible: nunca debería
+   verse un bloque de color sin su texto. */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .5s ease var(--reveal-delay, 0s), transform .5s ease var(--reveal-delay, 0s); }
 .reveal.inView { opacity: 1; transform: none; }
 
 /* ---- flor 3D ---- */
@@ -306,8 +307,8 @@ section, header { position: relative; text-align: center; }
 .cierre .mono { font-family: var(--titulo); letter-spacing: .2em; font-size: 13px; margin-top: 6px; color: #f0dcc8; }
 
 @media (prefers-reduced-motion: reduce) {
-  .stage, .sobreWrap, .card, .flap, .sello, .rev, .visible .rev, .reveal { transition-duration: .01s !important; transition-delay: 0s !important; animation: none !important; }
-  .rev, .reveal { opacity: 1; transform: none; }
+  .stage, .sobreWrap, .card, .flap, .sello, .reveal { transition-duration: .01s !important; transition-delay: 0s !important; animation: none !important; }
+  .reveal { opacity: 1; transform: none; }
   .petal { display: none; }
   .pinHero__media img { animation: none; }
   .pinHero { height: auto; }

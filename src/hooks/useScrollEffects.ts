@@ -42,8 +42,18 @@ export function useScrollProgress<T extends HTMLElement>() {
   return { ref, progress };
 }
 
-/** true la primera vez que el elemento entra en pantalla (y se queda en true). */
-export function useInView<T extends HTMLElement>(threshold = 0.22) {
+/**
+ * true la primera vez que el elemento entra en pantalla (y se queda en true).
+ *
+ * `rootMargin` positivo en el borde inferior agranda la zona de detección
+ * hacia abajo, así el disparo ocurre ANTES de que el elemento sea
+ * físicamente visible — para cuando el usuario llega a esa sección con el
+ * scroll, el fade-in ya terminó y nunca se ve un bloque de color vacío.
+ */
+export function useInView<T extends HTMLElement>(
+  threshold = 0.01,
+  rootMargin = "0px 0px 180px 0px"
+) {
   const ref = useRef<T>(null);
   // Arranca en false tanto en el servidor como en el cliente (mismo valor
   // en los dos lados, sin mismatch de hidratación) y el efecto la prende
@@ -64,11 +74,11 @@ export function useInView<T extends HTMLElement>(threshold = 0.22) {
           }
         }
       },
-      { threshold }
+      { threshold, rootMargin }
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [threshold]);
+  }, [threshold, rootMargin]);
 
   return { ref, inView };
 }

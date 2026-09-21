@@ -163,44 +163,48 @@ export default function Invitation() {
         <div className="lugarFoto" role="img" aria-label="Karina y Guillermo sonriendo">
           <img src="/images/pareja.jpg" alt="" style={{ objectPosition: "22% 30%" }} />
         </div>
-        <Reveal as="section" className="lugar">
-          <div className="hora">5:00 pm</div>
-          <h2>Ceremonia</h2>
-          <p className="sitio">Iglesia San José</p>
-          <p className="dir">Quevedo, Ecuador</p>
-          <a
-            className="btn"
-            href="https://www.google.com/maps/search/?api=1&query=Iglesia+San+Jose+Quevedo"
-            target="_blank"
-            rel="noopener"
-          >
-            Ver ubicación
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
-              <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z" />
-              <circle cx="12" cy="9" r="2.4" />
-            </svg>
-          </a>
-        </Reveal>
+        <section className="lugar">
+          <Reveal>
+            <div className="hora">5:00 pm</div>
+            <h2>Ceremonia</h2>
+            <p className="sitio">Iglesia San José</p>
+            <p className="dir">Quevedo, Ecuador</p>
+            <a
+              className="btn"
+              href="https://www.google.com/maps/search/?api=1&query=Iglesia+San+Jose+Quevedo"
+              target="_blank"
+              rel="noopener"
+            >
+              Ver ubicación
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+                <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z" />
+                <circle cx="12" cy="9" r="2.4" />
+              </svg>
+            </a>
+          </Reveal>
+        </section>
         <div className="festones cielo" style={{ backgroundColor: "var(--terra)" }} aria-hidden="true" />
 
-        <Reveal as="section" className="lugar claro">
-          <div className="hora">6:00 pm</div>
-          <h2>Recepción</h2>
-          <p className="sitio">San Camilo</p>
-          <p className="dir">El patio de las Hadas</p>
-          <a
-            className="btn oscuro"
-            href="https://www.google.com/maps/search/?api=1&query=San+Camilo+El+Patio+de+las+Hadas"
-            target="_blank"
-            rel="noopener"
-          >
-            Ver ubicación
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
-              <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z" />
-              <circle cx="12" cy="9" r="2.4" />
-            </svg>
-          </a>
-        </Reveal>
+        <section className="lugar claro">
+          <Reveal>
+            <div className="hora">6:00 pm</div>
+            <h2>Recepción</h2>
+            <p className="sitio">San Camilo</p>
+            <p className="dir">El patio de las Hadas</p>
+            <a
+              className="btn oscuro"
+              href="https://www.google.com/maps/search/?api=1&query=San+Camilo+El+Patio+de+las+Hadas"
+              target="_blank"
+              rel="noopener"
+            >
+              Ver ubicación
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+                <path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z" />
+                <circle cx="12" cy="9" r="2.4" />
+              </svg>
+            </a>
+          </Reveal>
+        </section>
 
         <div className="festones sandy" style={{ backgroundColor: "var(--sand)" }} aria-hidden="true" />
         <section className="arena">

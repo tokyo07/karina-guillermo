@@ -5,15 +5,16 @@ import { useScrollProgress } from "@/hooks/useScrollEffects";
 export default function PinnedHero() {
   const { ref, progress } = useScrollProgress<HTMLDivElement>();
 
-  // El texto termina de aparecer al 40% del recorrido; después queda fijo
-  // en pantalla hasta que el sticky se suelta.
-  const t = Math.min(1, progress / 0.4);
-  const textOpacity = t;
-  const textScale = 0.82 + t * 0.18;
-  const textShift = (1 - t) * 26;
-  // El scrim se oscurece un poco más a medida que se acerca el final,
-  // para que el siguiente bloque (crema) entre con buen contraste.
-  const scrimExtra = 0.15 + progress * 0.25;
+  // El texto es visible desde el primer momento (nada depende de scrollear
+  // para poder leerlo). Recién en el último tramo del recorrido se
+  // desvanece hacia arriba, como salida, justo antes de que la foto se
+  // suelte y empiece la siguiente sección — así no queda ningún tramo
+  // "vacío" en el medio.
+  const exitStart = 0.6;
+  const exitT = Math.min(1, Math.max(0, (progress - exitStart) / (1 - exitStart)));
+  const textOpacity = 1 - exitT;
+  const textShift = -exitT * 22;
+  const textScale = 1 - exitT * 0.06;
 
   return (
     <div className="pinHero" ref={ref}>
@@ -24,7 +25,7 @@ export default function PinnedHero() {
             alt="Karina y Guillermo"
             style={{ objectPosition: "center 20%" }}
           />
-          <div className="pinHero__scrim" style={{ opacity: scrimExtra }} />
+          <div className="pinHero__scrim" />
         </div>
         <div
           className="pinHero__content"
@@ -41,7 +42,7 @@ export default function PinnedHero() {
         </div>
         <div
           className="pinHero__hint"
-          style={{ opacity: Math.max(0, 1 - progress * 4) }}
+          style={{ opacity: Math.max(0, 1 - progress * 5) }}
           aria-hidden="true"
         >
           <span />
