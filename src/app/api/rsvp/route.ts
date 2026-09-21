@@ -1,4 +1,4 @@
-import { getPool } from "@/lib/db";
+import { getSupabase } from "@/lib/supabase";
 
 type RsvpPayload = {
   nombre?: unknown;
@@ -31,10 +31,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    await getPool().query(
-      `insert into rsvps (nombre, asiste, acompanantes, mensaje) values ($1, $2, $3, $4)`,
-      [nombre, asiste, acompanantes, mensaje]
-    );
+    const { error } = await getSupabase()
+      .from("rsvps")
+      .insert({ nombre, asiste, acompanantes, mensaje });
+    if (error) throw error;
   } catch (err) {
     console.error("Error guardando RSVP:", err);
     return Response.json(
@@ -44,17 +44,4 @@ export async function POST(request: Request) {
   }
 
   return Response.json({ ok: true });
-}
-
-export async function GET() {
-  try {
-    const { rows } = await getPool().query(
-      `select id, nombre, asiste, acompanantes, mensaje, created_at
-       from rsvps order by created_at desc limit 200`
-    );
-    return Response.json({ rsvps: rows });
-  } catch (err) {
-    console.error("Error leyendo RSVPs:", err);
-    return Response.json({ error: "No se pudo leer las confirmaciones." }, { status: 500 });
-  }
 }
