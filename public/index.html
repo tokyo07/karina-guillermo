@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karina & Guillermo · 19 de diciembre</title>
+<meta name="description" content="Karina & Guillermo se casan el 19 de diciembre. ¡Acompáñanos!">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  /* Un solo color: terracota. Todo lo demás son tintes del mismo tono sobre fondo claro. */
+  :root{
+    --tc:#B4533A;
+    --tc-80:color-mix(in srgb,var(--tc) 80%,#fff);
+    --tc-40:color-mix(in srgb,var(--tc) 40%,#fff);
+    --tc-15:color-mix(in srgb,var(--tc) 15%,#fff);
+    --tc-06:color-mix(in srgb,var(--tc) 6%,#fff);
+    --bg:#FFFCFA;
+    --on-tc:#FFFCFA;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--tc);font-family:'Lato',sans-serif;font-weight:300;line-height:1.7;overflow-x:hidden}
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.1}
+  .script{font-family:'Great Vibes',cursive;font-weight:400}
+  a{color:inherit}
+  img{display:block;max-width:100%}
+  svg.ill{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--tc-15)}
+  nav .mono{font-family:'Great Vibes',cursive;font-size:1.7rem;text-decoration:none}
+  nav ul{list-style:none;display:flex;gap:22px;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase}
+  nav ul a{text-decoration:none;padding:6px 0;border-bottom:1px solid transparent}
+  nav ul a:hover,nav ul a:focus-visible{border-color:var(--tc)}
+  @media(max-width:700px){nav ul{display:none}}
+
+  section{position:relative;padding:100px 20px}
+  .wrap{max-width:1040px;margin:0 auto}
+  .narrow{max-width:680px;margin:0 auto}
+  .center{text-align:center}
+  .eyebrow{font-size:.75rem;letter-spacing:.3em;text-transform:uppercase}
+  .title{font-size:clamp(2.3rem,6vw,3.5rem);margin:.2em 0 .1em}
+  .divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:18px auto 36px}
+  .divider::before,.divider::after{content:"";width:60px;height:1px;background:var(--tc-40)}
+  .divider svg{width:22px;height:22px}
+
+  /* HERO: marco con nombres + foto en arco */
+  .hero{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center;max-width:1100px;margin:0 auto;padding:110px 24px 70px}
+  .hero-photo{position:relative;justify-self:center;width:min(400px,100%)}
+  .hero-photo img{width:100%;aspect-ratio:3/4.3;object-fit:cover;object-position:center 30%;border-radius:220px 220px 6px 6px}
+  .hero-photo::after{content:"";position:absolute;inset:-12px;border:1px solid var(--tc-40);border-radius:230px 230px 10px 10px;pointer-events:none}
+  .frame{position:relative;border:1.5px solid var(--tc);padding:60px 40px;text-align:center;background:var(--bg)}
+  .frame::after{content:"";position:absolute;inset:8px;border:1px solid var(--tc-40);pointer-events:none}
+  .frame h1{font-size:clamp(3rem,8vw,5rem);font-family:'Great Vibes',cursive;line-height:1}
+  .frame .amp{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.5em;margin:.1em 0}
+  .frame .date{letter-spacing:.25em;text-transform:uppercase;font-size:.85rem}
+  .corner{position:absolute;width:170px;height:170px;pointer-events:none}
+  .corner.tl{top:-64px;left:-70px}
+  .corner.br{bottom:-64px;right:-70px;transform:rotate(180deg)}
+  @media(max-width:860px){
+    .hero{grid-template-columns:1fr;gap:70px;padding-top:90px}
+    .hero-photo{order:-1;width:min(320px,86%)}
+    .frame{padding:50px 22px}
+    .corner{width:120px;height:120px}.corner.tl{top:-46px;left:-26px}.corner.br{bottom:-46px;right:-26px}
+  }
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:34px;padding:13px 34px;background:var(--tc);color:var(--on-tc);text-decoration:none;letter-spacing:.2em;text-transform:uppercase;font-size:.75rem;font-weight:700;border:1px solid var(--tc);border-radius:999px;cursor:pointer;transition:background .2s,color .2s;min-height:44px;font-family:'Lato',sans-serif}
+  .btn:hover,.btn:focus-visible{background:var(--bg);color:var(--tc)}
+  .btn.ghost{background:transparent;color:var(--tc)}
+  .btn.ghost:hover{background:var(--tc);color:var(--on-tc)}
+  .float-hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .float-hearts svg{position:absolute;width:16px;height:16px;opacity:.28;animation:rise 16s linear infinite}
+  @keyframes rise{from{transform:translateY(105vh) rotate(0)}to{transform:translateY(-10vh) rotate(25deg)}}
+  @media(prefers-reduced-motion:reduce){.float-hearts{display:none}}
+
+  /* INTRO */
+  .intro p{font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,2.6vw,1.45rem);line-height:1.6;margin-bottom:1.1em}
+  .intro .gloria{font-family:'Great Vibes',cursive;font-size:clamp(2rem,5vw,2.6rem);margin-top:.4em}
+
+  /* PADRES */
+  .parents{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:10px}
+  .parents h3{font-size:.78rem;font-family:'Lato',sans-serif;font-weight:700;letter-spacing:.25em;text-transform:uppercase;margin-bottom:12px}
+  .parents p{font-family:'Cormorant Garamond',serif;font-size:1.35rem;line-height:1.5}
+  @media(max-width:600px){.parents{grid-template-columns:1fr;gap:30px}}
+
+  /* EVENTOS */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:26px}
+  .card{border:1px solid var(--tc-40);padding:38px 26px;text-align:center;background:var(--bg);display:flex;flex-direction:column;align-items:center}
+  .card svg{width:62px;height:62px;margin-bottom:12px}
+  .card h3{font-size:1.9rem;margin-bottom:6px}
+  .card .when{font-size:1.5rem;font-family:'Cormorant Garamond',serif;font-weight:600;margin-bottom:4px}
+  .card .btn{margin-top:auto;padding:10px 24px}
+  .card .spacer{flex:1;min-height:18px}
+
+  /* ELLA & ÉL (fondo terracota) */
+  .story{background:var(--tc);color:var(--on-tc)}
+  .story .divider::before,.story .divider::after{background:color-mix(in srgb,var(--on-tc) 50%,transparent)}
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+  @media(max-width:760px){.duo{grid-template-columns:1fr;gap:50px}}
+  .person{text-align:center}
+  .person .ph{width:200px;height:260px;margin:0 auto 24px;border-radius:100px 100px 0 0;border:1.5px solid var(--on-tc);display:grid;place-items:center}
+  .person .ph svg{width:140px;height:190px;margin-top:30px;color:var(--on-tc)}
+  .person h3{font-size:3rem}
+  .person p{max-width:420px;margin:14px auto 0;font-size:1.02rem}
+
+  /* GALERÍA */
+  .gallery{columns:3 240px;column-gap:14px}
+  .gallery figure{break-inside:avoid;margin-bottom:14px;overflow:hidden;border-radius:4px}
+  .gallery img{width:100%;transition:transform .6s}
+  .gallery figure:hover img{transform:scale(1.03)}
+
+  /* CUENTA REGRESIVA */
+  .quote{background:var(--tc-06)}
+  .count{display:flex;justify-content:center;gap:clamp(12px,4vw,40px);margin-top:36px;flex-wrap:wrap}
+  .count div{min-width:80px}
+  .count b{display:block;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(2.6rem,7vw,4rem);line-height:1;font-variant-numeric:tabular-nums}
+  .count small{letter-spacing:.25em;text-transform:uppercase;font-size:.7rem}
+
+  /* VESTIMENTA */
+  .attire{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:30px;max-width:640px;margin:0 auto}
+  .attire svg{width:140px;height:190px}
+  .attire figcaption h3{font-size:1.7rem}
+  .attire figcaption p{font-size:.95rem;max-width:260px;margin:4px auto 0}
+  .avoid{max-width:360px;margin:44px auto 0}
+  .avoid img{border-radius:8px;border:1px solid var(--tc-15)}
+  .avoid p{font-size:.85rem;margin-top:10px}
+
+  /* NOTA ADULTOS (pequeña y suave) */
+  .note{max-width:460px;margin:0 auto;padding:22px 26px;border-top:1px solid var(--tc-40);border-bottom:1px solid var(--tc-40);font-size:.9rem;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:1.1rem;line-height:1.55}
+
+  footer{padding:70px 20px 110px;text-align:center;border-top:1px solid var(--tc-15)}
+  footer .script{font-size:3rem}
+  footer svg{width:180px;height:60px}
+
+  /* BOTÓN DE MÚSICA */
+  .music{position:fixed;right:18px;bottom:18px;z-index:20;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;background:var(--tc);color:var(--on-tc);border:0;cursor:pointer;box-shadow:0 6px 20px color-mix(in srgb,var(--tc) 35%,transparent);font:400 .8rem 'Lato',sans-serif;min-height:44px}
+  .music .disc{width:32px;height:32px;border-radius:50%;background:var(--on-tc);color:var(--tc);display:grid;place-items:center}
+  .music .disc svg{width:14px;height:14px;fill:currentColor}
+  .music.playing .disc{animation:spin 4s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(prefers-reduced-motion:reduce){.music.playing .disc{animation:none}}
+
+  /* ===== FRANJAS DE FOTO con borde de papel rasgado (foto fija al fondo = parallax) ===== */
+  .band{position:relative;height:clamp(340px,72vh,680px);clip-path:inset(0)}
+  .band-img{position:fixed;inset:0;background:var(--img) var(--pos,center)/cover no-repeat}
+  .torn{position:absolute;left:0;width:100%;height:clamp(34px,6vw,80px);z-index:1;filter:drop-shadow(0 3px 3px rgba(0,0,0,.10))}
+  .torn.top{top:-6px;fill:var(--top,var(--bg))}
+  .torn.bot{bottom:-6px;transform:scale(-1,-1);fill:var(--bot,var(--bg));filter:drop-shadow(0 3px 3px rgba(0,0,0,.10))}
+
+  /* ===== INTRO: sobre con sello de iniciales ===== */
+  body.locked{overflow:hidden}
+  .intro-screen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;background:radial-gradient(ellipse at center,var(--tc-06),var(--bg) 70%);transition:opacity 1s ease,transform 1.2s ease;overflow:hidden;padding:20px}
+  .intro-screen.gone{opacity:0;transform:scale(1.08);pointer-events:none}
+  .intro-screen .ic{position:absolute;width:min(220px,40vw);height:min(220px,40vw);opacity:.9}
+  .intro-screen .ic.tl{top:-20px;left:-20px}
+  .intro-screen .ic.br{bottom:-20px;right:-20px;transform:rotate(180deg)}
+  .intro-top{text-align:center}
+  .intro-top .script{font-size:clamp(2.2rem,7vw,3rem);line-height:1}
+  .intro-hint{font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;animation:breathe 2.4s ease-in-out infinite}
+  @keyframes breathe{50%{opacity:.35}}
+
+  .env{position:relative;width:min(440px,88vw);aspect-ratio:1.5;perspective:1400px;transition:transform 1.1s cubic-bezier(.6,0,.3,1),opacity 1s}
+  .env-back{position:absolute;inset:0;background:color-mix(in srgb,var(--tc) 88%,#000);border-radius:6px;box-shadow:0 24px 50px -18px color-mix(in srgb,var(--tc) 55%,transparent)}
+  .env-letter{position:absolute;left:6%;right:6%;top:6%;height:88%;z-index:2;background:var(--bg);border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;transition:transform 1s cubic-bezier(.3,.7,.2,1);box-shadow:0 2px 10px rgba(0,0,0,.08)}
+  .env-letter::after{content:"";position:absolute;inset:7px;border:1px solid var(--tc-40);pointer-events:none}
+  .env-letter .names{font-family:'Great Vibes',cursive;font-size:clamp(1.9rem,7vw,2.7rem);line-height:1.05}
+  .env-letter .d{font-size:.7rem;letter-spacing:.3em;margin-top:8px}
+  .env-letter svg{width:18px;height:18px;margin-top:6px}
+  .env-front{position:absolute;inset:0;z-index:3;background:var(--tc);clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%);border-radius:6px}
+  .env-front::before{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent 49.6%,color-mix(in srgb,var(--tc) 80%,#000) 50%,transparent 50.4%),linear-gradient(to top left,transparent 49.6%,color-mix(in srgb,var(--tc) 80%,#000) 50%,transparent 50.4%);opacity:.35}
+  .env-flap{position:absolute;left:0;right:0;top:0;height:58%;z-index:4;background:color-mix(in srgb,var(--tc) 94%,#fff);clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .9s cubic-bezier(.5,0,.3,1);border-radius:6px 6px 0 0}
+  .seal{position:absolute;left:50%;top:58%;z-index:5;width:clamp(78px,20vw,96px);aspect-ratio:1;transform:translate(-50%,-50%);border:0;border-radius:50%;cursor:pointer;color:var(--on-tc);
+    background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--tc) 75%,#fff),color-mix(in srgb,var(--tc) 70%,#000) 75%);
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--tc) 80%,#000),0 0 0 5px color-mix(in srgb,var(--tc) 50%,transparent),0 8px 18px rgba(0,0,0,.25);
+    display:flex;align-items:center;justify-content:center;white-space:nowrap;font-family:'Great Vibes',cursive;font-size:clamp(1.7rem,6vw,2.1rem);line-height:1;transition:transform .5s,opacity .5s;animation:pulse 2.4s ease-in-out infinite}
+  .seal::before{content:"";position:absolute;inset:7px;border-radius:50%;border:1px dashed color-mix(in srgb,var(--on-tc) 55%,transparent)}
+  .seal:focus-visible{outline:2px solid var(--tc);outline-offset:8px}
+  @keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.06)}}
+
+  /* secuencia de apertura */
+  .intro-screen.s1 .seal{animation:none;transform:translate(-50%,-50%) scale(.2) rotate(-40deg);opacity:0}
+  .intro-screen.s1 .intro-hint{opacity:0;animation:none}
+  .intro-screen.s2 .env-flap{transform:rotateX(180deg)}
+  .intro-screen.s3 .env-flap{z-index:1}
+  .intro-screen.s4 .env-letter{transform:translateY(-58%)}
+  .intro-screen.s5 .env{transform:translateY(12%) scale(1.35)}
+  .burst{position:absolute;left:50%;top:50%;width:16px;height:16px;pointer-events:none;color:var(--tc);animation:burst 1.6s ease-out forwards}
+  @keyframes burst{from{transform:translate(-50%,-50%) scale(.3);opacity:1}to{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1) rotate(var(--r));opacity:0}}
+  @media(prefers-reduced-motion:reduce){.seal,.intro-hint{animation:none}.env,.env-flap,.env-letter{transition-duration:.01s}}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .9s,transform .9s}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+  main,header,footer{position:relative;z-index:1}
+</style>
+</head>
+<body class="locked">
+
+<!-- Ilustraciones de línea propias. Todas usan currentColor = terracota. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="heart" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.6 7.8 3.9 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.9 1.2-1.8 2.8-2.9 4.8-2.9 3.3 0 5.6 3.3 4.4 6.7-1.7 4.7-9.2 9.3-9.2 9.3z"/></symbol>
+    <symbol id="petal5" viewBox="-30 -30 60 60">
+      <circle r="5"/>
+      <path d="M0-6c-6-10-2-20 0-22 2 2 6 12 0 22z"/>
+      <path d="M0-6c-6-10-2-20 0-22 2 2 6 12 0 22z" transform="rotate(72)"/>
+      <path d="M0-6c-6-10-2-20 0-22 2 2 6 12 0 22z" transform="rotate(144)"/>
+      <path d="M0-6c-6-10-2-20 0-22 2 2 6 12 0 22z" transform="rotate(216)"/>
+      <path d="M0-6c-6-10-2-20 0-22 2 2 6 12 0 22z" transform="rotate(288)"/>
+    </symbol>
+    <symbol id="floral-corner" viewBox="0 0 200 200">
+      <path d="M20 190 C 50 140, 80 100, 150 40"/>
+      <path d="M45 150 C 30 130, 20 110, 25 90"/>
+      <path d="M85 100 C 110 95, 130 100, 150 115"/>
+      <path d="M55 132c-10-4-16-14-14-24 10 3 16 13 14 24z"/>
+      <path d="M70 115c4-10 14-16 24-14-3 10-13 16-24 14z"/>
+      <path d="M100 80c-9-6-12-17-8-26 9 6 12 17 8 26z"/>
+      <path d="M115 70c6-9 17-12 26-8-6 9-17 12-26 8z"/>
+      <path d="M33 110c-8-6-10-16-6-24 8 6 10 16 6 24z"/>
+      <path d="M120 105c6 8 6 18 0 24-6-8-6-18 0-24z"/>
+      <use href="#petal5" x="122" y="8" width="60" height="60"/>
+      <use href="#petal5" x="134" y="98" width="36" height="36"/>
+      <path d="M25 90c-6-4-7-12-2-16 5 4 6 12 2 16z"/>
+      <circle cx="70" cy="165" r="2.5"/><circle cx="165" cy="70" r="2"/><circle cx="95" cy="150" r="1.5"/>
+    </symbol>
+    <symbol id="dress" viewBox="0 0 170 230">
+      <path d="M68 12c-2 10-4 18-4 26M102 12c2 10 4 18 4 26"/>
+      <path d="M64 38c6 6 14 9 21 9s15-3 21-9"/>
+      <path d="M64 38c-2 14 0 30 6 42h30c6-12 8-28 6-42"/>
+      <path d="M70 80c10 3 20 3 30 0"/>
+      <path d="M70 80C54 120 30 170 14 215c40 10 102 10 142 0-16-45-40-95-56-135"/>
+      <path d="M85 84c-4 40-6 90-8 128M85 84c6 40 14 88 22 128M85 84c-14 40-30 86-44 124M85 84c18 38 36 82 50 122"/>
+      <path d="M14 215c10-6 20 4 30-2s20 4 30-2 22 4 32-2 22 4 32-2 10 4 18 6"/>
+      <circle cx="85" cy="62" r="2"/><circle cx="78" cy="55" r="1.3"/><circle cx="92" cy="55" r="1.3"/>
+    </symbol>
+    <symbol id="suit" viewBox="0 0 170 230">
+      <path d="M60 14l25 30 25-30"/>
+      <path d="M60 14C40 20 30 28 26 40L18 150h24l6-80"/>
+      <path d="M110 14c20 6 30 14 34 26l8 110h-24l-6-80"/>
+      <path d="M48 70l-4 150h82l-4-150"/>
+      <path d="M60 14l-4 40 24 40 5-50M110 14l4 40-24 40-5-50"/>
+      <path d="M75 30l10 6 10-6v12l-10-6-10 6z"/>
+      <circle cx="85" cy="120" r="2.5"/><circle cx="85" cy="142" r="2.5"/>
+      <path d="M100 76l14-4"/>
+      <path d="M85 94v126"/>
+    </symbol>
+    <symbol id="rings" viewBox="0 0 64 64">
+      <circle cx="25" cy="38" r="15"/><circle cx="39" cy="38" r="15"/>
+      <path d="M20 23l5-8 5 8zM20 23l5 4 5-4"/>
+    </symbol>
+    <symbol id="church" viewBox="0 0 64 64">
+      <path d="M32 4v12M27 9h10"/>
+      <path d="M20 30l12-14 12 14"/>
+      <path d="M22 28v30h20V28"/>
+      <path d="M8 58V38l14-8M56 58V38l-14-8"/>
+      <path d="M28 58v-9a4 4 0 018 0v9"/>
+      <circle cx="32" cy="36" r="3"/>
+      <path d="M4 58h56"/>
+    </symbol>
+    <symbol id="cheers" viewBox="0 0 64 64">
+      <path d="M14 10h14l-2 16a5 5 0 01-10 0z" transform="rotate(-12 21 20)"/>
+      <path d="M36 10h14l-2 16a5 5 0 01-10 0z" transform="rotate(12 43 20)"/>
+      <path d="M24 32l-3 18M17 51h9M40 32l3 18M38 51h9"/>
+      <path d="M32 4v4M26 6l2 3M38 6l-2 3"/>
+    </symbol>
+    <symbol id="calendar" viewBox="0 0 64 64">
+      <rect x="8" y="12" width="48" height="44" rx="4"/>
+      <path d="M8 24h48M20 6v10M44 6v10"/>
+      <path d="M32 46s-9-5-9-10a4.5 4.5 0 019-1 4.5 4.5 0 019 1c0 5-9 10-9 10z"/>
+    </symbol>
+    <symbol id="garland" viewBox="0 0 180 60">
+      <path d="M5 30c30-20 60 20 85 0s55-20 85 0"/>
+      <path d="M30 22c-4-8 0-14 6-14 0 8-2 12-6 14zM55 34c6 6 4 14-2 16-2-8 0-12 2-16zM125 22c4-8 12-8 16-4-6 4-10 6-16 4zM150 34c-2 8-8 10-14 8 4-6 8-8 14-8z"/>
+      <path d="M90 36c-3-2-8 0-8 4 0 5 8 9 8 9s8-4 8-9c0-4-5-6-8-4z"/>
+    </symbol>
+    <symbol id="play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+    <symbol id="pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></symbol>
+    <symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-12a7 7 0 0114 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+  </defs>
+</svg>
+
+<!-- INTRO: sobre cerrado con sello de iniciales. Al tocar el sello se abre y muestra la invitación. -->
+<div class="intro-screen" id="intro" role="dialog" aria-label="Invitación de boda de Karina y Guillermo">
+  <svg class="ill ic tl" aria-hidden="true"><use href="#floral-corner"/></svg>
+  <svg class="ill ic br" aria-hidden="true"><use href="#floral-corner"/></svg>
+  <div class="intro-top">
+    <p class="eyebrow">Tienes una invitación</p>
+  </div>
+  <div class="env">
+    <div class="env-back"></div>
+    <div class="env-letter" aria-hidden="true">
+      <p class="eyebrow" style="font-size:.6rem">Nos casamos</p>
+      <p class="names">Karina &amp; Guillermo</p>
+      <svg class="ill"><use href="#heart"/></svg>
+      <p class="d">19 · 12 · 2026</p>
+    </div>
+    <div class="env-front"></div>
+    <div class="env-flap"></div>
+    <button class="seal" id="seal" type="button" aria-label="Abrir invitación">K<span style="font-size:.55em;margin:0 1px">&amp;</span>G</button>
+  </div>
+  <p class="intro-hint">Toca el sello para abrir</p>
+</div>
+
+<div class="float-hearts" id="hearts" aria-hidden="true"></div>
+
+<nav aria-label="Principal">
+  <a class="mono" href="#inicio">K &amp; G</a>
+  <ul>
+    <li><a href="#invitacion">Invitación</a></li>
+    <li><a href="#cuando">Cuándo y dónde</a></li>
+    <li><a href="#fotos">Fotos</a></li>
+    <li><a href="#vestimenta">Vestimenta</a></li>
+  </ul>
+</nav>
+
+<header class="hero" id="inicio">
+  <div class="frame">
+    <svg class="ill corner tl" aria-hidden="true"><use href="#floral-corner"/></svg>
+    <svg class="ill corner br" aria-hidden="true"><use href="#floral-corner"/></svg>
+    <p class="eyebrow">Nos casamos</p>
+    <h1>Karina <span class="amp">&amp;</span> Guillermo</h1>
+    <div class="divider" aria-hidden="true"><svg class="ill"><use href="#heart"/></svg></div>
+    <p class="date">Sábado · 19 · Diciembre · 2026</p>
+    <a class="btn" href="#cuando">Ver detalles</a>
+  </div>
+  <div class="hero-photo">
+    <img src="img/WhatsApp%20Image%202026-09-27%20at%202.27.12.jpeg" alt="Karina y Guillermo abrazados al atardecer" fetchpriority="high">
+  </div>
+</header>
+
+<main>
+
+<section id="invitacion" class="intro">
+  <div class="narrow center reveal">
+    <svg class="ill" style="width:120px;height:40px;margin:0 auto 20px" aria-hidden="true"><use href="#garland"/></svg>
+    <p>Por mucho tiempo soñamos con este momento, y hoy decidimos dar el paso más importante de nuestras vidas: unir nuestros caminos y recibir la bendición de Dios para siempre.</p>
+    <p>Lo que un día comenzó con una mirada, hoy se convierte en una vida juntos y en el comienzo de nuestra propia historia.</p>
+    <p>Con el corazón lleno de amor y gratitud, tenemos la dicha de compartir con ustedes la fecha en que celebraremos este momento tan importante para nuestras vidas.</p>
+    <p class="gloria">Para la gloria de Dios</p>
+  </div>
+</section>
+
+<div class="band" style="--img:url('img/hero_upscaled.jpg');--pos:center 30%;--bot:var(--tc-06)" role="img" aria-label="Karina y Guillermo abrazados con un ramo de rosas">
+  <div class="band-img"></div>
+  <svg class="torn top" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true"><path/></svg>
+  <svg class="torn bot" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true"><path/></svg>
+</div>
+
+<section class="quote" style="padding-top:80px;padding-bottom:80px">
+  <div class="narrow center reveal">
+    <p class="eyebrow">Con la bendición de Dios y de nuestros padres</p>
+    <div class="divider" aria-hidden="true"><svg class="ill"><use href="#heart"/></svg></div>
+    <div class="parents">
+      <div>
+        <h3>Padres de la novia</h3>
+        <p>Damián Carriel Arias<br>Juana Porro Cedeño</p>
+      </div>
+      <div>
+        <h3>Padres del novio</h3>
+        <p>Juana Emperatriz Luna Plaza<br>Guillermo José Pacheco Díaz</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cuando">
+  <div class="wrap center reveal">
+    <p class="eyebrow">Guarda la fecha</p>
+    <h2 class="title">Cuándo y dónde</h2>
+    <div class="divider" aria-hidden="true"><svg class="ill"><use href="#rings"/></svg></div>
+    <div class="cards">
+      <article class="card">
+        <svg class="ill" aria-hidden="true"><use href="#calendar"/></svg>
+        <h3>Fecha</h3>
+        <p class="when">19 de diciembre</p>
+        <p>Sábado · 2026</p>
+        <div class="spacer"></div>
+        <a class="btn ghost" id="add-cal" href="#" download="boda-karina-guillermo.ics">Agendar</a>
+      </article>
+      <article class="card">
+        <svg class="ill" aria-hidden="true"><use href="#church"/></svg>
+        <h3>Ceremonia</h3>
+        <p class="when">5:00 pm</p>
+        <p>Iglesia Católica San Alberto Magno<br>Sector La Joya</p>
+        <div class="spacer"></div>
+        <a class="btn" href="https://maps.app.goo.gl/xE6HfJ8jiwQL23tq8?g_st=iwb" target="_blank" rel="noopener">Cómo llegar</a>
+      </article>
+      <article class="card">
+        <svg class="ill" aria-hidden="true"><use href="#cheers"/></svg>
+        <h3>Recepción</h3>
+        <p class="when">7:00 pm</p>
+        <p>Alta Ría Eventos</p>
+        <div class="spacer"></div>
+        <a class="btn" href="https://maps.app.goo.gl/KuWgkAvbLbSDoR2q9?g_st=iwb" target="_blank" rel="noopener">Cómo llegar</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="band" style="--img:url('img/3_upscaled.jpg');--pos:center 40%;--bot:var(--tc)" role="img" aria-label="Karina y Guillermo sonriendo al atardecer">
+  <div class="band-img"></div>
+  <svg class="torn top" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true"><path/></svg>
+  <svg class="torn bot" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true"><path/></svg>
+</div>
+
+<section id="historia" class="story">
+  <div class="wrap reveal">
+    <div class="center">
+      <p class="eyebrow">Nuestra historia</p>
+      <h2 class="title">Ella &amp; Él</h2>
+      <div class="divider" aria-hidden="true"><svg class="ill"><use href="#heart"/></svg></div>
+    </div>
+    <div class="duo">
+      <div class="person">
+        <div class="ph"><svg class="ill" aria-hidden="true"><use href="#dress"/></svg></div>
+        <h3 class="script">Karina</h3>
+        <p>Cuando estoy con Guillermo siento que todo encaja. Es mi lugar tranquilo, mi risa de todos los días y la persona con la que quiero seguir escribiendo esta historia.</p>
+      </div>
+      <div class="person">
+        <div class="ph"><svg class="ill" aria-hidden="true"><use href="#suit"/></svg></div>
+        <h3 class="script">Guillermo</h3>
+        <p>Karina es mi ancla y mi aventura al mismo tiempo. Con ella todo vale la pena, y no hay nada que quiera más que caminar a su lado, hoy y siempre.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fotos">
+  <div class="wrap center reveal">
+    <p class="eyebrow">Nosotros</p>
+    <h2 class="title script">Qué suerte tenerte</h2>
+    <div class="divider" aria-hidden="true"><svg class="ill"><use href="#heart"/></svg></div>
+    <div class="gallery">
+      <figure><img src="img/3.jpeg" alt="Karina y Guillermo sonriendo al atardecer" loading="lazy"></figure>
+      <figure><img src="img/4.jpeg" alt="Karina y Guillermo frente con frente" loading="lazy"></figure>
+      <figure><img src="img/7.jpeg" alt="Guillermo abraza a Karina con el sol de fondo" loading="lazy"></figure>
+      <figure><img src="img/6.jpeg" alt="Karina y Guillermo abrazados con ramo de rosas" loading="lazy"></figure>
+      <figure><img src="img/WhatsApp%20Image%202026-09-27%20at%202.27.12%20PM.jpeg" alt="Karina y Guillermo mirándose" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+
+<div class="band" style="--img:url('img/7_upscaled.jpg');--pos:center 45%;--bot:var(--tc-06)" role="img" aria-label="Guillermo abraza a Karina con el sol de fondo">
+  <div class="band-img"></div>
+  <svg class="torn top" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true"><path/></svg>
+  <svg class="torn bot" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true"><path/></svg>
+</div>
+
+<section class="quote">
+  <div class="wrap center reveal">
+    <p class="eyebrow">Falta muy poco</p>
+    <h2 class="title script">Cuenta regresiva</h2>
+    <div class="count" aria-live="off">
+      <div><b id="d">00</b><small>Días</small></div>
+      <div><b id="h">00</b><small>Horas</small></div>
+      <div><b id="m">00</b><small>Minutos</small></div>
+      <div><b id="s">00</b><small>Segundos</small></div>
+    </div>
+  </div>
+</section>
+
+<section id="vestimenta">
+  <div class="wrap center reveal">
+    <p class="eyebrow">Código de vestimenta</p>
+    <h2 class="title">Formal</h2>
+    <div class="divider" aria-hidden="true"><svg class="ill"><use href="#heart"/></svg></div>
+    <div class="attire">
+      <figure>
+        <svg class="ill" aria-hidden="true"><use href="#dress"/></svg>
+        <figcaption><h3>Ellas</h3><p>Vestido largo o midi.</p></figcaption>
+      </figure>
+      <figure>
+        <svg class="ill" aria-hidden="true"><use href="#suit"/></svg>
+        <figcaption><h3>Ellos</h3><p>Traje o camisa formal.</p></figcaption>
+      </figure>
+    </div>
+    <figure class="avoid">
+      <img src="img/tonos.jpeg" alt="Tonos a evitar el día de la boda: blanco, terracota, naranja y beige" loading="lazy">
+      <figcaption>Con cariño te pedimos evitar estos tonos.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section style="padding-top:20px">
+  <div class="center reveal">
+    <p class="note">Con mucho cariño, esperamos compartir con ustedes una noche inolvidable en una celebración para adultos. Su compañía hará este día aún más especial.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <svg class="ill" aria-hidden="true"><use href="#garland"/></svg>
+  <p class="script">Karina &amp; Guillermo</p>
+  <p class="eyebrow">¡Los esperamos! · 19.12.2026</p>
+</footer>
+
+<audio id="song" src="musica/que-suerte-tenerte.mp3" loop preload="none"></audio>
+<button class="music" id="music" type="button" aria-pressed="false" aria-label="Reproducir canción: Qué suerte tenerte">
+  <span class="disc"><svg id="music-icon"><use href="#play"/></svg></span>
+  <span>Qué suerte tenerte</span>
+</button>
+
+<script>
+  // Cuenta regresiva hasta la ceremonia
+  const target = new Date('2026-12-19T17:00:00');
+  const pad = n => String(n).padStart(2,'0');
+  const el = id => document.getElementById(id);
+  function tick(){
+    let t = Math.max(0, target - new Date());
+    const d = Math.floor(t/864e5); t%=864e5;
+    const h = Math.floor(t/36e5);  t%=36e5;
+    const m = Math.floor(t/6e4);   t%=6e4;
+    el('d').textContent = pad(d); el('h').textContent = pad(h);
+    el('m').textContent = pad(m); el('s').textContent = pad(Math.floor(t/1e3));
+  }
+  tick(); setInterval(tick,1000);
+
+  // Música: los navegadores bloquean el autoplay, así que arranca al tocar el sello del sobre (o con el botón)
+  const song = el('song'), btn = el('music'), icon = el('music-icon');
+  function setPlaying(on){
+    btn.classList.toggle('playing', on);
+    btn.setAttribute('aria-pressed', on);
+    icon.innerHTML = `<use href="#${on ? 'pause' : 'play'}"/>`;
+  }
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    song.paused ? song.play().then(() => setPlaying(true)).catch(()=>{}) : (song.pause(), setPlaying(false));
+  });
+
+  // Apertura del sobre: sello → solapa → carta sube → se agranda y aparece la página
+  const intro = el('intro'), seal = el('seal');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+  seal.addEventListener('click', async e => {
+    e.stopPropagation();
+    seal.disabled = true;
+    song.play().then(() => setPlaying(true)).catch(()=>{});
+    intro.classList.add('s1');                 // el sello se desvanece
+    await wait(350);  intro.classList.add('s2'); // se abre la solapa
+    await wait(450);  intro.classList.add('s3'); // la solapa pasa detrás de la carta
+    await wait(450);  intro.classList.add('s4'); // la carta sube
+    const env = intro.querySelector('.env');
+    for (let i = 0; i < 16; i++) {             // corazoncitos que saltan
+      const a = Math.random() * Math.PI * 2, r = 120 + Math.random() * 160;
+      env.insertAdjacentHTML('beforeend',
+        `<svg class="ill burst" style="--x:${Math.cos(a)*r}px;--y:${Math.sin(a)*r - 80}px;--r:${Math.random()*90-45}deg;animation-delay:${Math.random()*.3}s"><use href="#heart"/></svg>`);
+    }
+    await wait(1400); intro.classList.add('s5'); // la carta se acerca
+    await wait(500);  intro.classList.add('gone'); document.body.classList.remove('locked');
+    await wait(1200); intro.remove();
+  });
+
+  // Archivo de calendario (.ics) para "Agendar"
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//KyG//Boda//ES','BEGIN:VEVENT',
+    'UID:boda-karina-guillermo-20261219','DTSTAMP:20260927T000000Z',
+    'DTSTART:20261219T170000','DTEND:20261220T010000',
+    'SUMMARY:Boda de Karina & Guillermo',
+    'LOCATION:Iglesia Católica San Alberto Magno (sector La Joya)',
+    'DESCRIPTION:Ceremonia 5:00 pm · Recepción 7:00 pm en Alta Ría Eventos',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  el('add-cal').href = URL.createObjectURL(new Blob([ics], {type:'text/calendar'}));
+
+  // Bordes de papel rasgado: cada borde es irregular y distinto (curvas suaves entre puntos aleatorios)
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  document.querySelectorAll('.torn path').forEach(p => {
+    let x = 0, y = 30 + rnd() * 20, d = `M0 0H1200V${y.toFixed(1)}`;
+    const pts = [];
+    while (x < 1200) { x += 25 + rnd() * 55; pts.push([Math.min(x, 1200), 18 + rnd() * 50]); }
+    pts.reverse().forEach(([px, py], i) => {
+      const cx = px + 12 + rnd() * 18, cy = py + (rnd() - .5) * 30;
+      d = i === 0 ? `M0 0H1200V${py.toFixed(1)}` : d + `Q${cx.toFixed(1)} ${cy.toFixed(1)} ${px.toFixed(1)} ${py.toFixed(1)}`;
+    });
+    p.setAttribute('d', d + 'Q10 40 0 38Z');
+  });
+
+  // Corazoncitos flotando
+  const box = el('hearts');
+  for (let i=0;i<12;i++){
+    box.insertAdjacentHTML('beforeend',
+      `<svg class="ill" style="left:${Math.random()*100}%;animation-delay:-${Math.random()*16}s;animation-duration:${12+Math.random()*8}s"><use href="#heart"/></svg>`);
+  }
+
+  // Aparición suave al hacer scroll
+  const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
