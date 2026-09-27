@@ -4,9 +4,9 @@ export default function PinnedHero() {
       <div className="pinHero__stage">
         <div className="pinHero__media">
           <img
-            src="/images/pareja.jpg"
+            src="/images/hero.jpg"
             alt="Karina y Guillermo"
-            style={{ objectPosition: "center 20%" }}
+            style={{ objectPosition: "center 30%" }}
           />
           <div className="pinHero__scrim" />
         </div>

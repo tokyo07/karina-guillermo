@@ -237,6 +237,12 @@ section, header { position: relative; text-align: center; }
 .lugar .dir { font-style: italic; font-size: 15px; max-width: 280px; margin: 0 auto 18px; color: #f6dcc6; }
 .lugar.claro .dir { color: var(--terra-deep); }
 
+/* ---- galería de fotos ---- */
+.galeria { background: var(--cream); padding: 38px 26px 44px; text-align: center; }
+.galeria .titulo { margin-bottom: 18px; }
+.galeria .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 420px; margin: 0 auto; }
+.galeria .grid img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 8px; display: block; }
+
 .btn {
   display: inline-flex; align-items: center; gap: .4rem; text-decoration: none; cursor: pointer;
   background: var(--cream); color: var(--terra-deep); font-family: var(--titulo); font-size: 13.5px; letter-spacing: .08em;

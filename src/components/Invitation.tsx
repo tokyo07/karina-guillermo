@@ -163,7 +163,7 @@ export default function Invitation() {
         </Reveal>
 
         <div className="lugarFoto" role="img" aria-label="Karina y Guillermo sonriendo">
-          <img src="/images/pareja.jpg" alt="" style={{ objectPosition: "22% 30%" }} />
+          <img src="/images/mirada.jpg" alt="" style={{ objectPosition: "50% 15%" }} />
         </div>
         <section className="lugar">
           <Reveal>
@@ -204,6 +204,18 @@ export default function Invitation() {
                 <circle cx="12" cy="9" r="2.4" />
               </svg>
             </a>
+          </Reveal>
+        </section>
+
+        <div className="festones" style={{ backgroundColor: "var(--cream)" }} aria-hidden="true" />
+        <section className="galeria">
+          <Reveal>
+            <h2 className="titulo">Nuestros Momentos</h2>
+            <div className="grid">
+              <img src="/images/frentes.jpg" alt="Karina y Guillermo" />
+              <img src="/images/abrazo.jpg" alt="Karina y Guillermo" />
+              <img src="/images/pareja.jpg" alt="Karina y Guillermo" />
+            </div>
           </Reveal>
         </section>
 
@@ -301,7 +313,7 @@ export default function Invitation() {
         </section>
 
         <div className="cierre" role="img" aria-label="Karina y Guillermo al atardecer">
-          <img src="/images/pareja.jpg" alt="" style={{ objectPosition: "center 25%" }} />
+          <img src="/images/beso.jpg" alt="" style={{ objectPosition: "50% 20%" }} />
           <Reveal>
             <p className="fin">Esperamos contar con su presencia</p>
             <p className="gracias">Muchas gracias</p>
