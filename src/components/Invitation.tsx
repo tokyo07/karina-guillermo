@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Petals from "./Petals";
-import Flower3D from "./Flower3D";
 import Countdown from "./Countdown";
 import MusicPlayer from "./MusicPlayer";
 import RsvpForm from "./RsvpForm";
@@ -107,10 +106,6 @@ export default function Invitation() {
       <main className={`invite${visible ? " visible" : ""}`} inert={!visible || undefined}>
         <PinnedHero />
         <div className="festones" style={{ backgroundColor: "var(--cream)", marginTop: "-1px" }} aria-hidden="true" />
-
-        <Reveal>
-          <Flower3D />
-        </Reveal>
 
         <section className="cartas cream">
           <img className="flor a" src="/images/rosas-lazo.png" alt="" />

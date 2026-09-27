@@ -180,11 +180,6 @@ section, header { position: relative; text-align: center; }
 .reveal { opacity: 0; transform: translateY(16px); transition: opacity .5s ease var(--reveal-delay, 0s), transform .5s ease var(--reveal-delay, 0s); }
 .reveal.inView { opacity: 1; transform: none; }
 
-/* ---- flor 3D ---- */
-.flor3d { background: var(--cream); padding: .6rem 1.6rem 1.8rem; display: flex; flex-direction: column; align-items: center; }
-.flor3d canvas { width: 200px; height: 220px; display: block; touch-action: none; }
-.flor3dCaption { font-family: var(--titulo); font-size: .78rem; color: var(--terra-deep); margin-top: .1rem; text-align: center; }
-
 /* ---- cartas ---- */
 .cartas { padding: 44px 30px 8px; font-size: 17px; background: var(--cream); }
 .cartas .flor.a { top: -16px; right: -30px; transform: scaleX(-1); width: 96px; z-index: 1; }
@@ -272,14 +267,7 @@ section, header { position: relative; text-align: center; }
 .swatch i {
   width: 30px; height: 30px; border-radius: 50%; display: block; font-style: normal;
   box-shadow: 0 0 0 1px rgba(70, 41, 29, .15), 0 2px 4px rgba(70, 41, 29, .15);
-  position: relative;
 }
-.swatch i::before, .swatch i::after {
-  content: ""; position: absolute; top: 50%; left: 50%; width: 30px; height: 1px;
-  background: rgba(70, 41, 29, .45); transform-origin: center;
-}
-.swatch i::before { transform: translate(-50%, -50%) rotate(45deg); }
-.swatch i::after { transform: translate(-50%, -50%) rotate(-45deg); }
 .swatch b { font-family: var(--titulo); font-weight: 400; font-size: 9.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink); }
 .ticket { margin: 16px auto 0; max-width: 300px; border: 1px dashed var(--terra); border-radius: 6px; padding: 14px 16px; font-size: 15.5px; line-height: 1.5; background: rgba(248, 241, 229, .55); }
 .ticket b { font-weight: 600; }
