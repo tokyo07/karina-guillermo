@@ -15,7 +15,7 @@ export default function PinnedHero() {
           <h1>
             Karina <span>&amp;</span> Guillermo
           </h1>
-          <p className="cuando">sábado 11 de julio de 2026</p>
+          <p className="cuando">sábado 19 de diciembre de 2026</p>
         </div>
         <div className="pinHero__hint" aria-hidden="true">
           <span />

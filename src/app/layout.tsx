@@ -23,7 +23,7 @@ const titulo = Marcellus({
 
 export const metadata: Metadata = {
   title: "Karina & Guillermo",
-  description: "Invitación de boda de Karina & Guillermo — 11 de julio de 2026",
+  description: "Invitación de boda de Karina & Guillermo — 19 de diciembre de 2026",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

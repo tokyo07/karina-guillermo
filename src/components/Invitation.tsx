@@ -85,7 +85,7 @@ export default function Invitation() {
                 <div className="n">
                   Karina <i>&amp;</i> Guillermo
                 </div>
-                <div className="f">11 · 07 · 2026</div>
+                <div className="f">19 · 12 · 2026</div>
               </div>
               <div className="pocket" />
               <div className="flap" />
@@ -116,11 +116,19 @@ export default function Invitation() {
           <img className="flor a" src="/images/rosas-lazo.png" alt="" />
           <Reveal>
             <p className="quote">
-              &ldquo;Hay momentos que permanecen para siempre en el corazón, y el nuestro ha
-              llegado. Después de recorrer caminos que nos llevaron a encontrarnos, hemos decidido
-              unir nuestras vidas y celebrar, ante Dios y junto a quienes más amamos, el inicio de
-              nuestra nueva historia.&rdquo;
+              Por mucho tiempo soñamos con este momento, y hoy decidimos dar el paso más
+              importante de nuestras vidas: unir nuestros caminos y recibir la bendición de Dios
+              para siempre.
             </p>
+            <p className="quote">
+              Lo que un día comenzó con una mirada, hoy se convierte en una vida juntos y en el
+              comienzo de nuestra propia historia.
+            </p>
+            <p className="quote">
+              Con el corazón lleno de amor y gratitud, tenemos la dicha de compartir con ustedes
+              la fecha en que celebraremos este momento tan importante para nuestras vidas.
+            </p>
+            <p className="honor">Para la gloria de Dios.</p>
           </Reveal>
           <Reveal delay={0.1}>
             <p>
@@ -130,23 +138,22 @@ export default function Invitation() {
             </p>
             <p>
               <span className="rol">Padres de la novia</span>
-              <span className="nom">Domingo Ramos Castro</span>
-              <span className="nom">Narcisa Guevara Farias ✝</span>
+              <span className="nom">Damián Carriel Arias</span>
+              <span className="nom">Juana Porro Cedeño</span>
             </p>
             <p>
               <span className="rol">Padres del novio</span>
-              <span className="nom">Ruperto Yun Hon Moran</span>
-              <span className="nom">Diana Sacoto Hidalgo</span>
+              <span className="nom">Juana Emperatriz Luna Plaza</span>
+              <span className="nom">Guillermo José Pacheco Díaz</span>
             </p>
-            <p className="honor">Tenemos el honor de invitarte a celebrar nuestra unión en matrimonio</p>
           </Reveal>
           <Reveal delay={0.2}>
             <div className="diaSem" style={{ marginTop: "26px" }}>
               sábado
             </div>
             <div className="diaGrande">
-              <span className="mes">julio</span>
-              <span className="num">11</span>
+              <span className="mes">diciembre</span>
+              <span className="num">19</span>
               <span className="anio">2026</span>
             </div>
           </Reveal>
@@ -157,7 +164,7 @@ export default function Invitation() {
         </Reveal>
 
         <Reveal>
-          <MusicPlayer />
+          <MusicPlayer songTitle="Qué suerte tenerte" />
         </Reveal>
 
         <div className="lugarFoto" role="img" aria-label="Karina y Guillermo sonriendo">
@@ -167,11 +174,11 @@ export default function Invitation() {
           <Reveal>
             <div className="hora">5:00 pm</div>
             <h2>Ceremonia</h2>
-            <p className="sitio">Iglesia San José</p>
-            <p className="dir">Quevedo, Ecuador</p>
+            <p className="sitio">Iglesia Católica San Alberto Magno</p>
+            <p className="dir">Sector La Joya</p>
             <a
               className="btn"
-              href="https://www.google.com/maps/search/?api=1&query=Iglesia+San+Jose+Quevedo"
+              href="https://maps.app.goo.gl/xE6HfJ8jiwQL23tq8?g_st=iwb"
               target="_blank"
               rel="noopener"
             >
@@ -187,13 +194,12 @@ export default function Invitation() {
 
         <section className="lugar claro">
           <Reveal>
-            <div className="hora">6:00 pm</div>
+            <div className="hora">7:00 pm</div>
             <h2>Recepción</h2>
-            <p className="sitio">San Camilo</p>
-            <p className="dir">El patio de las Hadas</p>
+            <p className="sitio">Altaría Eventos</p>
             <a
               className="btn oscuro"
-              href="https://www.google.com/maps/search/?api=1&query=San+Camilo+El+Patio+de+las+Hadas"
+              href="https://maps.app.goo.gl/KuWgkAvbLbSDoR2q9?g_st=iwb"
               target="_blank"
               rel="noopener"
             >
@@ -210,8 +216,8 @@ export default function Invitation() {
         <section className="arena">
           <img className="florArena" src="/images/azaleas.png" alt="" aria-hidden="true" />
           <Reveal>
-            <div className="bloque">
-              <h2 className="titulo">No Niños</h2>
+            <div className="bloque bloque--sutil">
+              <h2 className="titulo titulo--sutil">No Niños</h2>
               <p>
                 Con mucho cariño, esperamos compartir con ustedes una noche inolvidable en una
                 celebración para adultos. Su compañía hará este día aún más especial.
@@ -242,13 +248,25 @@ export default function Invitation() {
         <section className="arena p2">
           <Reveal>
             <div className="bloque">
-              <h2 className="titulo">Evitar</h2>
-              <p>Con cariño, les pedimos no vestir de blanco y de los tonos de nuestra paleta de boda.</p>
+              <h2 className="titulo">Tonos a evitar</h2>
+              <p>Con cariño, les pedimos no vestir de blanco ni de los tonos de nuestra paleta de boda el día de la ceremonia.</p>
               <div className="swatches">
-                <span style={{ background: "#a7c0dc" }} />
-                <span style={{ background: "#fff" }} />
-                <span style={{ background: "#efe6d3" }} />
-                <span style={{ background: "#a33f37" }} />
+                <span className="swatch">
+                  <i style={{ background: "#ffffff", border: "1px solid #e2ddcf" }} />
+                  <b>Blanco</b>
+                </span>
+                <span className="swatch">
+                  <i style={{ background: "#a94b24" }} />
+                  <b>Terracota</b>
+                </span>
+                <span className="swatch">
+                  <i style={{ background: "#d97a2e" }} />
+                  <b>Naranja</b>
+                </span>
+                <span className="swatch">
+                  <i style={{ background: "#d3bfa0" }} />
+                  <b>Beige</b>
+                </span>
               </div>
               <p style={{ fontStyle: "italic", color: "var(--terra-deep)", fontSize: "15px" }}>
                 ¡Gracias por ser parte de nuestro gran día!
@@ -283,7 +301,7 @@ export default function Invitation() {
                 Confirmar por WhatsApp
               </a>
             </div>
-            <p className="deadline">Hasta el 1 de julio</p>
+            <p className="deadline">Hasta el 5 de diciembre</p>
           </Reveal>
         </section>
 

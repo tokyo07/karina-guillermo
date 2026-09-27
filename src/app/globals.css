@@ -226,6 +226,8 @@ section, header { position: relative; text-align: center; }
 .playerBar { max-width: 270px; margin: 0 auto; height: 4px; border-radius: 99px; background: var(--sand); position: relative; cursor: pointer; }
 .playerBar span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--terra); width: 0%; }
 .playerBarDot { position: absolute; left: 0%; top: 50%; width: 9px; height: 9px; border-radius: 50%; background: var(--terra-deep); transform: translate(-50%, -50%); }
+.playerFallback { font-size: 12px; color: var(--terra-deep); opacity: .75; margin-top: 12px; }
+.playerFallback a { color: var(--terra-deep); text-decoration: underline; }
 
 /* ---- lugar ---- */
 .lugarFoto { position: relative; aspect-ratio: 5 / 4; overflow: hidden; }
@@ -259,11 +261,26 @@ section, header { position: relative; text-align: center; }
 .bloque:last-child { margin-bottom: 0; }
 .bloque p { font-size: 16px; max-width: 300px; margin: 8px auto 0; }
 .bloque .sub { font-style: italic; color: var(--terra-deep); font-size: 19px; }
+.bloque--sutil { margin-bottom: 22px; }
+.bloque--sutil p { font-size: 13.5px; max-width: 260px; color: var(--ink); opacity: .85; line-height: 1.6; }
+.titulo--sutil { font-size: 12px; letter-spacing: .1em; color: var(--terra-deep); margin-bottom: 2px; }
 .titulo { font-family: var(--titulo); font-weight: 400; letter-spacing: .14em; font-size: 16px; text-align: center; }
 .trajes { display: flex; justify-content: center; gap: 10px; margin: 10px 0 2px; }
 .trajes svg { width: 58px; height: 100px; }
-.swatches { display: flex; justify-content: center; gap: .7rem; margin: .9rem 0 .3rem; }
-.swatches span { width: 30px; height: 30px; border-radius: 50%; display: block; box-shadow: 0 0 0 1px rgba(70, 41, 29, .15); }
+.swatches { display: flex; justify-content: center; gap: 1rem; margin: .9rem 0 .3rem; }
+.swatch { display: flex; flex-direction: column; align-items: center; gap: .35rem; }
+.swatch i {
+  width: 30px; height: 30px; border-radius: 50%; display: block; font-style: normal;
+  box-shadow: 0 0 0 1px rgba(70, 41, 29, .15), 0 2px 4px rgba(70, 41, 29, .15);
+  position: relative;
+}
+.swatch i::before, .swatch i::after {
+  content: ""; position: absolute; top: 50%; left: 50%; width: 30px; height: 1px;
+  background: rgba(70, 41, 29, .45); transform-origin: center;
+}
+.swatch i::before { transform: translate(-50%, -50%) rotate(45deg); }
+.swatch i::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.swatch b { font-family: var(--titulo); font-weight: 400; font-size: 9.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink); }
 .ticket { margin: 16px auto 0; max-width: 300px; border: 1px dashed var(--terra); border-radius: 6px; padding: 14px 16px; font-size: 15.5px; line-height: 1.5; background: rgba(248, 241, 229, .55); }
 .ticket b { font-weight: 600; }
 

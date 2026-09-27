@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const EVENTO = new Date("2026-07-11T17:00:00-05:00").getTime();
+const EVENTO = new Date("2026-12-19T17:00:00-05:00").getTime();
 
 function dos(n: number) {
   return (n < 10 ? "0" : "") + n;

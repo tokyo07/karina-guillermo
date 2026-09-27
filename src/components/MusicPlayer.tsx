@@ -4,9 +4,10 @@ import { useRef, useState } from "react";
 
 type Props = {
   src?: string;
+  songTitle?: string;
 };
 
-export default function MusicPlayer({ src }: Props) {
+export default function MusicPlayer({ src, songTitle }: Props) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -35,9 +36,19 @@ export default function MusicPlayer({ src }: Props) {
   return (
     <section className="playerSection">
       <p className="cue">
-        Clic en el reproductor para escuchar
-        <br />
-        nuestra canción
+        {songTitle ? (
+          <>
+            Clic en el reproductor para escuchar
+            <br />
+            &ldquo;{songTitle}&rdquo;
+          </>
+        ) : (
+          <>
+            Clic en el reproductor para escuchar
+            <br />
+            nuestra canción
+          </>
+        )}
       </p>
       <audio
         ref={audioRef}
@@ -105,6 +116,19 @@ export default function MusicPlayer({ src }: Props) {
           <i className="playerBarDot" style={{ left: `${progress}%` }} />
         </div>
       </div>
+
+      {!src && songTitle && (
+        <p className="playerFallback">
+          Todavía no tiene audio cargado —{" "}
+          <a
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(songTitle)}`}
+            target="_blank"
+            rel="noopener"
+          >
+            buscarla en YouTube
+          </a>
+        </p>
+      )}
     </section>
   );
 }
