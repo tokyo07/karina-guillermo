@@ -1,6 +1,6 @@
 :root {
-  --terra: #a94b24;
-  --terra-deep: #7d3419;
+  --terra: #a86142;
+  --terra-deep: #78462f;
   --clay: #cf7a4c;
   --sand: #ecdcc6;
   --kraft: #d6bb93;
@@ -197,7 +197,7 @@ section, header { position: relative; text-align: center; }
 .cuenta { padding: 30px 24px 12px; background: var(--cream); }
 .cuenta h2 { font-family: var(--titulo); font-weight: 400; letter-spacing: .14em; font-size: 15px; margin-bottom: 12px; }
 .contador { display: flex; justify-content: center; gap: 9px; font-variant-numeric: tabular-nums; }
-.contador div { width: 64px; padding: 10px 0 7px; border: 1px solid var(--terra); border-radius: 34px 34px 6px 6px; background: rgba(169, 75, 36, .06); }
+.contador div { width: 64px; padding: 10px 0 7px; border: 1px solid var(--terra); border-radius: 34px 34px 6px 6px; background: rgba(168, 97, 66, .08); }
 .contador strong { display: block; font-size: 30px; line-height: 1.1; font-weight: 500; color: var(--terra); }
 .contador small { font-size: 13px; }
 

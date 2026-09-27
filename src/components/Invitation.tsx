@@ -159,7 +159,7 @@ export default function Invitation() {
         </Reveal>
 
         <Reveal>
-          <MusicPlayer songTitle="Qué suerte tenerte" />
+          <MusicPlayer src="/audio/que-suerte-tenerte.mp3" songTitle="Qué suerte tenerte" />
         </Reveal>
 
         <div className="lugarFoto" role="img" aria-label="Karina y Guillermo sonriendo">
