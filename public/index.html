@@ -640,7 +640,8 @@
 
       await fetch('https://formspree.io/f/mdekpjkr', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: { 'Accept': 'application/json' }
       });
 
       // Mostrar éxito después de enviar
