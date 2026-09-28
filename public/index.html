@@ -157,6 +157,8 @@
   .intro-screen .ic.br{bottom:-20px;right:-20px;transform:rotate(180deg)}
   .intro-top{text-align:center}
   .intro-top .script{font-size:clamp(2.2rem,7vw,3rem);line-height:1}
+  .guest-name{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.2rem,4vw,1.6rem);margin-top:8px}
+  .guest-name-letter{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.9rem;margin-top:10px;opacity:.85}
   .intro-hint{font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;animation:breathe 2.4s ease-in-out infinite}
   @keyframes breathe{50%{opacity:.35}}
 
@@ -298,6 +300,7 @@
   <svg class="ill ic br" aria-hidden="true"><use href="#floral-corner"/></svg>
   <div class="intro-top">
     <p class="eyebrow">Tienes una invitación</p>
+    <p class="guest-name" id="guest-name" style="display:none"></p>
   </div>
   <div class="env">
     <div class="env-back"></div>
@@ -306,6 +309,7 @@
       <p class="names">Karina &amp; Guillermo</p>
       <svg class="ill"><use href="#heart"/></svg>
       <p class="d">19 · 12 · 2026</p>
+      <p class="guest-name-letter" id="guest-name-letter" style="display:none"></p>
     </div>
     <div class="env-front"></div>
     <div class="env-flap"></div>
@@ -541,10 +545,26 @@
 </button>
 
 <script>
-  // Cuenta regresiva hasta la ceremonia
-  const target = new Date('2026-12-19T17:00:00');
   const pad = n => String(n).padStart(2,'0');
   const el = id => document.getElementById(id);
+
+  // Invitación personalizada: ?invitado=Nombre en la URL muestra el nombre en el sobre
+  const params = new URLSearchParams(location.search);
+  const invitado = params.get('invitado');
+  if (invitado) {
+    const nombre = decodeURIComponent(invitado.replace(/\+/g, ' '));
+    const gn = el('guest-name'), gnl = el('guest-name-letter');
+    gn.textContent = 'Para: ' + nombre;
+    gn.style.display = 'block';
+    gnl.textContent = 'Querid@ ' + nombre;
+    gnl.style.display = 'block';
+    // Pre-llena el nombre en el formulario RSVP
+    const nombreInput = document.querySelector('#rsvp-form input[type="text"]');
+    if (nombreInput) nombreInput.value = nombre;
+  }
+
+  // Cuenta regresiva hasta la ceremonia
+  const target = new Date('2026-12-19T17:00:00');
   function tick(){
     let t = Math.max(0, target - new Date());
     const d = Math.floor(t/864e5); t%=864e5;
