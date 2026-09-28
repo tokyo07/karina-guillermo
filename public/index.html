@@ -625,32 +625,40 @@
   const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), {threshold:.12});
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // RSVP conectado a Formspree
+  // RSVP conectado a Google Sheets (Apps Script) + copia a Formspree por email
   document.getElementById('rsvp-form').addEventListener('submit', async e => {
     e.preventDefault();
     const form = e.target;
+
+    const inputs = form.querySelectorAll('input[type="text"], input[type="number"]');
+    const nombre = inputs[0]?.value || '';
+    const asiste = form.querySelector('input[name="asiste"]:checked')?.value || 'Sí';
+    const acompanantes = inputs[1]?.value || '0';
+    const mensaje = form.querySelector('textarea')?.value || '';
+
+    // Google Sheets vía Apps Script: 'no-cors' evita el bloqueo del navegador.
+    // No podemos leer la respuesta, pero el dato sí llega a la hoja.
+    fetch('https://script.google.com/macros/s/AKfycbyXikOB2fze3_3qDxFXBNim-kvHIZNgobu-3bo3-P5qtoDz7cqd0VZ9XL971Bg1Ik7efQ/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ nombre, asiste, acompanantes, mensaje })
+    }).catch(err => console.error('Sheets error:', err));
+
+    // Formspree: además notifica por email
     const formData = new FormData(form);
+    formData.set('nombre', nombre);
+    formData.set('asiste', asiste);
+    formData.set('acompanantes', acompanantes);
+    formData.set('mensaje', mensaje);
+    fetch('https://formspree.io/f/mdekpjkr', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    }).catch(err => console.error('Formspree error:', err));
 
-    try {
-      const inputs = form.querySelectorAll('input[type="text"], input[type="number"]');
-      formData.set('nombre', inputs[0]?.value || '');
-      formData.set('asiste', form.querySelector('input[name="asiste"]:checked')?.value || 'Sí');
-      formData.set('acompanantes', inputs[1]?.value || '0');
-      formData.set('mensaje', form.querySelector('textarea')?.value || '');
-
-      await fetch('https://formspree.io/f/mdekpjkr', {
-        method: 'POST',
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-      });
-
-      // Mostrar éxito después de enviar
-      form.style.display = 'none';
-      document.getElementById('thanks').style.display = 'block';
-
-    } catch (err) {
-      console.error('Error:', err);
-    }
+    form.style.display = 'none';
+    document.getElementById('thanks').style.display = 'block';
   });
 </script>
 </body>
