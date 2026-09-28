@@ -638,20 +638,17 @@
       formData.set('acompanantes', inputs[1]?.value || '0');
       formData.set('mensaje', form.querySelector('textarea')?.value || '');
 
-      const response = await fetch('https://formspree.io/f/mdekpjkr', {
+      await fetch('https://formspree.io/f/mdekpjkr', {
         method: 'POST',
         body: formData
       });
 
-      if (response.ok) {
-        form.style.display = 'none';
-        document.getElementById('thanks').style.display = 'block';
-      } else {
-        alert('Error al enviar. Intenta de nuevo.');
-      }
+      // Mostrar éxito después de enviar
+      form.style.display = 'none';
+      document.getElementById('thanks').style.display = 'block';
+
     } catch (err) {
       console.error('Error:', err);
-      alert('Hubo un error. Intenta de nuevo.');
     }
   });
 </script>
