@@ -37,9 +37,69 @@ export type Database = {
         };
         Relationships: [];
       };
+      // Álbum (sql/album.sql). Escrito a mano siguiendo la migración;
+      // regenerar con `supabase gen types typescript` cuando esté aplicada.
+      fotos: {
+        Row: {
+          id: string;
+          public_id: string;
+          ancho: number;
+          alto: number;
+          nombre: string;
+          momento: string;
+          reto: string | null;
+          oculta: boolean;
+          creada_en: string;
+        };
+        Insert: never;
+        Update: {
+          oculta?: boolean;
+        };
+        Relationships: [];
+      };
+      novios: {
+        Row: { user_id: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      es_novio: { Args: Record<string, never>; Returns: boolean };
+      subir_foto: {
+        Args: {
+          p_public_id: string;
+          p_ancho: number;
+          p_alto: number;
+          p_nombre: string;
+          p_momento: string;
+          p_reto: string | null;
+          p_dispositivo: string;
+        };
+        Returns: string;
+      };
+      listar_fotos: {
+        Args: { p_dispositivo?: string | null };
+        Returns: {
+          id: string;
+          public_id: string;
+          ancho: number;
+          alto: number;
+          nombre: string;
+          momento: string;
+          reto: string | null;
+          oculta: boolean;
+          creada_en: string;
+          corazones: number;
+          mi_corazon: boolean;
+        }[];
+      };
+      alternar_corazon: {
+        Args: { p_foto: string; p_dispositivo: string };
+        Returns: { mi_corazon: boolean; corazones: number }[];
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

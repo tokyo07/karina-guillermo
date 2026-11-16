@@ -84,6 +84,62 @@ src/
 sql/schema.sql            # tabla `rsvps` + políticas de RLS
 ```
 
+## Qué se publica en cada ruta
+
+| Ruta | Qué es |
+|---|---|
+| `/` | **La invitación oficial**: `public/index.html` (HTML estático). `next.config.ts` la sirve en `/` y conserva `?invitado=Nombre`. Su RSVP va a Google Apps Script + Formspree. |
+| `/album` | Subir fotos (destino del QR). Acepta `?invitado=Nombre`. |
+| `/album/fotos` | Mural de todos, visor y modo proyector. |
+| `/album/novios` | Panel con login: QR, estadísticas, moderación y descarga .zip. |
+
+`src/app/(invitacion)/page.tsx` (la versión React de la invitación) queda en el
+repo pero no se publica: la regla de `next.config.ts` tiene prioridad sobre ella.
+
+## Álbum de fotos
+
+Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
+**Supabase** (quién subió, momento, corazones, ocultas, login de los novios).
+
+### Configuración (una sola vez)
+
+1. **Supabase → SQL editor**: pegar y correr [`sql/album.sql`](./sql/album.sql).
+2. **Supabase → Authentication**:
+   - Users → *Add user* con el correo de los novios (*Auto Confirm User*).
+   - Sign In / Providers → desactivar *Allow new users to sign up*.
+   - Correr en el SQL editor (con el correo real):
+     ```sql
+     insert into public.novios (user_id)
+     select id from auth.users where email = 'CORREO_DE_LOS_NOVIOS'
+     on conflict do nothing;
+     ```
+3. **Cloudinary → Settings → Upload → Upload presets → Add**:
+   - Signing mode: **Unsigned**. Nombre: `boda_album`.
+   - Asset folder: `boda`. Allowed formats: `jpg`.
+   - Incoming transformation: `c_limit,w_1600,h_1600` (tope aunque alguien
+     salte la compresión del navegador).
+   - Desactivar *Use filename* / dejar *Unique filename* activo.
+4. Variables en `.env.local` y en **Vercel → Settings → Environment Variables**:
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`.
+
+### Operación
+
+- Cerrar las subidas después de la boda:
+  `update public.album_ajustes set subidas_abiertas = false;`
+- Límite por teléfono: 60 fotos/hora (`album_ajustes.max_subidas_por_hora`).
+- Al día siguiente: descargar el .zip desde el panel **y** exportar la carpeta
+  `boda` desde Cloudinary (copia de respaldo).
+
+### Riesgos conocidos
+
+- El preset *unsigned* permite que alguien con el cloud name suba imágenes a
+  Cloudinary sin pasar por el álbum (no aparecen en el mural, pero gastan
+  cuota). Mitigación: borrar o desactivar el preset al cerrar el álbum.
+- El .zip se arma en el navegador: con cientos de fotos usar una computadora,
+  no el celular.
+- Probar antes del evento en iPhone real (fotos HEIC) y con 20+ subidas a la vez.
+
 ## Pendiente / a completar
 
 - **Número de WhatsApp real**: el botón "Confirmar por WhatsApp" en

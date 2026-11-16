@@ -1,0 +1,332 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getSupabase } from "@/lib/supabase";
+import {
+  EN_PARALELO,
+  FECHA,
+  MAX_INTENTOS,
+  MAX_NOMBRE,
+  MOMENTOS,
+  NOVIOS,
+  RETOS,
+  cloudinaryListo,
+  comprimir,
+  errorDefinitivo,
+  etiquetaMomento,
+  idDispositivo,
+  local,
+  mensajeError,
+  subirACloudinary,
+  type Momento,
+} from "@/lib/album";
+import { useToast } from "./Comun";
+
+type Item = {
+  id: string;
+  file: File;
+  miniatura: string;
+  nombre: string;
+  momento: Momento;
+  reto: string;
+  estado: "espera" | "subiendo" | "reintento" | "lista" | "error";
+  intentos: number;
+  error?: string;
+  definitivo?: boolean;
+  /** Si Cloudinary ya la recibió, no se vuelve a subir al reintentar. */
+  subida?: { publicId: string; ancho: number; alto: number };
+};
+
+const ETIQUETA: Record<Item["estado"], string> = {
+  espera: "En cola",
+  subiendo: "Subiendo",
+  reintento: "Reintentando",
+  lista: "Lista",
+  error: "",
+};
+
+const esImagen = (f: File) => f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name);
+const pausa = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+export default function SubirFotos() {
+  const [nombre, setNombre] = useState("");
+  const [momento, setMomento] = useState<Momento>("recepcion");
+  const [reto, setReto] = useState("");
+  const [toast, avisar] = useToast();
+  const [items, setItems] = useState<Item[]>([]);
+  /** Ids que ya tienen una subida corriendo (evita lanzarlas dos veces). */
+  const enCurso = useRef(new Set<string>());
+  const miniaturas = useRef(new Set<string>());
+  const inNombre = useRef<HTMLInputElement>(null);
+  const inCamara = useRef<HTMLInputElement>(null);
+  const inGaleria = useRef<HTMLInputElement>(null);
+
+  // Nombre: ?invitado=Nombre (máx. 40) o el que quedó guardado en este teléfono.
+  useEffect(() => {
+    const q = (new URLSearchParams(location.search).get("invitado") || "").trim().slice(0, MAX_NOMBRE);
+    const m = local.get("album:momento");
+    queueMicrotask(() => {
+      setNombre(q || local.get("album:nombre") || "");
+      if (MOMENTOS.some((x) => x.id === m)) setMomento(m as Momento);
+    });
+  }, []);
+
+  // Liberar las miniaturas locales al salir.
+  useEffect(() => {
+    const m = miniaturas.current;
+    return () => m.forEach((u) => URL.revokeObjectURL(u));
+  }, []);
+
+  const actualizar = useCallback(
+    (id: string, cambio: Partial<Item>) => setItems((prev) => prev.map((q) => (q.id === id ? { ...q, ...cambio } : q))),
+    []
+  );
+
+  const procesar = useCallback(
+    async (it: Item) => {
+      actualizar(it.id, { estado: "subiendo" });
+      let subida = it.subida;
+      try {
+        if (!subida) {
+          const blob = await comprimir(it.file);
+          subida = await subirACloudinary(blob);
+          actualizar(it.id, { subida }); // si falla Supabase, el reintento no vuelve a subir la imagen
+        }
+        const { error } = await getSupabase().rpc("subir_foto", {
+          p_public_id: subida.publicId,
+          p_ancho: subida.ancho,
+          p_alto: subida.alto,
+          p_nombre: it.nombre,
+          p_momento: it.momento,
+          p_reto: it.reto || null,
+          p_dispositivo: idDispositivo(),
+        });
+        // 23505 = ya estaba registrada (un intento anterior llegó pero se perdió la respuesta).
+        if (error && error.code !== "23505") throw error;
+        actualizar(it.id, { estado: "lista" });
+      } catch (e) {
+        const intentos = it.intentos + 1;
+        if (errorDefinitivo(e)) {
+          actualizar(it.id, { estado: "error", intentos, definitivo: true, error: mensajeError(e) });
+        } else if (intentos < MAX_INTENTOS) {
+          actualizar(it.id, { estado: "reintento", intentos });
+          await pausa(1500 * intentos);
+          enCurso.current.delete(it.id); // libre antes de volver a la cola
+          actualizar(it.id, { estado: "espera", subida });
+        } else {
+          actualizar(it.id, { estado: "error", intentos, error: mensajeError(e) });
+        }
+      }
+    },
+    [actualizar]
+  );
+
+  // Cola: hasta EN_PARALELO subidas a la vez; cada cambio de estado libera lugar.
+  useEffect(() => {
+    const ocupadas = items.filter((q) => q.estado === "subiendo" || q.estado === "reintento").length;
+    const libres = EN_PARALELO - Math.max(ocupadas, enCurso.current.size);
+    if (libres <= 0) return;
+    items
+      .filter((q) => q.estado === "espera" && !enCurso.current.has(q.id))
+      .slice(0, libres)
+      .forEach((it) => {
+        enCurso.current.add(it.id);
+        procesar(it).finally(() => enCurso.current.delete(it.id));
+      });
+  }, [items, procesar]);
+
+  function encolar(files: FileList | null) {
+    if (!files?.length) return;
+    const n = nombre.trim();
+    local.set("album:nombre", n);
+    const nuevos: Item[] = [...files].filter(esImagen).map((f) => ({
+      id: crypto.randomUUID(),
+      file: f,
+      miniatura: URL.createObjectURL(f),
+      nombre: n,
+      momento,
+      reto,
+      estado: "espera",
+      intentos: 0,
+    }));
+    if (!nuevos.length) return avisar("Solo se pueden subir imágenes.");
+    nuevos.forEach((q) => miniaturas.current.add(q.miniatura));
+    setItems((prev) => [...nuevos, ...prev]);
+  }
+
+  function faltaNombre() {
+    if (nombre.trim()) return false;
+    inNombre.current?.focus();
+    avisar("Escribe tu nombre para que los novios sepan quién subió cada foto.");
+    return true;
+  }
+
+  function reintentar(it: Item) {
+    if (it.definitivo) return;
+    actualizar(it.id, { intentos: 0, estado: "espera", error: undefined });
+  }
+
+  const pendientes = items.some((q) => q.estado === "espera" || q.estado === "subiendo" || q.estado === "reintento");
+  const listas = items.filter((q) => q.estado === "lista").length;
+  const configurado = cloudinaryListo();
+
+  return (
+    <section>
+      {!configurado && <div className="notice">El álbum todavía no está configurado (falta Cloudinary).</div>}
+      <div className="heroWrap">
+        <div className="festones" />
+        <div className="hero">
+          <h1>
+            <span>{NOVIOS.a}</span>
+            <i>&amp;</i>
+            <span>{NOVIOS.b}</span>
+          </h1>
+          <p className="date">{FECHA}</p>
+        </div>
+      </div>
+      <p className="lede">Cada mesa vive la fiesta distinta. Sube lo que ves tú y ayúdanos a recordarla completa.</p>
+
+      <div className="card">
+        <label className="field">
+          <span>Tu nombre</span>
+          <input
+            ref={inNombre}
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value.slice(0, MAX_NOMBRE))}
+            maxLength={MAX_NOMBRE}
+            autoComplete="given-name"
+            placeholder="Como te conocen en la fiesta"
+          />
+        </label>
+
+        <div className="field">
+          <span className="legend">¿En qué momento estás?</span>
+          <div className="chips" role="group" aria-label="Momento">
+            {MOMENTOS.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className="chip"
+                aria-pressed={momento === m.id}
+                onClick={() => {
+                  setMomento(m.id);
+                  local.set("album:momento", m.id);
+                }}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="field">
+          <span className="legend">
+            Reto para esta foto <small>(opcional)</small>
+          </span>
+          <div className="chips" role="group" aria-label="Retos">
+            {RETOS.map((r) => (
+              <button
+                key={r}
+                type="button"
+                className="chip"
+                aria-pressed={reto === r}
+                onClick={() => setReto(reto === r ? "" : r)}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="actions">
+          <button
+            className="btn"
+            type="button"
+            disabled={!configurado}
+            onClick={() => !faltaNombre() && inCamara.current?.click()}
+          >
+            Tomar foto
+          </button>
+          <button
+            className="btn ghost"
+            type="button"
+            disabled={!configurado}
+            onClick={() => !faltaNombre() && inGaleria.current?.click()}
+          >
+            Elegir de mi galería
+          </button>
+        </div>
+        <input
+          ref={inCamara}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          onChange={(e) => {
+            encolar(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <input
+          ref={inGaleria}
+          type="file"
+          accept="image/*"
+          multiple
+          hidden
+          onChange={(e) => {
+            encolar(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <p className="hint">
+          Puedes subir varias a la vez. Las comprimimos para que suban rápido aunque la señal esté floja.
+        </p>
+
+        <ul className="queue" aria-live="polite">
+          {items.slice(0, 12).map((it) => {
+            const reintentable = it.estado === "error" && !it.definitivo;
+            return (
+              <li
+                key={it.id}
+                className={`q ${it.estado === "lista" ? "done" : it.estado === "error" ? "fail" : ""}${reintentable ? " retryable" : ""}`}
+                onClick={reintentable ? () => reintentar(it) : undefined}
+              >
+                <img src={it.miniatura} alt="" />
+                <div>
+                  <div>
+                    {it.nombre} · {etiquetaMomento(it.momento)}
+                  </div>
+                  <div className="st">{it.estado === "error" ? it.error : ETIQUETA[it.estado]}</div>
+                  {(it.estado === "subiendo" || it.estado === "reintento") && <div className="bar-load" />}
+                  {reintentable && (
+                    <button
+                      type="button"
+                      className="sr-only"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        reintentar(it);
+                      }}
+                    >
+                      Reintentar
+                    </button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        {!pendientes && listas > 0 && (
+          <div className="thanks">
+            Gracias, {items[0]?.nombre}.{" "}
+            {listas === 1 ? "Tu foto ya está" : `Tus ${listas} fotos ya están`} en el álbum.{" "}
+            <Link href="/album/fotos">Ver el álbum</Link>
+          </div>
+        )}
+      </div>
+      {toast}
+    </section>
+  );
+}
