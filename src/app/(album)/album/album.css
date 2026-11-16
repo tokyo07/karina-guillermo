@@ -165,6 +165,17 @@ dialog.viewer::backdrop { background: rgba(32, 13, 6, 0.95); }
 .login { max-width: 420px; }
 .sesion { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--muted); font-size: 0.9rem; margin-bottom: 18px; }
 
+/* presentación de entrada (IntroAlbum): cubre todo, incluida la barra */
+.intro-album {
+  position: fixed; inset: 0; z-index: 60; background: var(--cream);
+  --pth-bg: var(--cream); --pth-display: var(--display); --pth-body: var(--body);
+  /* Siempre en la paleta clara, también con el sistema en modo oscuro. */
+  --text: var(--ink); --accent: var(--terra); --accent-ink: var(--cream); color-scheme: light;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.intro-album.saliendo { opacity: 0; transform: scale(1.04); pointer-events: none; }
+.intro-acciones { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
 .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 11px 18px; border-radius: 40px; font-size: 0.92rem; z-index: 100; max-width: 90vw; text-align: center; box-shadow: var(--shadow); }
 
 @media (prefers-reduced-motion: reduce) {
