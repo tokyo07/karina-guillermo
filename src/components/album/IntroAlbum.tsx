@@ -7,7 +7,8 @@ import { FECHA, NOVIOS } from "@/lib/album";
 
 // Presentación del álbum: las fotos de los novios se acercan a la pantalla y se
 // desvanecen; cuando se agotan aparecen los nombres y el botón para entrar.
-// Se muestra una vez por visita (sessionStorage), no cada vez que se vuelve a /album.
+// Es la bienvenida: se muestra en cada carga de la página (también al refrescar).
+// Al moverse dentro del álbum (Subir ↔ Álbum ↔ Novios) no se repite.
 
 const FOTOS: TunnelImage[] = [
   "/images/beso.jpg",
@@ -23,27 +24,17 @@ const FOTOS: TunnelImage[] = [
   "/images/hero.jpg",
 ].map((src) => ({ src: encodeURI(src), alt: `${NOVIOS.a} y ${NOVIOS.b}` }));
 
-const CLAVE = "album:intro-vista";
+// Vive en memoria del módulo: se reinicia al recargar la página, pero sobrevive
+// a la navegación interna de Next (que no recarga los módulos).
+let yaMostrada = false;
 
 function marcarVista() {
-  try {
-    sessionStorage.setItem(CLAVE, "1");
-  } catch {
-    /* sin almacenamiento: se volverá a mostrar, no pasa nada */
-  }
+  yaMostrada = true;
 }
 
 export default function IntroAlbum() {
-  // "mostrar" desde el servidor para que no se vea el formulario un instante antes del intro.
-  const [estado, setEstado] = useState<"mostrar" | "saliendo" | "oculto">("mostrar");
-
-  useEffect(() => {
-    let vista = false;
-    try {
-      vista = sessionStorage.getItem(CLAVE) === "1";
-    } catch {}
-    if (vista) queueMicrotask(() => setEstado("oculto"));
-  }, []);
+  // En la primera carga vale "mostrar" igual que en el servidor (sin desajuste de hidratación).
+  const [estado, setEstado] = useState<"mostrar" | "saliendo" | "oculto">(() => (yaMostrada ? "oculto" : "mostrar"));
 
   // Sin scroll de fondo mientras está la presentación.
   useEffect(() => {
@@ -68,6 +59,7 @@ export default function IntroAlbum() {
       <PerspectiveTunnelHero
         images={FOTOS}
         once
+        alwaysZoom
         skipLabel="Saltar"
         eyebrow="Álbum de la boda"
         title={

@@ -41,6 +41,11 @@ export interface PerspectiveTunnelHeroProps {
   flyMs?: number;
   /** Modo once: texto del botón para saltar la animación (sin texto, no hay botón). */
   skipLabel?: string;
+  /**
+   * Hace el zoom aunque el sistema pida "reducir movimiento" (lo activan, por ejemplo,
+   * Escritorio remoto o Windows sin efectos de animación). Úsalo solo con un botón para saltar.
+   */
+  alwaysZoom?: boolean;
   height?: string;
   className?: string;
 }
@@ -60,12 +65,11 @@ function opacityAt(t: number) {
 }
 
 function opacityOnce(t: number) {
-  // Una pasada: entra rápido y se va desvaneciendo mientras se acerca a la pantalla.
+  // Una pasada: entra rápido, crece casi hasta llenar la pantalla y se desvanece al final.
   if (t <= 0 || t >= 1) return 0;
-  if (t < 0.15) return t / 0.15;
-  if (t < 0.55) return 1;
-  if (t < 0.95) return 1 - (t - 0.55) / 0.4;
-  return 0;
+  if (t < 0.12) return t / 0.12;
+  if (t < 0.7) return 1;
+  return 1 - (t - 0.7) / 0.3;
 }
 
 function usePointerParallax(enabled: boolean) {
@@ -117,7 +121,8 @@ function TunnelCard({
   // Posición de esta foto en su recorrido: 0 = al fondo, 1 = pasó la pantalla.
   const local = (p: number) => (flyMs ? (p - card.start) / flyMs : frac(p + card.offset));
   const farZ = stage.isMobile ? -1200 : -1700;
-  const nearZ = stage.isMobile ? 350 : 500;
+  // Una pasada: llegan mucho más cerca (perspectiva 900/1200 → ~4-5x su tamaño) para el zoom.
+  const nearZ = flyMs ? (stage.isMobile ? 700 : 950) : stage.isMobile ? 350 : 500;
   const width = stage.isMobile
     ? Math.max(120, Math.min(170, stage.width * 0.36))
     : Math.max(170, Math.min(260, stage.width * 0.18));
@@ -127,7 +132,8 @@ function TunnelCard({
 
   const transform = useTransform([progress, pointer.x, pointer.y], ([p, px, py]: number[]) => {
     const t = still ? 0.55 : Math.min(1, Math.max(0, local(p)));
-    const z = farZ + (nearZ - farZ) * t;
+    // Una pasada: acelera al acercarse, como si la cámara avanzara hacia ellas.
+    const z = farZ + (nearZ - farZ) * (flyMs ? Math.pow(t, 1.6) : t);
     return `translate3d(calc(-50% + ${baseX - px * pan}px), calc(-50% + ${baseY - py * pan}px), ${z}px) rotateZ(${card.rotZ}deg)`;
   });
   const opacity = useTransform(progress, (p) => {
@@ -162,6 +168,7 @@ export default function PerspectiveTunnelHero({
   stepMs = 650,
   flyMs = 3600,
   skipLabel,
+  alwaysZoom = false,
   height = "100svh",
   className,
 }: PerspectiveTunnelHeroProps) {
@@ -193,13 +200,14 @@ export default function PerspectiveTunnelHero({
           offset: i / images.length,
           cos: Math.cos(a),
           sin: Math.sin(a),
-          rx: 0.28 + (i % 3) * 0.08,
-          ry: 0.26 + (i % 2) * 0.09,
+          // Una pasada: salen más cerca del centro y la perspectiva las abre hacia los bordes.
+          rx: (once ? 0.16 : 0.28) + (i % 3) * (once ? 0.05 : 0.08),
+          ry: (once ? 0.14 : 0.26) + (i % 2) * (once ? 0.06 : 0.09),
           rotZ: (i % 2 === 0 ? 1 : -1) * (3 + (i % 5) * 2),
           start: i * stepMs,
         };
       }),
-    [images, stepMs]
+    [images, stepMs, once]
   );
 
   // Modo once: los textos aparecen cuando la última foto ya va de salida.
@@ -220,7 +228,7 @@ export default function PerspectiveTunnelHero({
   }, []);
   // Con "reducir movimiento" (accesibilidad del sistema) sigue pasando solo,
   // pero las fotos no vuelan: aparecen y se desvanecen en su lugar, más despacio.
-  const still = Boolean(reduce);
+  const still = Boolean(reduce) && !alwaysZoom;
   useAnimationFrame((_, delta) => {
     if (!visible.current || document.hidden) return;
     const dt = Math.min(delta, 100);
