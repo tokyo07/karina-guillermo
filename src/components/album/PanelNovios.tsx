@@ -16,6 +16,7 @@ import {
   type Momento,
 } from "@/lib/album";
 import { ETIQUETA_MOTIVO, type Motivo } from "@/lib/calidad";
+import { masQueridas } from "@/lib/ranking";
 import { ZONA_HORARIA, horaCorta, siguienteCambio } from "@/lib/cronograma";
 import { useMomento } from "./Ambiente";
 import { AvisoEstado, useToast } from "./Comun";
@@ -119,6 +120,9 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
   const [toast, avisar] = useToast();
   const visibles = fotos.filter(esVisible);
   const porRevisar = fotos.filter((f) => f.revisar && !f.oculta);
+  // Ranking "Más queridas" (promedio bayesiano de corazones sobre vistas, lib/ranking.ts).
+  const queridas = masQueridas(visibles);
+  const conCorazones = queridas.filter((f) => f.corazones > 0);
 
   const invitados = new Map<string, number>();
   visibles.forEach((f) => invitados.set(f.nombre, (invitados.get(f.nombre) ?? 0) + 1));
@@ -182,6 +186,36 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
             )}
           </ol>
         </div>
+      </div>
+      <div className="panel" style={{ marginTop: 22 }}>
+        <h3>Las más queridas</h3>
+        <p>
+          Ordenadas por corazones sobre las veces que las vieron: así una foto nueva que encanta puede ganarle a una
+          vieja con más corazones. Ideales para el álbum impreso.
+        </p>
+        {conCorazones.length ? (
+          <>
+            <ol className="queridas">
+              {conCorazones.slice(0, 12).map((f, i) => (
+                <li key={f.id}>
+                  <img src={urlFoto(f.public_id, 480)} alt={`Foto de ${f.nombre}`} loading="lazy" decoding="async" />
+                  <span className="puesto">{i + 1}</span>
+                  <span className="dato">
+                    ♥ {f.corazones} · {Math.max(f.vistas, f.corazones)} {Math.max(f.vistas, f.corazones) === 1 ? "vista" : "vistas"}
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <DescargaZip
+              fotos={queridas.slice(0, 30)}
+              avisar={avisar}
+              etiqueta={`Descargar las ${Math.min(30, queridas.length)} más queridas (.zip)`}
+              archivo={`mas-queridas-${NOVIOS.a}-${NOVIOS.b}`}
+            />
+          </>
+        ) : (
+          <p className="hint">Todavía nadie ha dado corazones.</p>
+        )}
       </div>
       {porRevisar.length > 0 && (
         <div className="panel" style={{ marginTop: 22 }}>
@@ -332,7 +366,17 @@ function TarjetaQR({ avisar }: { avisar: (m: string) => void }) {
   );
 }
 
-function DescargaZip({ fotos, avisar }: { fotos: Foto[]; avisar: (m: string) => void }) {
+function DescargaZip({
+  fotos,
+  avisar,
+  etiqueta = "Descargar todo (.zip)",
+  archivo = `fotos-boda-${NOVIOS.a}-${NOVIOS.b}`,
+}: {
+  fotos: Foto[];
+  avisar: (m: string) => void;
+  etiqueta?: string;
+  archivo?: string;
+}) {
   const [estado, setEstado] = useState("");
   const [ocupado, setOcupado] = useState(false);
 
@@ -357,7 +401,7 @@ function DescargaZip({ fotos, avisar }: { fotos: Foto[]; avisar: (m: string) => 
       setEstado("Armando el archivo…");
       // Las JPEG ya están comprimidas: STORE evita gastar CPU sin ganar tamaño.
       const out = await zip.generateAsync({ type: "blob", compression: "STORE" });
-      guardarArchivo(out, `fotos-boda-${NOVIOS.a}-${NOVIOS.b}.zip`.toLowerCase());
+      guardarArchivo(out, `${archivo}.zip`.toLowerCase());
       setEstado(
         ok === fotos.length ? `Listo: ${ok} fotos.` : `Listo: ${ok} de ${fotos.length} fotos (algunas no se pudieron leer).`
       );
@@ -372,7 +416,7 @@ function DescargaZip({ fotos, avisar }: { fotos: Foto[]; avisar: (m: string) => 
   return (
     <>
       <button className="btn" type="button" onClick={descargar} disabled={ocupado}>
-        Descargar todo (.zip)
+        {etiqueta}
       </button>
       <p className="hint">{estado}</p>
     </>

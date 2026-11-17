@@ -112,12 +112,17 @@ export type Database = {
           motivo: string | null;
           creada_en: string;
           corazones: number;
+          vistas: number;
           mi_corazon: boolean;
         }[];
       };
       alternar_corazon: {
         Args: { p_foto: string; p_dispositivo: string };
         Returns: { mi_corazon: boolean; corazones: number }[];
+      };
+      registrar_vistas: {
+        Args: { p_fotos: string[]; p_dispositivo: string };
+        Returns: number;
       };
       fijar_momento: {
         Args: { p_momento: string };

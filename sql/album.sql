@@ -61,6 +61,16 @@ create table if not exists public.corazones (
   primary key (foto_id, dispositivo)
 );
 
+-- Qué teléfonos vieron cada foto (una vez por teléfono). Sirve para el ranking
+-- "Más queridas": corazones sobre vistas, así las fotos que subieron temprano
+-- (y que más gente vio) no ganan solo por llevar más tiempo en el álbum.
+create table if not exists public.vistas (
+  foto_id uuid not null references public.fotos (id) on delete cascade,
+  dispositivo uuid not null,
+  vista_en timestamptz not null default now(),
+  primary key (foto_id, dispositivo)
+);
+
 create table if not exists public.novios (
   user_id uuid primary key references auth.users (id) on delete cascade
 );
@@ -98,7 +108,7 @@ alter table public.album_ajustes add constraint album_ajustes_momento_actual_che
 -- Supabase da por defecto todos los privilegios de las tablas nuevas a anon y
 -- authenticated. Se quitan y se otorga solo lo necesario.
 
-revoke all on public.fotos, public.subidas, public.corazones, public.novios, public.album_ajustes
+revoke all on public.fotos, public.subidas, public.corazones, public.vistas, public.novios, public.album_ajustes
   from anon, authenticated;
 
 grant select on public.fotos to anon, authenticated;
@@ -108,6 +118,7 @@ grant select on public.novios to authenticated;
 alter table public.fotos enable row level security;
 alter table public.subidas enable row level security;
 alter table public.corazones enable row level security;
+alter table public.vistas enable row level security;
 alter table public.novios enable row level security;
 alter table public.album_ajustes enable row level security;
 
@@ -222,6 +233,7 @@ returns table (
   motivo text,
   creada_en timestamptz,
   corazones bigint,
+  vistas bigint,
   mi_corazon boolean
 )
 language sql
@@ -231,6 +243,7 @@ set search_path = ''
 as $$
   select f.id, f.public_id, f.ancho, f.alto, f.nombre, f.momento, f.reto, f.oculta, f.revisar, f.motivo, f.creada_en,
          (select count(*) from public.corazones c where c.foto_id = f.id),
+         (select count(*) from public.vistas v where v.foto_id = f.id),
          exists (select 1 from public.corazones c
                  where c.foto_id = f.id and c.dispositivo = p_dispositivo)
   from public.fotos f
@@ -275,6 +288,37 @@ grant execute on function public.es_novio() to anon, authenticated;
 grant execute on function public.subir_foto(text, integer, integer, text, text, text, uuid, text, jsonb) to anon, authenticated;
 grant execute on function public.listar_fotos(uuid) to anon, authenticated;
 grant execute on function public.alternar_corazon(uuid, uuid) to anon, authenticated;
+
+-- Registra que este teléfono vio estas fotos (una vista por foto y teléfono).
+-- Llega en tandas desde el álbum; ignora ids repetidos, inexistentes u ocultos.
+create or replace function public.registrar_vistas(p_fotos uuid[], p_dispositivo uuid)
+returns integer
+language plpgsql
+volatile
+security definer
+set search_path = ''
+as $$
+declare
+  v_n integer;
+begin
+  if p_dispositivo is null or p_fotos is null then
+    return 0;
+  end if;
+  if cardinality(p_fotos) > 200 then
+    raise exception 'demasiadas_vistas' using errcode = '22023';
+  end if;
+  insert into public.vistas (foto_id, dispositivo)
+  select f.id, p_dispositivo
+  from public.fotos f
+  where f.id = any (p_fotos) and f.oculta = false and f.revisar = false
+  on conflict do nothing;
+  get diagnostics v_n = row_count;
+  return v_n;
+end;
+$$;
+
+revoke all on function public.registrar_vistas(uuid[], uuid) from public;
+grant execute on function public.registrar_vistas(uuid[], uuid) to anon, authenticated;
 
 -- Cambia el momento de toda la boda. Solo novios (y moderadores en `novios`).
 create or replace function public.fijar_momento(p_momento text)

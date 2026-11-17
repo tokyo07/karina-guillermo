@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import JournalSpreadCarousel, {
   type JournalAction,
   type JournalSpread,
 } from "@/components/ui/journal-spread-carousel";
-import { NOVIOS, etiquetaMomento, urlFoto, type Foto } from "@/lib/album";
+import { NOVIOS, etiquetaMomento, marcarVistas, urlFoto, type Foto } from "@/lib/album";
 
 // El álbum de los invitados como diario: una portada con los novios y luego una
 // página por cada 3 fotos (una de fondo y dos polaroids, con una nota de quién la subió).
@@ -14,12 +14,14 @@ import { NOVIOS, etiquetaMomento, urlFoto, type Foto } from "@/lib/album";
 const PORTADA = encodeURI("/images/hero.jpg");
 const POR_PAGINA = 3;
 
-type Pagina = { spread: JournalSpread; fondo: number | null };
+/** `ids`: fotos que se ven en la página (para contar vistas). */
+type Pagina = { spread: JournalSpread; fondo: number | null; ids: string[] };
 
 function armarPaginas(fotos: Foto[]): Pagina[] {
   const n = fotos.length;
   const portada: Pagina = {
     fondo: n ? 0 : null,
+    ids: fotos.slice(0, 2).map((f) => f.id),
     spread: {
       id: "portada",
       label: "Portada",
@@ -53,6 +55,7 @@ function armarPaginas(fotos: Foto[]): Pagina[] {
     if (p2) prints.push({ src: urlFoto(p2.public_id, 480), x: par ? 74 : 72, y: par ? 52 : 8, w: 19, rotate: par ? -4 : 6, tape: true, caption: p2.nombre });
     paginas.push({
       fondo: i,
+      ids: [bg, p1, p2].filter(Boolean).map((f) => f.id),
       spread: {
         id: bg.id,
         label: `Foto de ${bg.nombre}`,
@@ -89,6 +92,11 @@ export default function DiarioAlbum({
 }) {
   const router = useRouter();
   const paginas = useMemo(() => armarPaginas(fotos), [fotos]);
+  // La portada se ve al abrir; las demás páginas, cuando el invitado llega a ellas.
+  const idsPortada = paginas[0]?.ids.join(",") ?? "";
+  useEffect(() => {
+    if (idsPortada) marcarVistas(idsPortada.split(","));
+  }, [idsPortada]);
 
   async function accion(a: JournalAction, i: number) {
     if (a === "add") return router.push("/album");
@@ -120,6 +128,7 @@ export default function DiarioAlbum({
         actions={["add", "more", "share"]}
         actionLabels={{ add: "Subir una foto", more: "Ver foto en grande", share: "Compartir el álbum" }}
         onAction={accion}
+        onIndexChange={(i) => marcarVistas(paginas[i]?.ids ?? [])}
         onGridView={onMural}
         showTools={false}
       />

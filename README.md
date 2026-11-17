@@ -140,6 +140,12 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
   mariachis y pastel, parranda vallenata, hora loca de cierre…) sus retos
   aparecen primero al subir. Para probarlo en desarrollo: `/album?hora=2026-12-19T22:15`.
   Si `album.sql` se corrió antes, volver a correrlo completo (es idempotente).
+- **Ranking por corazones** (`src/lib/ranking.ts`): cada teléfono registra
+  qué fotos vio (una vista por foto y teléfono). "♥ Más queridas" en el álbum y
+  en el panel ordena por *promedio bayesiano* de corazones sobre vistas, así las
+  fotos que subieron temprano no ganan solo por antigüedad. La presentación de
+  bienvenida suma las 4 "más queridas ahora" (como Hacker News: los corazones
+  pesan menos con las horas). Desde el panel se descargan las 30 más queridas.
 - **Filtro de calidad:** antes de subir, el teléfono mide cada foto
   (`src/lib/calidad.ts`): borrosa o movida, casi negra, casi blanca, "lisa"
   (pared, techo, bolsillo) o casi igual a otra que ese teléfono ya subió. Una

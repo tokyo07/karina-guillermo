@@ -229,6 +229,8 @@ export type Foto = {
   motivo: string | null;
   creada_en: string;
   corazones: number;
+  /** Teléfonos que la vieron (para el ranking "Más queridas"). */
+  vistas: number;
   mi_corazon: boolean;
 };
 
@@ -265,7 +267,7 @@ export function useFotos(alLlegar?: (nuevas: Foto[]) => void) {
     try {
       const { data, error } = await getSupabase().rpc("listar_fotos", { p_dispositivo: idDispositivo() });
       if (error) throw error;
-      aplicar(((data ?? []) as Foto[]).map((f) => ({ ...f, corazones: Number(f.corazones) })));
+      aplicar(((data ?? []) as Foto[]).map((f) => ({ ...f, corazones: Number(f.corazones), vistas: Number(f.vistas ?? 0) })));
       setEstado("listo");
     } catch (e) {
       const m = e instanceof Error ? e.message : "";
@@ -286,8 +288,8 @@ export function useFotos(alLlegar?: (nuevas: Foto[]) => void) {
     const canal = sb
       .channel("album-fotos")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "fotos" }, (p) => {
-        const n = p.new as Omit<Foto, "corazones" | "mi_corazon" | "revisar" | "motivo"> & Partial<Foto>;
-        const f: Foto = { ...n, revisar: n.revisar ?? false, motivo: n.motivo ?? null, corazones: 0, mi_corazon: false };
+        const n = p.new as Omit<Foto, "corazones" | "vistas" | "mi_corazon" | "revisar" | "motivo"> & Partial<Foto>;
+        const f: Foto = { ...n, revisar: n.revisar ?? false, motivo: n.motivo ?? null, corazones: 0, vistas: 0, mi_corazon: false };
         // Las ocultas no llegan a los invitados (RLS); las por revisar solo llegan
         // a los novios, que las ven en el panel pero no como "nuevas" del álbum.
         if (f.oculta || conocidas.current?.has(f.id)) return;
@@ -332,6 +334,39 @@ export function useFotos(alLlegar?: (nuevas: Foto[]) => void) {
   );
 
   return { fotos, estado, recargar, corazon, setFotos };
+}
+
+/* ───────────── vistas (para el ranking) ───────────── */
+
+const porEnviar = new Set<string>();
+const enviadas = new Set<string>();
+let temporizador: ReturnType<typeof setTimeout> | null = null;
+
+async function enviarVistas() {
+  temporizador = null;
+  const ids = [...porEnviar].slice(0, 200);
+  if (!ids.length) return;
+  ids.forEach((id) => porEnviar.delete(id));
+  try {
+    const { error } = await getSupabase().rpc("registrar_vistas", { p_fotos: ids, p_dispositivo: idDispositivo() });
+    if (error) throw error;
+    ids.forEach((id) => enviadas.add(id));
+  } catch {
+    // Sin conexión o base sin la función todavía: se reintenta en la próxima tanda.
+    ids.forEach((id) => porEnviar.add(id));
+  }
+  if (porEnviar.size) temporizador = setTimeout(enviarVistas, 8_000);
+}
+
+/** Este teléfono vio estas fotos. Se mandan en tandas (una vista por foto y teléfono). */
+export function marcarVistas(ids: readonly string[]) {
+  let nuevas = false;
+  for (const id of ids)
+    if (id && !enviadas.has(id) && !porEnviar.has(id)) {
+      porEnviar.add(id);
+      nuevas = true;
+    }
+  if (nuevas && !temporizador) temporizador = setTimeout(enviarVistas, 4_000);
 }
 
 /* ───────────── utilidades de descarga ───────────── */

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MOMENTOS, NOVIOS, esVisible, etiquetaMomento, urlFoto, useFotos, type Foto } from "@/lib/album";
+import { MOMENTOS, NOVIOS, esVisible, etiquetaMomento, marcarVistas, urlFoto, useFotos, type Foto } from "@/lib/album";
+import { masQueridas, queridasAhora } from "@/lib/ranking";
 import { AvisoEstado, IconoCorazon, useToast } from "./Comun";
 import DiarioAlbum from "./DiarioAlbum";
 
@@ -10,6 +11,8 @@ const ROTACION_MS = 7000;
 
 export default function Album() {
   const [filtro, setFiltro] = useState<string>("todas");
+  // "Más queridas": promedio bayesiano de corazones sobre vistas (lib/ranking.ts).
+  const [orden, setOrden] = useState<"recientes" | "queridas">("recientes");
   // "Ver el álbum" abre el diario; el mural en columnas queda como vista alternativa.
   const [vista, setVista] = useState<"diario" | "mural">("diario");
   const [toast, avisar] = useToast();
@@ -32,7 +35,22 @@ export default function Album() {
     setProyector(true);
   };
 
-  const lista = fotos.filter((f) => esVisible(f) && (filtro === "todas" || f.momento === filtro));
+  const filtradas = fotos.filter((f) => esVisible(f) && (filtro === "todas" || f.momento === filtro));
+  const lista = orden === "queridas" ? masQueridas(filtradas) : filtradas;
+  const mural = useRef<HTMLDivElement>(null);
+
+  // Mural: cuenta como vista la foto que entra a la pantalla.
+  const idsMural = vista === "mural" ? lista.map((f) => f.id).join(",") : "";
+  useEffect(() => {
+    const el = mural.current;
+    if (!idsMural || !el) return;
+    const io = new IntersectionObserver(
+      (es) => marcarVistas(es.filter((e) => e.isIntersecting).map((e) => (e.target as HTMLElement).dataset.id ?? "")),
+      { threshold: 0.6 }
+    );
+    el.querySelectorAll<HTMLElement>("[data-id]").forEach((t) => io.observe(t));
+    return () => io.disconnect();
+  }, [idsMural]);
   // Una recarga fallida (señal floja en la fiesta) pone estado "error", pero las
   // fotos ya cargadas siguen sirviendo: no se esconde el diario ni el conteo.
   const hayDatos = estado === "listo" || fotos.length > 0;
@@ -66,18 +84,28 @@ export default function Album() {
         </div>
       </div>
 
-      <div className="chips" role="group" aria-label="Filtrar por momento" style={{ marginBottom: 18 }}>
-        {[{ id: "todas", label: "Todas" }, ...MOMENTOS].map((o) => (
-          <button
-            key={o.id}
-            type="button"
-            className="chip"
-            aria-pressed={filtro === o.id}
-            onClick={() => setFiltro(o.id)}
-          >
-            {o.label}
+      <div className="filtros">
+        <div className="chips" role="group" aria-label="Filtrar por momento">
+          {[{ id: "todas", label: "Todas" }, ...MOMENTOS].map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              className="chip"
+              aria-pressed={filtro === o.id}
+              onClick={() => setFiltro(o.id)}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+        <div className="chips" role="group" aria-label="Ordenar">
+          <button type="button" className="chip" aria-pressed={orden === "recientes"} onClick={() => setOrden("recientes")}>
+            Recientes
           </button>
-        ))}
+          <button type="button" className="chip" aria-pressed={orden === "queridas"} onClick={() => setOrden("queridas")}>
+            ♥ Más queridas
+          </button>
+        </div>
       </div>
 
       {vista === "diario" ? (
@@ -90,10 +118,11 @@ export default function Album() {
           />
         )
       ) : lista.length > 0 ? (
-        <div className="wall">
+        <div className="wall" ref={mural}>
           {lista.map((f, i) => (
             <figure
               key={f.id}
+              data-id={f.id}
               className={`tile${frescas.has(f.id) ? " fresh" : ""}`}
               tabIndex={0}
               role="button"
@@ -189,6 +218,10 @@ function Visor({
   const [i, setI] = useState(inicio);
   const n = lista.length;
   const f = lista[Math.min(i, n - 1)];
+  const idVisto = f?.id;
+  useEffect(() => {
+    if (idVisto) marcarVistas([idVisto]);
+  }, [idVisto]);
   const paso = useCallback((d: number) => setI((x) => (x + d + n) % n), [n]);
 
   useEffect(() => {
@@ -260,16 +293,24 @@ function Proyector({
     fotosRef.current = fotos;
   });
 
+  const idxSinVotos = useRef(0);
   const siguiente = useCallback(() => {
-    const visibles = fotosRef.current;
+    // Orden "lo más querido ahora" (lib/ranking.ts).
+    const visibles = queridasAhora(fotosRef.current, Date.now());
     const ids = new Set(visibles.map((f) => f.id));
     // Las recién llegadas pasan primero (si no las ocultaron mientras tanto).
     let p = prioridad.current.shift();
     while (p && !ids.has(p.id)) p = prioridad.current.shift();
     if (p) return setActual({ foto: p, nueva: true });
     if (!visibles.length) return setActual(null);
-    setActual({ foto: visibles[idx.current % visibles.length], nueva: false });
-    idx.current++;
+    // 1 de cada 3: una foto sin corazones todavía, para que lo nuevo también se vea.
+    const sinVotos = visibles.filter((f) => f.corazones === 0);
+    const turno = idx.current++;
+    if (turno % 3 === 2 && sinVotos.length) {
+      setActual({ foto: sinVotos[idxSinVotos.current++ % sinVotos.length], nueva: false });
+    } else {
+      setActual({ foto: visibles[(turno - Math.floor(turno / 3)) % visibles.length], nueva: false });
+    }
   }, [prioridad]);
 
   // Rotación; se reinicia cada vez que llega una foto nueva para mostrarla ya.
@@ -300,6 +341,10 @@ function Proyector({
   }, [onSalir]);
 
   const f = actual?.foto;
+  const idProyectado = f?.id;
+  useEffect(() => {
+    if (idProyectado) marcarVistas([idProyectado]);
+  }, [idProyectado]);
   return (
     <div className="proj">
       <button className="proj-x" type="button" onClick={onSalir}>
