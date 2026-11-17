@@ -132,6 +132,15 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
   Recepción es el diseño original. Si `album.sql` se corrió antes de este
   cambio, volver a correrlo completo (es idempotente) para crear
   `momento_actual` y `fijar_momento()`.
+- **Filtro de calidad:** antes de subir, el teléfono mide cada foto
+  (`src/lib/calidad.ts`): borrosa o movida, casi negra, casi blanca, "lisa"
+  (pared, techo, bolsillo) o casi igual a otra que ese teléfono ya subió. Una
+  foto dudosa sube igual pero queda **por revisar**: los invitados no la ven
+  hasta que los novios o el moderador la muestren desde "Por revisar" en el
+  panel. Los umbrales son permisivos a propósito (en la fiesta se tolera más
+  oscuridad). Para ajustarlos: `node scripts/calibrar-calidad.mjs` (necesita
+  ffmpeg) prueba el filtro con las fotos de `public/`. Las medidas de cada foto
+  quedan en `fotos.calidad` para revisar umbrales con fotos reales.
 - **Moderador:** se da de alta igual que los novios (paso 2 de Configuración),
   con su propio correo; entra al mismo panel.
 - Cerrar las subidas después de la boda:

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LADO_ANALISIS, medir, type Medidas } from "./calidad";
 import { getSupabase } from "./supabase";
 
 /* ───────────── configuración del álbum ───────────── */
@@ -124,7 +125,38 @@ export async function subirACloudinary(blob: Blob): Promise<{ publicId: string; 
 
 /* ───────────── compresión en el cliente ───────────── */
 
-export async function comprimir(file: File): Promise<Blob> {
+/** Mide la calidad de lo que ya está dibujado en `c`, reducido a LADO_ANALISIS (ver lib/calidad.ts). */
+function medirLienzo(c: HTMLCanvasElement): Medidas | null {
+  try {
+    const s = Math.min(1, LADO_ANALISIS / Math.max(c.width, c.height));
+    const p = document.createElement("canvas");
+    p.width = Math.max(1, Math.round(c.width * s));
+    p.height = Math.max(1, Math.round(c.height * s));
+    const ctx = p.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return null;
+    ctx.drawImage(c, 0, 0, p.width, p.height);
+    return medir(ctx.getImageData(0, 0, p.width, p.height).data, p.width, p.height);
+  } catch {
+    return null; // si algo falla, la foto sube sin filtro: nunca se bloquea por esto
+  }
+}
+
+/** Huellas de las fotos que este teléfono ya subió (para detectar repetidas). */
+const CLAVE_HUELLAS = "album:huellas";
+export function huellasPrevias(): string[] {
+  try {
+    const v = JSON.parse(local.get(CLAVE_HUELLAS) || "[]");
+    return Array.isArray(v) ? v.filter((x) => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+export function recordarHuella(h: string) {
+  local.set(CLAVE_HUELLAS, JSON.stringify([h, ...huellasPrevias()].slice(0, 150)));
+}
+
+/** Comprime y además mide la calidad de la foto (null si no se pudo medir). */
+export async function comprimir(file: File): Promise<{ blob: Blob; medidas: Medidas | null }> {
   let fuente: CanvasImageSource;
   let w: number;
   let h: number;
@@ -151,9 +183,10 @@ export async function comprimir(file: File): Promise<Blob> {
     const ctx = c.getContext("2d");
     if (!ctx) throw new Error("sin_canvas");
     ctx.drawImage(fuente, 0, 0, c.width, c.height);
+    const medidas = medirLienzo(c);
     const blob = await new Promise<Blob | null>((r) => c.toBlob(r, "image/jpeg", CALIDAD_JPEG));
     if (!blob) throw new Error("no_se_pudo_comprimir");
-    return blob;
+    return { blob, medidas };
   } finally {
     if (fuente instanceof ImageBitmap) fuente.close();
     if (url) URL.revokeObjectURL(url);
@@ -188,10 +221,16 @@ export type Foto = {
   momento: string;
   reto: string | null;
   oculta: boolean;
+  /** Dudosa según el filtro de calidad: espera la revisión de los novios. */
+  revisar: boolean;
+  motivo: string | null;
   creada_en: string;
   corazones: number;
   mi_corazon: boolean;
 };
+
+/** La ven los invitados: ni oculta ni esperando revisión. */
+export const esVisible = (f: Pick<Foto, "oculta" | "revisar">) => !f.oculta && !f.revisar;
 
 export type EstadoCarga = "cargando" | "listo" | "sin_configurar" | "error";
 
@@ -244,10 +283,13 @@ export function useFotos(alLlegar?: (nuevas: Foto[]) => void) {
     const canal = sb
       .channel("album-fotos")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "fotos" }, (p) => {
-        const f: Foto = { ...(p.new as Omit<Foto, "corazones" | "mi_corazon">), corazones: 0, mi_corazon: false };
+        const n = p.new as Omit<Foto, "corazones" | "mi_corazon" | "revisar" | "motivo"> & Partial<Foto>;
+        const f: Foto = { ...n, revisar: n.revisar ?? false, motivo: n.motivo ?? null, corazones: 0, mi_corazon: false };
+        // Las ocultas no llegan a los invitados (RLS); las por revisar solo llegan
+        // a los novios, que las ven en el panel pero no como "nuevas" del álbum.
         if (f.oculta || conocidas.current?.has(f.id)) return;
         conocidas.current?.add(f.id);
-        avisar.current?.([f]);
+        if (esVisible(f)) avisar.current?.([f]);
         setFotos((prev) => (prev.some((x) => x.id === f.id) ? prev : [f, ...prev]));
       })
       .subscribe();

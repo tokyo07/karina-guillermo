@@ -237,3 +237,10 @@ dialog.viewer::backdrop { background: rgba(32, 13, 6, 0.95); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* filtro de calidad: aviso en la cola de subida y cola "Por revisar" del panel */
+.q .st.revisa { color: var(--muted); font-weight: 400; font-style: italic; }
+.mod figure .motivo { position: absolute; left: 6px; right: 6px; top: 6px; background: rgba(42, 20, 11, 0.78); color: #f8f1e5; border-radius: 4px; padding: 3px 6px; font: 500 0.72rem/1.25 var(--body); }
+.mod .acciones { position: absolute; left: 6px; right: 6px; bottom: 6px; display: flex; gap: 4px; }
+.mod .acciones button { position: static; flex: 1; }
+.mod .acciones button.si { background: var(--accent); color: var(--accent-ink); }

@@ -6,6 +6,7 @@ import { getSupabase } from "@/lib/supabase";
 import {
   MOMENTOS,
   NOVIOS,
+  esVisible,
   etiquetaMomento,
   guardarArchivo,
   nombreArchivo,
@@ -14,6 +15,7 @@ import {
   type Foto,
   type Momento,
 } from "@/lib/album";
+import { ETIQUETA_MOTIVO, type Motivo } from "@/lib/calidad";
 import { useMomento } from "./Ambiente";
 import { AvisoEstado, useToast } from "./Comun";
 
@@ -114,19 +116,20 @@ function Login() {
 function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
   const { fotos, estado, setFotos } = useFotos();
   const [toast, avisar] = useToast();
-  const visibles = fotos.filter((f) => !f.oculta);
+  const visibles = fotos.filter(esVisible);
+  const porRevisar = fotos.filter((f) => f.revisar && !f.oculta);
 
   const invitados = new Map<string, number>();
   visibles.forEach((f) => invitados.set(f.nombre, (invitados.get(f.nombre) ?? 0) + 1));
   const corazones = visibles.reduce((a, f) => a + f.corazones, 0);
   const top = [...invitados.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-  async function alternarOculta(f: Foto) {
-    const oculta = !f.oculta;
-    setFotos((prev) => prev.map((x) => (x.id === f.id ? { ...x, oculta } : x)));
-    const { error } = await getSupabase().from("fotos").update({ oculta }).eq("id", f.id);
+  /** Cambia oculta/revisar con actualización optimista; si falla, vuelve atrás. */
+  async function cambiar(f: Foto, cambio: Partial<Pick<Foto, "oculta" | "revisar">>) {
+    setFotos((prev) => prev.map((x) => (x.id === f.id ? { ...x, ...cambio } : x)));
+    const { error } = await getSupabase().from("fotos").update(cambio).eq("id", f.id);
     if (error) {
-      setFotos((prev) => prev.map((x) => (x.id === f.id ? { ...x, oculta: f.oculta } : x)));
+      setFotos((prev) => prev.map((x) => (x.id === f.id ? { ...x, oculta: f.oculta, revisar: f.revisar } : x)));
       avisar("No se pudo cambiar. Revisa tu conexión.");
     }
   }
@@ -179,18 +182,47 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
           </ol>
         </div>
       </div>
+      {porRevisar.length > 0 && (
+        <div className="panel" style={{ marginTop: 22 }}>
+          <h3>Por revisar ({porRevisar.length})</h3>
+          <p>
+            El filtro de calidad las retuvo porque parecen tomadas sin querer. Los invitados no las ven hasta que
+            las muestres.
+          </p>
+          <div className="mod">
+            {porRevisar.map((f) => (
+              <figure key={f.id}>
+                <img src={urlFoto(f.public_id, 480)} alt={`Foto de ${f.nombre}`} loading="lazy" decoding="async" />
+                <span className="motivo">
+                  {f.nombre} · {ETIQUETA_MOTIVO[f.motivo as Motivo] ?? "Dudosa"}
+                </span>
+                <div className="acciones">
+                  <button type="button" className="si" onClick={() => cambiar(f, { revisar: false })}>
+                    Mostrar
+                  </button>
+                  <button type="button" onClick={() => cambiar(f, { revisar: false, oculta: true })}>
+                    Ocultar
+                  </button>
+                </div>
+              </figure>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="panel" style={{ marginTop: 22 }}>
         <h3>Moderación</h3>
         <p>Oculta cualquier foto y deja de mostrarse en el álbum y el proyector. No se borra.</p>
         <div className="mod">
-          {fotos.map((f) => (
-            <figure key={f.id} className={f.oculta ? "off" : ""}>
-              <img src={urlFoto(f.public_id, 480)} alt={`Foto de ${f.nombre}`} loading="lazy" decoding="async" />
-              <button type="button" onClick={() => alternarOculta(f)}>
-                {f.oculta ? "Mostrar" : "Ocultar"}
-              </button>
-            </figure>
-          ))}
+          {fotos
+            .filter((f) => !f.revisar)
+            .map((f) => (
+              <figure key={f.id} className={f.oculta ? "off" : ""}>
+                <img src={urlFoto(f.public_id, 480)} alt={`Foto de ${f.nombre}`} loading="lazy" decoding="async" />
+                <button type="button" onClick={() => cambiar(f, { oculta: !f.oculta })}>
+                  {f.oculta ? "Mostrar" : "Ocultar"}
+                </button>
+              </figure>
+            ))}
         </div>
       </div>
       {toast}

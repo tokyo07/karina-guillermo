@@ -15,12 +15,15 @@ import {
   comprimir,
   errorDefinitivo,
   etiquetaMomento,
+  huellasPrevias,
   idDispositivo,
   local,
   mensajeError,
+  recordarHuella,
   subirACloudinary,
   type Momento,
 } from "@/lib/album";
+import { ETIQUETA_MOTIVO, juzgar, type Medidas, type Motivo } from "@/lib/calidad";
 import { useMomento } from "./Ambiente";
 import { useToast } from "./Comun";
 
@@ -37,6 +40,8 @@ type Item = {
   definitivo?: boolean;
   /** Si Cloudinary ya la recibió, no se vuelve a subir al reintentar. */
   subida?: { publicId: string; ancho: number; alto: number };
+  /** Resultado del filtro de calidad; se mide una sola vez (al reintentar no se repite). */
+  calidad?: { motivo: Motivo | null; medidas: Medidas | null };
 };
 
 const ETIQUETA: Record<Item["estado"], string> = {
@@ -90,13 +95,20 @@ export default function SubirFotos() {
     async (it: Item) => {
       actualizar(it.id, { estado: "subiendo" });
       let subida = it.subida;
+      let calidad = it.calidad;
       try {
         if (!subida) {
-          const blob = await comprimir(it.file);
+          const { blob, medidas } = await comprimir(it.file);
+          if (!calidad) {
+            // Filtro de calidad: una foto dudosa sube igual, pero espera la revisión de los novios.
+            calidad = { medidas, motivo: medidas ? juzgar(medidas, it.momento, huellasPrevias()) : null };
+            if (medidas) recordarHuella(medidas.huella);
+            actualizar(it.id, { calidad });
+          }
           subida = await subirACloudinary(blob);
           actualizar(it.id, { subida }); // si falla Supabase, el reintento no vuelve a subir la imagen
         }
-        const { error } = await getSupabase().rpc("subir_foto", {
+        const base = {
           p_public_id: subida.publicId,
           p_ancho: subida.ancho,
           p_alto: subida.alto,
@@ -104,7 +116,16 @@ export default function SubirFotos() {
           p_momento: it.momento,
           p_reto: it.reto || null,
           p_dispositivo: idDispositivo(),
+        };
+        const sb = getSupabase();
+        let { error } = await sb.rpc("subir_foto", {
+          ...base,
+          p_motivo: calidad?.motivo ?? null,
+          p_calidad: calidad?.medidas ?? null,
         });
+        // PGRST202: la base todavía tiene la versión de subir_foto sin filtro de
+        // calidad (falta correr sql/album.sql). Se sube igual, sin el filtro.
+        if (error?.code === "PGRST202") ({ error } = await sb.rpc("subir_foto", base));
         // 23505 = ya estaba registrada (un intento anterior llegó pero se perdió la respuesta).
         if (error && error.code !== "23505") throw error;
         actualizar(it.id, { estado: "lista" });
@@ -172,6 +193,7 @@ export default function SubirFotos() {
 
   const pendientes = items.some((q) => q.estado === "espera" || q.estado === "subiendo" || q.estado === "reintento");
   const listas = items.filter((q) => q.estado === "lista").length;
+  const enRevision = items.filter((q) => q.estado === "lista" && q.calidad?.motivo).length;
   const configurado = cloudinaryListo();
 
   return (
@@ -299,7 +321,16 @@ export default function SubirFotos() {
                   <div>
                     {it.nombre} · {etiquetaMomento(it.momento)}
                   </div>
-                  <div className="st">{it.estado === "error" ? it.error : ETIQUETA[it.estado]}</div>
+                  <div className="st">
+                    {it.estado === "error"
+                      ? it.error
+                      : it.estado === "lista" && it.calidad?.motivo
+                        ? "Lista · los novios la revisan antes de mostrarla"
+                        : ETIQUETA[it.estado]}
+                  </div>
+                  {it.calidad?.motivo && it.estado !== "error" && (
+                    <div className="st revisa">{ETIQUETA_MOTIVO[it.calidad.motivo]}</div>
+                  )}
                   {(it.estado === "subiendo" || it.estado === "reintento") && <div className="bar-load" />}
                   {reintentable && (
                     <button
@@ -323,6 +354,10 @@ export default function SubirFotos() {
           <div className="thanks">
             Gracias, {items[0]?.nombre}.{" "}
             {listas === 1 ? "Tu foto ya está" : `Tus ${listas} fotos ya están`} en el álbum.{" "}
+            {enRevision > 0 &&
+              (enRevision === 1
+                ? "Una parece tomada sin querer: se mostrará cuando los novios la revisen. "
+                : `${enRevision} parecen tomadas sin querer: se mostrarán cuando los novios las revisen. `)}
             <Link href="/album/fotos">Ver el álbum</Link>
           </div>
         )}

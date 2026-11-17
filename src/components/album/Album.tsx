@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MOMENTOS, NOVIOS, etiquetaMomento, urlFoto, useFotos, type Foto } from "@/lib/album";
+import { MOMENTOS, NOVIOS, esVisible, etiquetaMomento, urlFoto, useFotos, type Foto } from "@/lib/album";
 import { AvisoEstado, IconoCorazon, useToast } from "./Comun";
 import DiarioAlbum from "./DiarioAlbum";
 
@@ -32,7 +32,7 @@ export default function Album() {
     setProyector(true);
   };
 
-  const lista = fotos.filter((f) => !f.oculta && (filtro === "todas" || f.momento === filtro));
+  const lista = fotos.filter((f) => esVisible(f) && (filtro === "todas" || f.momento === filtro));
   // Una recarga fallida (señal floja en la fiesta) pone estado "error", pero las
   // fotos ya cargadas siguen sirviendo: no se esconde el diario ni el conteo.
   const hayDatos = estado === "listo" || fotos.length > 0;
@@ -143,7 +143,7 @@ export default function Album() {
       )}
       {proyector && (
         <Proyector
-          fotos={fotos.filter((f) => !f.oculta)}
+          fotos={fotos.filter(esVisible)}
           prioridad={prioridad}
           senalNueva={senalNueva}
           onSalir={salirProyector}

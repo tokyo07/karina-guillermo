@@ -9,7 +9,11 @@
 -- Modelo de seguridad:
 --   * anon NO escribe directo en ninguna tabla. Subir foto y dar corazón pasan
 --     por funciones SECURITY DEFINER que validan todo y limitan abuso.
---   * anon solo puede LEER fotos no ocultas (necesario para Realtime).
+--   * anon solo puede LEER fotos ni ocultas ni por revisar (necesario para Realtime).
+--
+-- Todo corre en una transacción: si algo falla, no queda nada a medias.
+
+begin;
 --   * Los novios son usuarios de Supabase Auth registrados en la tabla
 --     `novios`. Solo ellos ven las ocultas y pueden ocultar/mostrar.
 --     Estar "autenticado" no alcanza: hay que estar en `novios`.
@@ -28,6 +32,16 @@ create table if not exists public.fotos (
   creada_en timestamptz not null default now()
 );
 create index if not exists fotos_creada_en_idx on public.fotos (creada_en desc);
+
+-- Filtro de calidad: el teléfono mide cada foto antes de subirla. Si parece
+-- tomada sin querer (borrosa, negra, quemada, lisa o repetida), llega con
+-- `revisar = true` y no se muestra a los invitados hasta que los novios o el
+-- moderador la aprueben. `calidad` guarda las medidas para ajustar umbrales.
+alter table public.fotos add column if not exists revisar boolean not null default false;
+alter table public.fotos add column if not exists motivo text
+  check (motivo is null or motivo in ('borrosa', 'oscura', 'quemada', 'lisa', 'repetida'));
+alter table public.fotos add column if not exists calidad jsonb
+  check (calidad is null or (jsonb_typeof(calidad) = 'object' and pg_column_size(calidad) < 2000));
 
 -- Qué dispositivo subió cada foto. Separado de `fotos` para que el id de
 -- dispositivo nunca viaje a otros invitados (ni por API ni por Realtime).
@@ -74,7 +88,7 @@ revoke all on public.fotos, public.subidas, public.corazones, public.novios, pub
   from anon, authenticated;
 
 grant select on public.fotos to anon, authenticated;
-grant update (oculta) on public.fotos to authenticated;
+grant update (oculta, revisar) on public.fotos to authenticated;
 grant select on public.novios to authenticated;
 
 alter table public.fotos enable row level security;
@@ -96,7 +110,7 @@ $$;
 drop policy if exists "ver fotos visibles" on public.fotos;
 create policy "ver fotos visibles" on public.fotos
   for select to anon, authenticated
-  using (oculta = false or (select public.es_novio()));
+  using ((oculta = false and revisar = false) or (select public.es_novio()));
 
 drop policy if exists "novios moderan" on public.fotos;
 create policy "novios moderan" on public.fotos
@@ -122,7 +136,9 @@ create policy "ver ajustes" on public.album_ajustes
 
 -- ─────────────────────────── funciones ───────────────────────────
 
--- Registra una foto ya subida a Cloudinary.
+-- Registra una foto ya subida a Cloudinary. `p_motivo` no nulo = foto dudosa
+-- (queda por revisar). Se borra la versión anterior sin filtro de calidad.
+drop function if exists public.subir_foto(text, integer, integer, text, text, text, uuid);
 create or replace function public.subir_foto(
   p_public_id text,
   p_ancho integer,
@@ -130,7 +146,9 @@ create or replace function public.subir_foto(
   p_nombre text,
   p_momento text,
   p_reto text,
-  p_dispositivo uuid
+  p_dispositivo uuid,
+  p_motivo text default null,
+  p_calidad jsonb default null
 )
 returns uuid
 language plpgsql
@@ -162,8 +180,9 @@ begin
     raise exception 'limite_por_hora' using errcode = 'P0001';
   end if;
 
-  insert into public.fotos (public_id, ancho, alto, nombre, momento, reto)
-  values (p_public_id, p_ancho, p_alto, btrim(p_nombre), p_momento, nullif(btrim(p_reto), ''))
+  insert into public.fotos (public_id, ancho, alto, nombre, momento, reto, revisar, motivo, calidad)
+  values (p_public_id, p_ancho, p_alto, btrim(p_nombre), p_momento, nullif(btrim(p_reto), ''),
+          p_motivo is not null, p_motivo, p_calidad)
   returning id into v_id;
 
   insert into public.subidas (foto_id, dispositivo) values (v_id, p_dispositivo);
@@ -172,8 +191,10 @@ end;
 $$;
 
 -- Lista para el mural con el conteo de corazones y si este dispositivo ya
--- dio corazón. Los invitados solo reciben las visibles; los novios, todas.
-create or replace function public.listar_fotos(p_dispositivo uuid default null)
+-- dio corazón. Los invitados solo reciben las visibles (ni ocultas ni por
+-- revisar); los novios, todas. Cambió el tipo de retorno: se borra y se crea.
+drop function if exists public.listar_fotos(uuid);
+create function public.listar_fotos(p_dispositivo uuid default null)
 returns table (
   id uuid,
   public_id text,
@@ -183,6 +204,8 @@ returns table (
   momento text,
   reto text,
   oculta boolean,
+  revisar boolean,
+  motivo text,
   creada_en timestamptz,
   corazones bigint,
   mi_corazon boolean
@@ -192,12 +215,12 @@ stable
 security definer
 set search_path = ''
 as $$
-  select f.id, f.public_id, f.ancho, f.alto, f.nombre, f.momento, f.reto, f.oculta, f.creada_en,
+  select f.id, f.public_id, f.ancho, f.alto, f.nombre, f.momento, f.reto, f.oculta, f.revisar, f.motivo, f.creada_en,
          (select count(*) from public.corazones c where c.foto_id = f.id),
          exists (select 1 from public.corazones c
                  where c.foto_id = f.id and c.dispositivo = p_dispositivo)
   from public.fotos f
-  where f.oculta = false or public.es_novio()
+  where (f.oculta = false and f.revisar = false) or public.es_novio()
   order by f.creada_en desc;
 $$;
 
@@ -213,7 +236,7 @@ begin
   if p_dispositivo is null then
     raise exception 'dispositivo_requerido' using errcode = '22023';
   end if;
-  if not exists (select 1 from public.fotos f where f.id = p_foto and f.oculta = false) then
+  if not exists (select 1 from public.fotos f where f.id = p_foto and f.oculta = false and f.revisar = false) then
     raise exception 'foto_no_encontrada' using errcode = 'P0002';
   end if;
 
@@ -231,11 +254,11 @@ end;
 $$;
 
 revoke all on function public.es_novio() from public;
-revoke all on function public.subir_foto(text, integer, integer, text, text, text, uuid) from public;
+revoke all on function public.subir_foto(text, integer, integer, text, text, text, uuid, text, jsonb) from public;
 revoke all on function public.listar_fotos(uuid) from public;
 revoke all on function public.alternar_corazon(uuid, uuid) from public;
 grant execute on function public.es_novio() to anon, authenticated;
-grant execute on function public.subir_foto(text, integer, integer, text, text, text, uuid) to anon, authenticated;
+grant execute on function public.subir_foto(text, integer, integer, text, text, text, uuid, text, jsonb) to anon, authenticated;
 grant execute on function public.listar_fotos(uuid) to anon, authenticated;
 grant execute on function public.alternar_corazon(uuid, uuid) to anon, authenticated;
 
@@ -282,6 +305,8 @@ begin
   end if;
 end;
 $$;
+
+commit;
 
 -- ─────────────────────────── alta de los novios ───────────────────────────
 -- 1. Authentication → Users → "Add user" con el correo de los novios y una

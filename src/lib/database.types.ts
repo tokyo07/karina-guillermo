@@ -49,11 +49,15 @@ export type Database = {
           momento: string;
           reto: string | null;
           oculta: boolean;
+          revisar: boolean;
+          motivo: string | null;
+          calidad: Json | null;
           creada_en: string;
         };
         Insert: never;
         Update: {
           oculta?: boolean;
+          revisar?: boolean;
         };
         Relationships: [];
       };
@@ -87,6 +91,8 @@ export type Database = {
           p_momento: string;
           p_reto: string | null;
           p_dispositivo: string;
+          p_motivo?: string | null;
+          p_calidad?: Json | null;
         };
         Returns: string;
       };
@@ -101,6 +107,8 @@ export type Database = {
           momento: string;
           reto: string | null;
           oculta: boolean;
+          revisar: boolean;
+          motivo: string | null;
           creada_en: string;
           corazones: number;
           mi_corazon: boolean;
