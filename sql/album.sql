@@ -59,6 +59,13 @@ create table if not exists public.album_ajustes (
 );
 insert into public.album_ajustes (id) values (true) on conflict (id) do nothing;
 
+-- Momento que se vive ahora (lo cambian los novios o el moderador desde el
+-- panel). Define el ambiente de todos los teléfonos: colores, retos y la
+-- etiqueta que se propone al subir.
+alter table public.album_ajustes
+  add column if not exists momento_actual text not null default 'ceremonia'
+  check (momento_actual in ('ceremonia', 'recepcion', 'fiesta'));
+
 -- ─────────────────────────── permisos ───────────────────────────
 -- Supabase da por defecto todos los privilegios de las tablas nuevas a anon y
 -- authenticated. Se quitan y se otorga solo lo necesario.
@@ -102,8 +109,16 @@ create policy "cada novio se ve a sí mismo" on public.novios
   for select to authenticated
   using (user_id = (select auth.uid()));
 
--- subidas, corazones y album_ajustes no tienen políticas: con RLS activo y
--- sin grants, solo se accede a través de las funciones de abajo.
+-- Los ajustes no son secretos: cualquiera los lee (hace falta para que el
+-- cambio de momento llegue por Realtime). Solo se cambian con fijar_momento().
+grant select on public.album_ajustes to anon, authenticated;
+drop policy if exists "ver ajustes" on public.album_ajustes;
+create policy "ver ajustes" on public.album_ajustes
+  for select to anon, authenticated
+  using (true);
+
+-- subidas y corazones no tienen políticas: con RLS activo y sin grants, solo
+-- se accede a través de las funciones de abajo.
 
 -- ─────────────────────────── funciones ───────────────────────────
 
@@ -224,6 +239,29 @@ grant execute on function public.subir_foto(text, integer, integer, text, text, 
 grant execute on function public.listar_fotos(uuid) to anon, authenticated;
 grant execute on function public.alternar_corazon(uuid, uuid) to anon, authenticated;
 
+-- Cambia el momento de toda la boda. Solo novios (y moderadores en `novios`).
+create or replace function public.fijar_momento(p_momento text)
+returns text
+language plpgsql
+volatile
+security definer
+set search_path = ''
+as $$
+begin
+  if not public.es_novio() then
+    raise exception 'solo_novios' using errcode = '42501';
+  end if;
+  if p_momento is null or p_momento not in ('ceremonia', 'recepcion', 'fiesta') then
+    raise exception 'momento_invalido' using errcode = '22023';
+  end if;
+  update public.album_ajustes set momento_actual = p_momento where id;
+  return p_momento;
+end;
+$$;
+
+revoke all on function public.fijar_momento(text) from public;
+grant execute on function public.fijar_momento(text) to authenticated;
+
 -- ─────────────────────────── Realtime ───────────────────────────
 -- El mural y el proyector escuchan los INSERT de `fotos` (Realtime respeta la
 -- política de lectura: los invitados no reciben fotos ocultas).
@@ -234,6 +272,13 @@ begin
     where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'fotos'
   ) then
     alter publication supabase_realtime add table public.fotos;
+  end if;
+  -- Los teléfonos escuchan los UPDATE de album_ajustes para cambiar de ambiente.
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'album_ajustes'
+  ) then
+    alter publication supabase_realtime add table public.album_ajustes;
   end if;
 end;
 $$;
@@ -246,6 +291,8 @@ $$;
 --      insert into public.novios (user_id)
 --      select id from auth.users where email = 'CORREO_DE_LOS_NOVIOS'
 --      on conflict do nothing;
+--    El moderador (un amigo) se da de alta igual, con su propio correo: entra
+--    al mismo panel sin usar la contraseña de los novios.
 --
 -- Cerrar las subidas después de la boda:
 --      update public.album_ajustes set subidas_abiertas = false;

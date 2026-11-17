@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Caveat, Figtree } from "next/font/google";
+import { Ambiente } from "@/components/album/Ambiente";
+import { SCRIPT_AMBIENTE } from "@/lib/ambiente";
 import Barra from "@/components/album/Barra";
+import { ScriptEnLinea } from "@/components/album/ScriptEnLinea";
 import "./album.css";
 
 const display = Bodoni_Moda({
@@ -37,10 +40,15 @@ export const viewport: Viewport = {
 
 export default function AlbumLayout({ children }: LayoutProps<"/album">) {
   return (
-    <html lang="es" className={`${display.variable} ${cuerpo.variable} ${mano.variable}`}>
+    // suppressHydrationWarning: el script de abajo pone data-momento en <html>
+    // antes de que React hidrate (ver docs/01-app/02-guides/preventing-flash-before-hydration).
+    <html lang="es" className={`${display.variable} ${cuerpo.variable} ${mano.variable}`} suppressHydrationWarning>
       <body>
-        <Barra />
-        <main>{children}</main>
+        <ScriptEnLinea html={SCRIPT_AMBIENTE} />
+        <Ambiente>
+          <Barra />
+          <main>{children}</main>
+        </Ambiente>
       </body>
     </html>
   );

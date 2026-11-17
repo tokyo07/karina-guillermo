@@ -63,6 +63,17 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      album_ajustes: {
+        Row: {
+          id: boolean;
+          subidas_abiertas: boolean;
+          max_subidas_por_hora: number;
+          momento_actual: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -98,6 +109,10 @@ export type Database = {
       alternar_corazon: {
         Args: { p_foto: string; p_dispositivo: string };
         Returns: { mi_corazon: boolean; corazones: number }[];
+      };
+      fijar_momento: {
+        Args: { p_momento: string };
+        Returns: string;
       };
     };
     Enums: { [_ in never]: never };

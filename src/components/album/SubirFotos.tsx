@@ -8,9 +8,9 @@ import {
   FECHA,
   MAX_INTENTOS,
   MAX_NOMBRE,
+  AMBIENTES,
   MOMENTOS,
   NOVIOS,
-  RETOS,
   cloudinaryListo,
   comprimir,
   errorDefinitivo,
@@ -21,6 +21,7 @@ import {
   subirACloudinary,
   type Momento,
 } from "@/lib/album";
+import { useMomento } from "./Ambiente";
 import { useToast } from "./Comun";
 
 type Item = {
@@ -51,8 +52,14 @@ const pausa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function SubirFotos() {
   const [nombre, setNombre] = useState("");
-  const [momento, setMomento] = useState<Momento>("recepcion");
-  const [reto, setReto] = useState("");
+  // El momento sigue al ambiente de la boda; el invitado puede cambiarlo para
+  // esta tanda, y vuelve a seguir al ambiente cuando los novios lo cambian.
+  const { momento: actual } = useMomento();
+  const [elegido, setElegido] = useState<{ m: Momento; durante: Momento } | null>(null);
+  const momento = elegido && elegido.durante === actual ? elegido.m : actual;
+  const ambiente = AMBIENTES[momento];
+  const [retoElegido, setReto] = useState("");
+  const reto = ambiente.retos.includes(retoElegido) ? retoElegido : "";
   const [toast, avisar] = useToast();
   const [items, setItems] = useState<Item[]>([]);
   /** Ids que ya tienen una subida corriendo (evita lanzarlas dos veces). */
@@ -65,11 +72,7 @@ export default function SubirFotos() {
   // Nombre: ?invitado=Nombre (máx. 40) o el que quedó guardado en este teléfono.
   useEffect(() => {
     const q = (new URLSearchParams(location.search).get("invitado") || "").trim().slice(0, MAX_NOMBRE);
-    const m = local.get("album:momento");
-    queueMicrotask(() => {
-      setNombre(q || local.get("album:nombre") || "");
-      if (MOMENTOS.some((x) => x.id === m)) setMomento(m as Momento);
-    });
+    queueMicrotask(() => setNombre(q || local.get("album:nombre") || ""));
   }, []);
 
   // Liberar las miniaturas locales al salir.
@@ -185,7 +188,8 @@ export default function SubirFotos() {
           <p className="date">{FECHA}</p>
         </div>
       </div>
-      <p className="lede">Cada mesa vive la fiesta distinta. Sube lo que ves tú y ayúdanos a recordarla completa.</p>
+      <p className="lede">{AMBIENTES[actual].lede}</p>
+      {AMBIENTES[actual].aviso && <p className="aviso-momento">{AMBIENTES[actual].aviso}</p>}
 
       <div className="card">
         <label className="field">
@@ -210,10 +214,7 @@ export default function SubirFotos() {
                 type="button"
                 className="chip"
                 aria-pressed={momento === m.id}
-                onClick={() => {
-                  setMomento(m.id);
-                  local.set("album:momento", m.id);
-                }}
+                onClick={() => setElegido({ m: m.id, durante: actual })}
               >
                 {m.label}
               </button>
@@ -226,7 +227,7 @@ export default function SubirFotos() {
             Reto para esta foto <small>(opcional)</small>
           </span>
           <div className="chips" role="group" aria-label="Retos">
-            {RETOS.map((r) => (
+            {ambiente.retos.map((r) => (
               <button
                 key={r}
                 type="button"

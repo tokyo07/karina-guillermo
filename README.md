@@ -125,6 +125,15 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
 
 ### Operación
 
+- **Ambiente por momento:** en el panel, "¿Qué se vive ahora?" cambia entre
+  Ceremonia, Recepción y Fiesta. Todos los teléfonos cambian solos (al instante
+  por Realtime, o en menos de 30 s): colores, retos, texto de bienvenida y el
+  momento que se propone al subir. En Ceremonia se pide apagar flash y sonido.
+  Recepción es el diseño original. Si `album.sql` se corrió antes de este
+  cambio, volver a correrlo completo (es idempotente) para crear
+  `momento_actual` y `fijar_momento()`.
+- **Moderador:** se da de alta igual que los novios (paso 2 de Configuración),
+  con su propio correo; entra al mismo panel.
 - Cerrar las subidas después de la boda:
   `update public.album_ajustes set subidas_abiertas = false;`
 - Límite por teléfono: 60 fotos/hora (`album_ajustes.max_subidas_por_hora`).

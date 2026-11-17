@@ -3,7 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { getSupabase } from "@/lib/supabase";
-import { NOVIOS, guardarArchivo, nombreArchivo, urlFoto, useFotos, type Foto } from "@/lib/album";
+import {
+  MOMENTOS,
+  NOVIOS,
+  etiquetaMomento,
+  guardarArchivo,
+  nombreArchivo,
+  urlFoto,
+  useFotos,
+  type Foto,
+  type Momento,
+} from "@/lib/album";
+import { useMomento } from "./Ambiente";
 import { AvisoEstado, useToast } from "./Comun";
 
 type Acceso = "verificando" | "fuera" | "no_novio" | "novio" | "sin_configurar";
@@ -129,6 +140,7 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
           Cerrar sesión
         </button>
       </div>
+      <MomentoActual avisar={avisar} />
       <div className="stats">
         {(
           [
@@ -183,6 +195,43 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
       </div>
       {toast}
     </>
+  );
+}
+
+/** Cambia el ambiente de todos los teléfonos: colores, retos y momento propuesto al subir. */
+function MomentoActual({ avisar }: { avisar: (m: string) => void }) {
+  const { momento, aplicar } = useMomento();
+  const [enviando, setEnviando] = useState<Momento | null>(null);
+
+  async function fijar(m: Momento) {
+    if (m === momento || enviando) return;
+    setEnviando(m);
+    const { error } = await getSupabase().rpc("fijar_momento", { p_momento: m });
+    setEnviando(null);
+    if (error) return avisar("No se pudo cambiar el momento. Revisa tu conexión.");
+    aplicar(m);
+    avisar(`Ahora: ${etiquetaMomento(m)}. Los teléfonos cambian en unos segundos.`);
+  }
+
+  return (
+    <div className="panel momento-panel">
+      <h3>¿Qué se vive ahora?</h3>
+      <p>Cambia el ambiente del álbum en todos los teléfonos: colores, retos y el momento de las fotos nuevas.</p>
+      <div className="chips" role="group" aria-label="Momento actual de la boda">
+        {MOMENTOS.map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            className="chip"
+            aria-pressed={momento === m.id}
+            disabled={enviando !== null}
+            onClick={() => fijar(m.id)}
+          >
+            {enviando === m.id ? "Cambiando…" : m.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

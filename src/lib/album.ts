@@ -15,14 +15,48 @@ export const MOMENTOS = [
 ] as const;
 export type Momento = (typeof MOMENTOS)[number]["id"];
 
-export const RETOS = [
-  "Foto con quien vino de más lejos",
-  "El abrazo más sincero",
-  "Los novios sin que se den cuenta",
-  "La pista de baile en pleno apogeo",
-  "Selfie de toda tu mesa",
-  "Algo azul de la boda",
-];
+export const esMomento = (x: unknown): x is Momento => MOMENTOS.some((m) => m.id === x);
+
+/** Ambiente de cada momento: retos y textos de la pantalla de subir. */
+export const AMBIENTES: Record<Momento, { retos: string[]; lede: string; aviso?: string }> = {
+  ceremonia: {
+    retos: [
+      "Los anillos",
+      "La cara del novio al verla entrar",
+      "Un detalle de la decoración",
+      "Las manos de los novios",
+      "Quien se emocionó a tu lado",
+      "La salida de los novios",
+    ],
+    lede: "Los anillos, las miradas, los detalles. Guarda la ceremonia como la vives tú.",
+    aviso: "Estamos en la iglesia: apaga el flash y el sonido de la cámara, por favor.",
+  },
+  recepcion: {
+    retos: [
+      "Foto con quien vino de más lejos",
+      "Selfie de toda tu mesa",
+      "El brindis",
+      "Algo azul de la boda",
+      "El abrazo más sincero",
+      "Los novios sin que se den cuenta",
+    ],
+    lede: "Cada mesa vive la fiesta distinta. Sube lo que ves tú y ayúdanos a recordarla completa.",
+  },
+  fiesta: {
+    retos: [
+      "La pista de baile en pleno apogeo",
+      "El paso de baile más raro",
+      "Los novios bailando",
+      "Tu grupo en plena foto loca",
+      "El primero que se quitó los zapatos",
+      "La hora loca",
+    ],
+    lede: "¡Ahora sí, a la pista! Sube lo más divertido de la noche.",
+  },
+};
+
+/** Momento que se usa mientras no se sabe el real (es el diseño original). */
+export const MOMENTO_INICIAL: Momento = "recepcion";
 
 export const MAX_LADO = 1600;
 export const CALIDAD_JPEG = 0.82;
