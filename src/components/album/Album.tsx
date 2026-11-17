@@ -33,6 +33,9 @@ export default function Album() {
   };
 
   const lista = fotos.filter((f) => !f.oculta && (filtro === "todas" || f.momento === filtro));
+  // Una recarga fallida (señal floja en la fiesta) pone estado "error", pero las
+  // fotos ya cargadas siguen sirviendo: no se esconde el diario ni el conteo.
+  const hayDatos = estado === "listo" || fotos.length > 0;
 
   return (
     <section className="pg">
@@ -43,7 +46,7 @@ export default function Album() {
           <p>
             {estado === "cargando"
               ? "Cargando fotos…"
-              : estado === "listo"
+              : hayDatos
                 ? `${lista.length} ${lista.length === 1 ? "foto" : "fotos"} compartidas por los invitados`
                 : ""}
           </p>
@@ -78,7 +81,7 @@ export default function Album() {
       </div>
 
       {vista === "diario" ? (
-        estado === "listo" && (
+        hayDatos && (
           <DiarioAlbum
             fotos={lista}
             onAbrir={(i) => setVisor({ lista, i })}
