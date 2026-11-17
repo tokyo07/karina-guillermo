@@ -21,15 +21,16 @@ export const esMomento = (x: unknown): x is Momento => MOMENTOS.some((m) => m.id
 /** Ambiente de cada momento: retos y textos de la pantalla de subir. */
 export const AMBIENTES: Record<Momento, { retos: string[]; lede: string; aviso?: string }> = {
   ceremonia: {
+    // Retos para hacer desde tu lugar, sin acercarse a los novios ni interrumpir.
     retos: [
-      "Los anillos",
-      "La cara del novio al verla entrar",
+      "La fachada de la iglesia",
+      "Selfie con tu acompañante",
       "Un detalle de la decoración",
-      "Las manos de los novios",
+      "Las flores del altar desde tu lugar",
       "Quien se emocionó a tu lado",
-      "La salida de los novios",
+      "La lluvia de pétalos a la salida",
     ],
-    lede: "Los anillos, las miradas, los detalles. Guarda la ceremonia como la vives tú.",
+    lede: "La iglesia, los detalles y la emoción de todos. Guarda la ceremonia como la vives tú, desde tu lugar.",
     aviso: "Estamos en la iglesia: apaga el flash y el sonido de la cámara, por favor.",
   },
   recepcion: {
