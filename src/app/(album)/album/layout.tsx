@@ -3,6 +3,7 @@ import { Bodoni_Moda, Caveat, Cormorant_Garamond, Figtree, Great_Vibes, Jost, La
 import { Ambiente } from "@/components/album/Ambiente";
 import { SCRIPT_AMBIENTE } from "@/lib/ambiente";
 import Barra from "@/components/album/Barra";
+import { Presentacion } from "@/components/album/Presentacion";
 import { ScriptEnLinea } from "@/components/album/ScriptEnLinea";
 import "./album.css";
 
@@ -82,8 +83,10 @@ export default function AlbumLayout({ children }: LayoutProps<"/album">) {
       <body>
         <ScriptEnLinea html={SCRIPT_AMBIENTE} />
         <Ambiente>
-          <Barra />
-          <main>{children}</main>
+          <Presentacion>
+            <Barra />
+            <main>{children}</main>
+          </Presentacion>
         </Ambiente>
       </body>
     </html>

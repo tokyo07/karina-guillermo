@@ -77,9 +77,24 @@ function marcarVista() {
   yaMostrada = true;
 }
 
-export default function IntroAlbum() {
+type Props = {
+  /**
+   * "bienvenida" (por defecto): al abrir /album, una vez por carga, con los botones
+   * para entrar. "viaje": la lanza "Ver el álbum" (Presentacion.tsx); sin botones,
+   * avisa con alRevelar cuando aparece el título y el que la lanzó lleva al álbum.
+   */
+  modo?: "bienvenida" | "viaje";
+  alRevelar?: () => void;
+  /** Modo viaje: el que la lanzó pide que se desvanezca (ya llegó al álbum). */
+  saliendo?: boolean;
+};
+
+export default function IntroAlbum({ modo = "bienvenida", alRevelar, saliendo = false }: Props) {
+  const viaje = modo === "viaje";
   // En la primera carga vale "mostrar" igual que en el servidor (sin desajuste de hidratación).
-  const [estado, setEstado] = useState<"mostrar" | "saliendo" | "oculto">(() => (yaMostrada ? "oculto" : "mostrar"));
+  const [estado, setEstado] = useState<"mostrar" | "saliendo" | "oculto">(() =>
+    yaMostrada && !viaje ? "oculto" : "mostrar"
+  );
   // null mientras se espera el ranking (la presentación arranca cuando llega o a los ESPERA_MS).
   const [fotos, setFotos] = useState<TunnelImage[] | null>(null);
   // En la fiesta: fondo de noche y una bola de espejo gigante que se expande detrás de las fotos.
@@ -88,7 +103,8 @@ export default function IntroAlbum() {
   const [bola, setBola] = useState(0);
 
   useEffect(() => {
-    if (yaMostrada) return;
+    if (yaMostrada && !viaje) return;
+    if (viaje) marcarVista(); // después de un viaje, la bienvenida ya no se repite
     let listo = false;
     let previas: TunnelImage[] = [];
     try {
@@ -110,7 +126,7 @@ export default function IntroAlbum() {
       })
       .catch(() => arrancar(previas));
     return () => clearTimeout(t);
-  }, []);
+  }, [viaje]);
 
   // Sin scroll de fondo mientras está la presentación.
   useEffect(() => {
@@ -132,7 +148,9 @@ export default function IntroAlbum() {
 
   return (
     <div
-      className={"intro-album" + (fiesta ? " intro-fiesta" : "") + (estado === "saliendo" ? " saliendo" : "")}
+      className={
+        "intro-album" + (fiesta ? " intro-fiesta" : "") + (estado === "saliendo" || saliendo ? " saliendo" : "")
+      }
       role="dialog"
       aria-label="Presentación del álbum"
     >
@@ -155,15 +173,22 @@ export default function IntroAlbum() {
             </>
           }
           subtitle={FECHA}
+          onReveal={alRevelar}
         >
-          <div className="intro-acciones">
-            <button type="button" className="btn" onClick={entrar}>
-              Compartir mis fotos
-            </button>
-            <Link className="btn ghost" href="/album/fotos" onClick={marcarVista}>
-              Ver el álbum
-            </Link>
-          </div>
+          {viaje ? (
+            <p className="intro-abriendo" role="status">
+              Abriendo el álbum…
+            </p>
+          ) : (
+            <div className="intro-acciones">
+              <button type="button" className="btn" onClick={entrar}>
+                Compartir mis fotos
+              </button>
+              <Link className="btn ghost" href="/album/fotos" onClick={marcarVista}>
+                Ver el álbum
+              </Link>
+            </div>
+          )}
         </PerspectiveTunnelHero>
       )}
     </div>

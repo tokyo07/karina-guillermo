@@ -46,6 +46,8 @@ export interface PerspectiveTunnelHeroProps {
    * Escritorio remoto o Windows sin efectos de animación). Úsalo solo con un botón para saltar.
    */
   alwaysZoom?: boolean;
+  /** Modo once: se llama una vez cuando aparecen los textos (al final o al saltar). */
+  onReveal?: () => void;
   height?: string;
   className?: string;
 }
@@ -169,6 +171,7 @@ export default function PerspectiveTunnelHero({
   flyMs = 3600,
   skipLabel,
   alwaysZoom = false,
+  onReveal,
   height = "100svh",
   className,
 }: PerspectiveTunnelHeroProps) {
@@ -214,6 +217,13 @@ export default function PerspectiveTunnelHero({
   const revealAt = (images.length - 1) * stepMs + flyMs * 0.35;
   const endAt = (images.length - 1) * stepMs + flyMs;
   const [revealed, setRevealed] = useState(false);
+  const onRevealRef = useRef(onReveal);
+  useEffect(() => {
+    onRevealRef.current = onReveal;
+  });
+  useEffect(() => {
+    if (revealed) onRevealRef.current?.();
+  }, [revealed]);
 
   // Avance automático: el tiempo empuja el túnel, sin scroll.
   // Solo avanza mientras está en pantalla y la pestaña visible.

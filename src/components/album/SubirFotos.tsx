@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import {
@@ -26,6 +25,7 @@ import { ETIQUETA_MOTIVO, juzgar, type Medidas, type Motivo } from "@/lib/calida
 import { catalogo, ganadas, leerEstado, registrarFoto, ESTADO_VACIO, type EstadoBingo } from "@/lib/bingo";
 import { actividadActual } from "@/lib/cronograma";
 import { useMomento } from "./Ambiente";
+import { useVerAlbum } from "./Presentacion";
 import FirmaFiesta from "./FirmaFiesta";
 import PortadaInvitacion from "./PortadaInvitacion";
 import { useToast } from "./Comun";
@@ -79,6 +79,8 @@ export default function SubirFotos() {
   const [retoElegido, setReto] = useState("");
   const reto = retos.includes(retoElegido) ? retoElegido : "";
   const [toast, avisar] = useToast();
+  const verAlbum = useVerAlbum();
+  const exitoRef = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<Item[]>([]);
   // Bingo de retos: lo que este teléfono ya tachó y las fotos que subió (lib/bingo.ts).
   const [bingo, setBingo] = useState<EstadoBingo>(ESTADO_VACIO);
@@ -230,6 +232,11 @@ export default function SubirFotos() {
   const pendientes = items.some((q) => q.estado === "espera" || q.estado === "subiendo" || q.estado === "reintento");
   const listas = items.filter((q) => q.estado === "lista").length;
   const enRevision = items.filter((q) => q.estado === "lista" && q.calidad?.motivo).length;
+  const exito = !pendientes && listas > 0;
+  // Cuando terminan de subir, la tarjeta de éxito aparece y la pantalla va hacia ella.
+  useEffect(() => {
+    if (exito) exitoRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [exito]);
   const configurado = cloudinaryListo();
 
   return (
@@ -423,15 +430,23 @@ export default function SubirFotos() {
           })}
         </ul>
 
-        {!pendientes && listas > 0 && (
-          <div className="thanks">
-            Gracias, {items[0]?.nombre}.{" "}
-            {listas === 1 ? "Tu foto ya está" : `Tus ${listas} fotos ya están`} en el álbum.{" "}
-            {enRevision > 0 &&
-              (enRevision === 1
-                ? "Una parece tomada sin querer: se mostrará cuando los novios la revisen. "
-                : `${enRevision} parecen tomadas sin querer: se mostrarán cuando los novios las revisen. `)}
-            <Link href="/album/fotos">Ver el álbum</Link>
+        {exito && (
+          <div className="exito" ref={exitoRef} role="status">
+            <div className="exito-check" aria-hidden="true">
+              ✓
+            </div>
+            <h3>¡Listo, {(items[0]?.nombre ?? "").split(/\s+/)[0]}!</h3>
+            <p>
+              {listas === 1 ? "Tu foto ya está en el álbum." : `Tus ${listas} fotos ya están en el álbum.`}
+              {enRevision > 0 &&
+                (enRevision === 1
+                  ? " Una parece tomada sin querer: se mostrará cuando los novios la revisen."
+                  : ` ${enRevision} parecen tomadas sin querer: se mostrarán cuando los novios las revisen.`)}
+            </p>
+            <button type="button" className="btn exito-btn" onClick={verAlbum}>
+              Ver el álbum →
+            </button>
+            <p className="exito-nota">O sigue subiendo: cada foto con reto suma al bingo.</p>
           </div>
         )}
       </div>
