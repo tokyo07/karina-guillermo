@@ -68,6 +68,7 @@ export const CALIDAD_JPEG = 0.82;
 export const EN_PARALELO = 2;
 export const MAX_INTENTOS = 3;
 export const MAX_NOMBRE = 40;
+export const MAX_MENSAJE = 140;
 /** Cada cuánto se vuelve a pedir la lista completa (corazones y fotos ocultadas). */
 export const REFRESCO_MS = 30_000;
 
@@ -258,6 +259,8 @@ export type Foto = {
   /** Dudosa según el filtro de calidad: espera la revisión de los novios. */
   revisar: boolean;
   motivo: string | null;
+  /** Mensaje del invitado para los novios (opcional, hasta 140 caracteres). */
+  mensaje?: string | null;
   /** Medidas del filtro de calidad (null en fotos de antes del filtro). */
   calidad?: Partial<Medidas> | null;
   creada_en: string;

@@ -173,6 +173,10 @@ nada extra: los dos sitios usan la misma base y la misma nube.
   (nitidez, exposición y estructura que mide el teléfono al subir), una sola
   foto por ráfaga de casi iguales y el mejor 30 % del álbum (mín. 6, máx. 50).
   La presentación de bienvenida suma las 4 mejores entre las fotos de los novios.
+- **Mensaje para los novios:** al subir, el invitado puede dejar un mensaje
+  opcional (hasta 140 caracteres) que acompaña a esas fotos. Se ve en el mural,
+  la foto ampliada, la nota del diario y el proyector; en el panel se ve sobre
+  cada foto para moderarlo (ocultar la foto oculta también su mensaje).
 - **Bingo de retos** (`src/lib/bingo.ts`): cada momento tiene un cartón de
   3×2 con sus 6 retos. Tocar una casilla elige el reto de la próxima foto y
   subirla lo tacha. Insignias: Primera foto, ¡Línea! (una fila de 3), Testigo de

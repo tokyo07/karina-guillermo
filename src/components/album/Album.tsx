@@ -158,7 +158,10 @@ export default function Album() {
                 decoding="async"
               />
               <figcaption className="cap">
-                <span>{f.nombre}</span>
+                <span className="cap-texto">
+                  <span>{f.nombre}</span>
+                  {f.mensaje && <span className="cap-mensaje">“{f.mensaje}”</span>}
+                </span>
                 <BotonCorazon foto={f} onClick={() => corazon(f.id)} />
               </figcaption>
             </figure>
@@ -260,6 +263,7 @@ function Visor({
         <div className="v-top">
           <div className="v-cap">
             <strong>{f.nombre}</strong>
+            {f.mensaje && <div className="v-mensaje">“{f.mensaje}”</div>}
             <div>{[etiquetaMomento(f.momento), f.reto].filter(Boolean).join(" · ")}</div>
           </div>
           <button className="v-btn" type="button" onClick={() => dlg.current?.close()}>
@@ -378,6 +382,7 @@ function Proyector({
             {actual?.nueva && <span className="proj-new">Nueva</span>}
           </div>
           <div className="proj-meta">{f ? [etiquetaMomento(f.momento), f.reto].filter(Boolean).join(" · ") : ""}</div>
+          {f?.mensaje && <div className="proj-mensaje">“{f.mensaje}”</div>}
         </div>
         <div className="proj-meta">
           {NOVIOS.a} y {NOVIOS.b}

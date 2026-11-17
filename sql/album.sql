@@ -40,6 +40,9 @@ create index if not exists fotos_creada_en_idx on public.fotos (creada_en desc);
 alter table public.fotos add column if not exists revisar boolean not null default false;
 alter table public.fotos add column if not exists motivo text
   check (motivo is null or motivo in ('borrosa', 'oscura', 'quemada', 'lisa', 'repetida'));
+-- Mensaje opcional del invitado para los novios (se ve en el álbum).
+alter table public.fotos add column if not exists mensaje text
+  check (mensaje is null or char_length(mensaje) <= 140);
 alter table public.fotos add column if not exists calidad jsonb
   check (calidad is null or (jsonb_typeof(calidad) = 'object' and pg_column_size(calidad) < 2000));
 
@@ -164,6 +167,7 @@ create policy "ver ajustes" on public.album_ajustes
 -- Registra una foto ya subida a Cloudinary. `p_motivo` no nulo = foto dudosa
 -- (queda por revisar). Se borra la versión anterior sin filtro de calidad.
 drop function if exists public.subir_foto(text, integer, integer, text, text, text, uuid);
+drop function if exists public.subir_foto(text, integer, integer, text, text, text, uuid, text, jsonb);
 create or replace function public.subir_foto(
   p_public_id text,
   p_ancho integer,
@@ -173,7 +177,8 @@ create or replace function public.subir_foto(
   p_reto text,
   p_dispositivo uuid,
   p_motivo text default null,
-  p_calidad jsonb default null
+  p_calidad jsonb default null,
+  p_mensaje text default null
 )
 returns uuid
 language plpgsql
@@ -205,9 +210,9 @@ begin
     raise exception 'limite_por_hora' using errcode = 'P0001';
   end if;
 
-  insert into public.fotos (public_id, ancho, alto, nombre, momento, reto, revisar, motivo, calidad)
+  insert into public.fotos (public_id, ancho, alto, nombre, momento, reto, revisar, motivo, calidad, mensaje)
   values (p_public_id, p_ancho, p_alto, btrim(p_nombre), p_momento, nullif(btrim(p_reto), ''),
-          p_motivo is not null, p_motivo, p_calidad)
+          p_motivo is not null, p_motivo, p_calidad, nullif(btrim(p_mensaje), ''))
   returning id into v_id;
 
   insert into public.subidas (foto_id, dispositivo) values (v_id, p_dispositivo);
@@ -233,6 +238,7 @@ returns table (
   revisar boolean,
   motivo text,
   calidad jsonb,
+  mensaje text,
   creada_en timestamptz,
   corazones bigint,
   vistas bigint,
@@ -243,7 +249,7 @@ stable
 security definer
 set search_path = ''
 as $$
-  select f.id, f.public_id, f.ancho, f.alto, f.nombre, f.momento, f.reto, f.oculta, f.revisar, f.motivo, f.calidad, f.creada_en,
+  select f.id, f.public_id, f.ancho, f.alto, f.nombre, f.momento, f.reto, f.oculta, f.revisar, f.motivo, f.calidad, f.mensaje, f.creada_en,
          (select count(*) from public.corazones c where c.foto_id = f.id),
          (select count(*) from public.vistas v where v.foto_id = f.id),
          exists (select 1 from public.corazones c
@@ -283,11 +289,11 @@ end;
 $$;
 
 revoke all on function public.es_novio() from public;
-revoke all on function public.subir_foto(text, integer, integer, text, text, text, uuid, text, jsonb) from public;
+revoke all on function public.subir_foto(text, integer, integer, text, text, text, uuid, text, jsonb, text) from public;
 revoke all on function public.listar_fotos(uuid) from public;
 revoke all on function public.alternar_corazon(uuid, uuid) from public;
 grant execute on function public.es_novio() to anon, authenticated;
-grant execute on function public.subir_foto(text, integer, integer, text, text, text, uuid, text, jsonb) to anon, authenticated;
+grant execute on function public.subir_foto(text, integer, integer, text, text, text, uuid, text, jsonb, text) to anon, authenticated;
 grant execute on function public.listar_fotos(uuid) to anon, authenticated;
 grant execute on function public.alternar_corazon(uuid, uuid) to anon, authenticated;
 

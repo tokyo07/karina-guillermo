@@ -69,7 +69,8 @@ function armarPaginas(fotos: Foto[]): Pagina[] {
             w: 28,
             rotate: par ? -3 : 2,
             title: bg.nombre,
-            body: [etiquetaMomento(bg.momento), bg.reto].filter(Boolean).join(" · "),
+            // Con mensaje, la nota lo muestra; si no, el momento y el reto.
+            body: bg.mensaje ? `“${bg.mensaje}”` : [etiquetaMomento(bg.momento), bg.reto].filter(Boolean).join(" · "),
           },
         ],
       },

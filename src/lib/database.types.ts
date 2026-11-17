@@ -52,6 +52,7 @@ export type Database = {
           revisar: boolean;
           motivo: string | null;
           calidad: Json | null;
+          mensaje: string | null;
           creada_en: string;
         };
         Insert: never;
@@ -94,6 +95,7 @@ export type Database = {
           p_dispositivo: string;
           p_motivo?: string | null;
           p_calidad?: Json | null;
+          p_mensaje?: string | null;
         };
         Returns: string;
       };
@@ -111,6 +113,7 @@ export type Database = {
           revisar: boolean;
           motivo: string | null;
           calidad: Json | null;
+          mensaje: string | null;
           creada_en: string;
           corazones: number;
           vistas: number;

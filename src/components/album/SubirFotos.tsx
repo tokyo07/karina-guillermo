@@ -5,6 +5,7 @@ import { getSupabase } from "@/lib/supabase";
 import {
   EN_PARALELO,
   MAX_INTENTOS,
+  MAX_MENSAJE,
   MAX_NOMBRE,
   AMBIENTES,
   MOMENTOS,
@@ -37,6 +38,8 @@ type Item = {
   nombre: string;
   momento: Momento;
   reto: string;
+  /** Mensaje para los novios (el mismo para toda la tanda). */
+  mensaje: string;
   estado: "espera" | "subiendo" | "reintento" | "lista" | "error";
   intentos: number;
   error?: string;
@@ -65,6 +68,7 @@ const pausa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function SubirFotos() {
   const [nombre, setNombre] = useState("");
+  const [mensaje, setMensaje] = useState("");
   // El momento sigue al ambiente de la boda; el invitado puede cambiarlo para
   // esta tanda, y vuelve a seguir al ambiente cuando los novios lo cambian.
   const { momento: actual, ahora } = useMomento();
@@ -155,13 +159,11 @@ export default function SubirFotos() {
           p_dispositivo: idDispositivo(),
         };
         const sb = getSupabase();
-        let { error } = await sb.rpc("subir_foto", {
-          ...base,
-          p_motivo: calidad?.motivo ?? null,
-          p_calidad: calidad?.medidas ?? null,
-        });
-        // PGRST202: la base todavía tiene la versión de subir_foto sin filtro de
-        // calidad (falta correr sql/album.sql). Se sube igual, sin el filtro.
+        const filtro = { p_motivo: calidad?.motivo ?? null, p_calidad: calidad?.medidas ?? null };
+        let { error } = await sb.rpc("subir_foto", { ...base, ...filtro, p_mensaje: it.mensaje.trim() || null });
+        // PGRST202: la base tiene una versión anterior de subir_foto (falta correr
+        // sql/album.sql). Se baja de a un paso: sin mensaje, y luego sin filtro de calidad.
+        if (error?.code === "PGRST202") ({ error } = await sb.rpc("subir_foto", { ...base, ...filtro }));
         if (error?.code === "PGRST202") ({ error } = await sb.rpc("subir_foto", base));
         // 23505 = ya estaba registrada (un intento anterior llegó pero se perdió la respuesta).
         if (error && error.code !== "23505") throw error;
@@ -209,12 +211,14 @@ export default function SubirFotos() {
       nombre: n,
       momento,
       reto,
+      mensaje: mensaje.trim(),
       estado: "espera",
       intentos: 0,
     }));
     if (!nuevos.length) return avisar("Solo se pueden subir imágenes.");
     nuevos.forEach((q) => miniaturas.current.add(q.miniatura));
     setItems((prev) => [...nuevos, ...prev]);
+    setMensaje(""); // el mensaje acompaña a esta tanda, no a las siguientes
   }
 
   function faltaNombre() {
@@ -342,6 +346,23 @@ export default function SubirFotos() {
             </ul>
           </div>
         </div>
+
+        <label className="field">
+          <span>
+            Mensaje para los novios <small>(opcional)</small>
+          </span>
+          <textarea
+            className="mensaje-input"
+            value={mensaje}
+            onChange={(e) => setMensaje(e.target.value.slice(0, MAX_MENSAJE))}
+            maxLength={MAX_MENSAJE}
+            rows={2}
+            placeholder="Unas palabras que acompañen tu foto"
+          />
+          <small className="contador" aria-live="polite">
+            {mensaje.length}/{MAX_MENSAJE}
+          </small>
+        </label>
 
         <div className="actions">
           <button

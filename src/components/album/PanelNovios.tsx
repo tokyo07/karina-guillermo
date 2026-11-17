@@ -231,6 +231,7 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
                 <img src={urlFoto(f.public_id, 480)} alt={`Foto de ${f.nombre}`} loading="lazy" decoding="async" />
                 <span className="motivo">
                   {f.nombre} · {ETIQUETA_MOTIVO[f.motivo as Motivo] ?? "Dudosa"}
+                  {f.mensaje && <em> · “{f.mensaje}”</em>}
                 </span>
                 <div className="acciones">
                   <button type="button" className="si" onClick={() => cambiar(f, { revisar: false })}>
@@ -247,13 +248,18 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
       )}
       <div className="panel" style={{ marginTop: 22 }}>
         <h3>Moderación</h3>
-        <p>Oculta cualquier foto y deja de mostrarse en el álbum y el proyector. No se borra.</p>
+        <p>
+          Oculta cualquier foto y deja de mostrarse en el álbum y el proyector (con su mensaje, si tiene). No se
+          borra.
+        </p>
         <div className="mod">
           {fotos
             .filter((f) => !f.revisar)
             .map((f) => (
               <figure key={f.id} className={f.oculta ? "off" : ""}>
                 <img src={urlFoto(f.public_id, 480)} alt={`Foto de ${f.nombre}`} loading="lazy" decoding="async" />
+                {/* El mensaje es texto libre que verán todos: a la vista para moderarlo. */}
+                {f.mensaje && <span className="mensaje-mod">“{f.mensaje}”</span>}
                 <button type="button" onClick={() => cambiar(f, { oculta: !f.oculta })}>
                   {f.oculta ? "Mostrar" : "Ocultar"}
                 </button>

@@ -529,3 +529,17 @@ dialog.viewer::backdrop { background: rgba(32, 13, 6, 0.95); }
 /* Presentación camino al álbum: en vez de botones, un aviso suave. */
 .intro-abriendo { margin: 6px 0 0; font-size: 0.95rem; letter-spacing: 0.08em; opacity: 0.8; animation: abriendo 1.2s ease-in-out infinite alternate; }
 @keyframes abriendo { from { opacity: 0.45; } to { opacity: 0.9; } }
+
+/* Mensaje para los novios: campo del formulario y cómo se ve en el álbum. */
+.mensaje-input {
+  width: 100%; padding: 12px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg);
+  color: var(--text); font: 400 16px/1.4 var(--body); resize: vertical; min-height: 64px;
+}
+:root[data-momento="recepcion"] .mensaje-input { border-radius: 0; }
+.field .contador { display: block; text-align: right; font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+.field > span small { font-weight: 400; color: var(--muted); }
+.tile .cap .cap-texto { display: flex; flex-direction: column; min-width: 0; }
+.tile .cap .cap-mensaje { font-style: italic; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.v-cap .v-mensaje { margin-top: 4px; font-style: italic; opacity: 0.95; }
+.proj-mensaje { font: italic 400 clamp(1rem, 2vw, 1.5rem) var(--display); color: #f8f1e5; margin-top: 4px; }
+.mod figure .mensaje-mod { position: absolute; left: 6px; right: 6px; top: 6px; background: rgba(42, 20, 11, 0.82); color: #f8f1e5; border-radius: 4px; padding: 3px 6px; font: italic 400 0.72rem/1.25 var(--body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
