@@ -1,8 +1,8 @@
 import { FECHA, NOVIOS } from "@/lib/album";
 
-// Portada de la fiesta y la hora loca: una foto de los novios al centro,
+// Portada de la recepción y la fiesta: una foto de los novios al centro,
 // fotos pequeñas que se dispersan alrededor y los nombres que se escriben solos
-// encima, en letra manuscrita blanca. Se monta al pasar a "fiesta" o "hora loca",
+// encima, en letra manuscrita blanca. Se monta al pasar a "recepcion" o "fiesta",
 // así que la animación corre cada vez que los novios cambian a uno de ellos.
 
 const FLOTANTES = [

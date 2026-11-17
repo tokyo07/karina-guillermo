@@ -73,6 +73,7 @@ export type Database = {
           subidas_abiertas: boolean;
           max_subidas_por_hora: number;
           momento_actual: string;
+          momento_fijado_en: string | null;
         };
         Insert: never;
         Update: never;

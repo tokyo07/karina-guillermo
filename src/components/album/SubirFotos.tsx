@@ -5,12 +5,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import {
   EN_PARALELO,
-  FECHA,
   MAX_INTENTOS,
   MAX_NOMBRE,
   AMBIENTES,
   MOMENTOS,
-  NOVIOS,
   cloudinaryListo,
   comprimir,
   conFirma,
@@ -25,9 +23,10 @@ import {
   type Momento,
 } from "@/lib/album";
 import { ETIQUETA_MOTIVO, juzgar, type Medidas, type Motivo } from "@/lib/calidad";
+import { actividadActual } from "@/lib/cronograma";
 import { useMomento } from "./Ambiente";
 import FirmaFiesta from "./FirmaFiesta";
-import PortadaRecepcion from "./PortadaRecepcion";
+import PortadaInvitacion from "./PortadaInvitacion";
 import { useToast } from "./Comun";
 
 type Item = {
@@ -62,12 +61,17 @@ export default function SubirFotos() {
   const [nombre, setNombre] = useState("");
   // El momento sigue al ambiente de la boda; el invitado puede cambiarlo para
   // esta tanda, y vuelve a seguir al ambiente cuando los novios lo cambian.
-  const { momento: actual } = useMomento();
+  const { momento: actual, ahora } = useMomento();
   const [elegido, setElegido] = useState<{ m: Momento; durante: Momento } | null>(null);
   const momento = elegido && elegido.durante === actual ? elegido.m : actual;
   const ambiente = AMBIENTES[momento];
+  // Retos: primero los de la actividad del programa que se vive ahora (si es de
+  // este momento), después los generales del momento.
+  const actividad = actividadActual(ahora);
+  const deAhora = actividad && actividad.momento === momento ? actividad.retos : [];
+  const retos = [...deAhora, ...ambiente.retos.filter((r) => !deAhora.includes(r))];
   const [retoElegido, setReto] = useState("");
-  const reto = ambiente.retos.includes(retoElegido) ? retoElegido : "";
+  const reto = retos.includes(retoElegido) ? retoElegido : "";
   const [toast, avisar] = useToast();
   const [items, setItems] = useState<Item[]>([]);
   /** Ids que ya tienen una subida corriendo (evita lanzarlas dos veces). */
@@ -202,23 +206,7 @@ export default function SubirFotos() {
   return (
     <section>
       {!configurado && <div className="notice">El álbum todavía no está configurado (falta Cloudinary).</div>}
-      {conFirma(actual) ? (
-        <FirmaFiesta key={actual} />
-      ) : actual === "recepcion" ? (
-        <PortadaRecepcion />
-      ) : (
-        <div className="heroWrap">
-          <div className="festones" />
-          <div className="hero">
-            <h1>
-              <span>{NOVIOS.a}</span>
-              <i>&amp;</i>
-              <span>{NOVIOS.b}</span>
-            </h1>
-            <p className="date">{FECHA}</p>
-          </div>
-        </div>
-      )}
+      {conFirma(actual) ? <FirmaFiesta key={actual} /> : <PortadaInvitacion />}
       <p className="lede">{AMBIENTES[actual].lede}</p>
       {AMBIENTES[actual].aviso && <p className="aviso-momento">{AMBIENTES[actual].aviso}</p>}
 
@@ -257,12 +245,17 @@ export default function SubirFotos() {
           <span className="legend">
             Reto para esta foto <small>(opcional)</small>
           </span>
+          {deAhora.length > 0 && actividad && (
+            <p className="ahora-programa">
+              Ahora: <b>{actividad.nombre}</b>
+            </p>
+          )}
           <div className="chips" role="group" aria-label="Retos">
-            {ambiente.retos.map((r) => (
+            {retos.map((r) => (
               <button
                 key={r}
                 type="button"
-                className="chip"
+                className={`chip${deAhora.includes(r) ? " ahora" : ""}`}
                 aria-pressed={reto === r}
                 onClick={() => setReto(reto === r ? "" : r)}
               >

@@ -24,29 +24,13 @@
 
 /* ── Ambiente por momento ──
    <html data-momento="…"> lo pone Ambiente.tsx con el momento que fijan los
-   novios en el panel. Recepción es el diseño original (las variables de arriba). */
+   novios en el panel (o el programa, a su hora). Tres temas:
+     ceremonia → la invitación · recepción → galería · fiesta → noche con luces. */
 
-/* Ceremonia: iglesia, marfil y dorado, sobria. */
-:root[data-momento="ceremonia"] {
-  --terra: #b9975b; --clay: #b9975b; --kraft: #cdbb94;
-  --bg: #f3eee3; --surface: #fffdf8; --surface2: #efe7d6; --text: #3b3226; --muted: #6e624f;
-  --line: #ddd0b4; --accent: #8c6d33; --accent-ink: #fffdf8; --bar: #4a3f2c; --bar-ink: #fffdf8; --bar-muted: #e3d5b4;
-  --ok: #6f7d5c; --bad: #a94b24; --date: #8c6d33;
-  --shadow: 0 12px 34px rgba(59, 50, 38, 0.12);
-  --diario-bg: radial-gradient(120% 80% at 50% 35%, #a08454 0%, #6b5532 55%, #3f321d 100%);
-}
-@media (prefers-color-scheme: dark) {
-  :root[data-momento="ceremonia"] {
-    --bg: #221d16; --surface: #2e271e; --surface2: #3a3226; --text: #f5efe2; --muted: #cbbd9c;
-    --line: #4a4032; --accent: #d4b26a; --accent-ink: #221d16; --bar: #17130e; --date: #d4b26a;
-    --shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
-  }
-}
-
-/* Recepción: la invitación (public/index.html). Marfil, terracota #B4533A,
+/* Ceremonia: la invitación (public/index.html). Marfil, terracota #B4533A,
    Great Vibes para los nombres, Cormorant Garamond para títulos y Lato para el
    texto. También es el aspecto mientras no se sabe el momento. Siempre claro. */
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) {
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) {
   --terra: #B4533A; --terra-deep: #8f3f2b; --clay: #B4533A; --kraft: #E1BAB0; --cream: #FFFCFA; --ink: #B4533A;
   --bg: #FFFCFA; --surface: #FFFCFA; --surface2: #FBF5F3; --text: #B4533A; --muted: #a0634f;
   --line: #E1BAB0; --accent: #B4533A; --accent-ink: #FFFCFA; --bar: #FFFCFA; --bar-ink: #B4533A; --bar-muted: #B4533A;
@@ -57,28 +41,28 @@
   --diario-bg: #F6E9E4;
   color-scheme: light;
 }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) body { font-weight: 300; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) body { font-weight: 300; }
 /* Barra como la de la invitación: clara, monograma en Great Vibes, enlaces en versalitas espaciadas. */
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .bar { border-bottom: 1px solid #F3DDD7; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) body::before { background: var(--bar); }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .mono { font: 400 1.7rem/1 var(--font-vibes), cursive; letter-spacing: 0; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .mono b { color: inherit; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .nav a { font: 400 0.72rem var(--body); letter-spacing: 0.18em; text-transform: uppercase; border-bottom: 1px solid transparent; padding: 8px 10px; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .nav a[aria-current="page"] { border-bottom-color: var(--accent); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .bar { border-bottom: 1px solid #F3DDD7; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) body::before { background: var(--bar); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .mono { font: 400 1.7rem/1 var(--font-vibes), cursive; letter-spacing: 0; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .mono b { color: inherit; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .nav a { font: 400 0.72rem var(--body); letter-spacing: 0.18em; text-transform: uppercase; border-bottom: 1px solid transparent; padding: 8px 10px; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .nav a[aria-current="page"] { border-bottom-color: var(--accent); }
 /* Tarjetas y botones finos, con las líneas de la invitación. */
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) :is(.card, .panel, .stat) { border: 1.5px solid var(--accent); border-radius: 0; position: relative; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .card::after { content: ""; position: absolute; inset: 6px; border: 1px solid var(--line); pointer-events: none; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .card > * { position: relative; z-index: 1; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .btn { font: 700 0.75rem var(--body); letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 26px; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .btn.small { font-size: 0.68rem; padding: 10px 18px; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .chip { border-color: var(--line); font-weight: 400; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .head h2 { font: 400 2.4rem/1.05 var(--font-vibes), cursive; }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) :is(.panel h3, .empty h3) { font: 400 1.7rem/1.15 var(--display); }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .lede { font-family: var(--display); font-style: italic; font-size: 1.2rem; color: var(--text); }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .diario :is(.jsc-top, .jsc-head) { color: var(--text); }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"]) .diario .jsc-title { font: 400 clamp(34px, 4cqi, 54px)/1 var(--font-vibes), cursive; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) :is(.card, .panel, .stat) { border: 1.5px solid var(--accent); border-radius: 0; position: relative; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .card::after { content: ""; position: absolute; inset: 6px; border: 1px solid var(--line); pointer-events: none; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .card > * { position: relative; z-index: 1; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .btn { font: 700 0.75rem var(--body); letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 26px; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .btn.small { font-size: 0.68rem; padding: 10px 18px; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .chip { border-color: var(--line); font-weight: 400; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .head h2 { font: 400 2.4rem/1.05 var(--font-vibes), cursive; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) :is(.panel h3, .empty h3) { font: 400 1.7rem/1.15 var(--display); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .lede { font-family: var(--display); font-style: italic; font-size: 1.2rem; color: var(--text); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .diario :is(.jsc-top, .jsc-head) { color: var(--text); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .diario .jsc-title { font: 400 clamp(34px, 4cqi, 54px)/1 var(--font-vibes), cursive; }
 
-/* Portada de recepción (PortadaRecepcion): marco con ramas y foto en arco. */
+/* Portada de ceremonia (PortadaInvitacion): marco con ramas y foto en arco. */
 .pr-ill { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .pr-hero { display: grid; gap: 64px; align-items: center; padding: 40px 6px 10px; color: var(--accent); }
 .pr-foto { position: relative; justify-self: center; width: min(320px, 86%); }
@@ -105,9 +89,9 @@
   .pr-rama.br { bottom: -64px; right: -70px; }
 }
 
-/* Hora loca: noche, morado oscuro con luces ámbar, rosa y lila. Siempre oscuro.
-   (Fue el primer diseño de la fiesta; usa la misma firma manuscrita en la portada.) */
-:root[data-momento="horaloca"] {
+/* Fiesta: noche, morado oscuro con luces ámbar, rosa y lila. Siempre oscuro.
+   Usa la misma firma manuscrita en la portada. */
+:root[data-momento="fiesta"] {
   --terra: #e2577a; --clay: #f0a24b; --kraft: #7a5384;
   --bg: #1a1020; --surface: #26182e; --surface2: #33203d; --text: #f8ecf2; --muted: #c9a9c0;
   --line: #4a2f55; --accent: #f0a24b; --accent-ink: #1a1020; --bar: #120a17; --bar-ink: #f8ecf2; --bar-muted: #d9b8d0;
@@ -122,11 +106,11 @@
     radial-gradient(circle at 20% 85%, rgba(170, 110, 220, 0.16) 0, transparent 22%),
     var(--bg) fixed;
 }
-:root[data-momento="horaloca"] body { background: transparent; }
+:root[data-momento="fiesta"] body { background: transparent; }
 
-/* Fiesta: estilo galería. Gris claro plano, naranja atardecer (#C04A2B), menú en Jost
+/* Recepción: estilo galería. Gris claro plano, naranja atardecer (#C04A2B), menú en Jost
    entre corchetes, esquinas rectas y firma manuscrita (Sacramento). Siempre claro. */
-:root[data-momento="fiesta"] {
+:root[data-momento="recepcion"] {
   --terra: #C04A2B; --clay: #C04A2B; --kraft: #b9b9b3;
   --bg: #e3e3df; --surface: #ecece8; --surface2: #d8d8d3; --text: #111111; --muted: #5a5a55;
   --line: #c4c4be; --accent: #C04A2B; --accent-ink: #ffffff; --bar: #e3e3df; --bar-ink: #111111; --bar-muted: #111111;
@@ -138,23 +122,23 @@
   color-scheme: light;
 }
 /* Todo recto y plano. */
-:root[data-momento="fiesta"] :is(.card, .panel, .stat, .chip, .btn, .q, .q img, .notice, .aviso-momento, .tile, .mod figure, .mod button, .thanks, .toast, input) { border-radius: 0; }
-:root[data-momento="fiesta"] .festones { display: none; }
-/* Menú: [subir] [álbum] [novios], el activo en caja azul. */
-:root[data-momento="fiesta"] .bar { border-bottom: 0; }
-:root[data-momento="fiesta"] .mono { font: 400 1.9rem/1 var(--font-firma), cursive; letter-spacing: 0; }
-:root[data-momento="fiesta"] .mono b { color: inherit; }
-:root[data-momento="fiesta"] .nav { gap: 6px; }
-:root[data-momento="fiesta"] .nav a { text-transform: lowercase; font: 500 0.95rem var(--body); letter-spacing: 0.02em; padding: 4px 8px; border-bottom: 0; color: var(--text); }
-:root[data-momento="fiesta"] .nav a::before { content: "["; }
-:root[data-momento="fiesta"] .nav a::after { content: "]"; }
-:root[data-momento="fiesta"] .nav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); }
+:root[data-momento="recepcion"] :is(.card, .panel, .stat, .chip, .btn, .q, .q img, .notice, .aviso-momento, .tile, .mod figure, .mod button, .thanks, .toast, input) { border-radius: 0; }
+:root[data-momento="recepcion"] .festones { display: none; }
+/* Menú: [subir] [álbum] [novios], el activo en caja naranja. */
+:root[data-momento="recepcion"] .bar { border-bottom: 0; }
+:root[data-momento="recepcion"] .mono { font: 400 1.9rem/1 var(--font-firma), cursive; letter-spacing: 0; }
+:root[data-momento="recepcion"] .mono b { color: inherit; }
+:root[data-momento="recepcion"] .nav { gap: 6px; }
+:root[data-momento="recepcion"] .nav a { text-transform: lowercase; font: 500 0.95rem var(--body); letter-spacing: 0.02em; padding: 4px 8px; border-bottom: 0; color: var(--text); }
+:root[data-momento="recepcion"] .nav a::before { content: "["; }
+:root[data-momento="recepcion"] .nav a::after { content: "]"; }
+:root[data-momento="recepcion"] .nav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); }
 /* Títulos en firma; los chips y botones, en Jost. */
-:root[data-momento="fiesta"] .head h2 { font: 400 2.8rem/1 var(--display); }
-:root[data-momento="fiesta"] :is(.panel h3, .empty h3) { font: 400 2.1rem/1.1 var(--display); }
-:root[data-momento="fiesta"] .chip { border-color: var(--text); font-size: 0.85rem; }
-:root[data-momento="fiesta"] .btn.ghost { border-color: var(--text); }
-:root[data-momento="fiesta"] .card, :root[data-momento="fiesta"] .panel { border-color: var(--line); }
+:root[data-momento="recepcion"] .head h2 { font: 400 2.8rem/1 var(--display); }
+:root[data-momento="recepcion"] :is(.panel h3, .empty h3) { font: 400 2.1rem/1.1 var(--display); }
+:root[data-momento="recepcion"] .chip { border-color: var(--text); font-size: 0.85rem; }
+:root[data-momento="recepcion"] .btn.ghost { border-color: var(--text); }
+:root[data-momento="recepcion"] .card, :root[data-momento="recepcion"] .panel { border-color: var(--line); }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { height: 100%; background: var(--bg); scroll-padding-top: env(safe-area-inset-top, 0px); }
@@ -337,7 +321,7 @@ dialog.viewer::backdrop { background: rgba(32, 13, 6, 0.95); }
 .mod .acciones button { position: static; flex: 1; }
 .mod .acciones button.si { background: var(--accent); color: var(--accent-ink); }
 
-/* Portada del modo fiesta (FirmaFiesta): foto central, fotos que se dispersan y firma que se escribe sola. */
+/* Portada con firma (FirmaFiesta, en recepción y fiesta): foto central, fotos que se dispersan y firma que se escribe sola. */
 .firma-fiesta { padding-top: 18px; }
 .ff-escena { position: relative; height: clamp(360px, 108vw, 560px); max-width: 760px; margin: 0 auto; }
 .ff-foto {
@@ -364,20 +348,26 @@ dialog.viewer::backdrop { background: rgba(32, 13, 6, 0.95); }
 @keyframes ff-escribe { from { clip-path: inset(-20% 100% -20% 0); } to { clip-path: inset(-20% -5% -20% 0); } }
 .ff-fecha { text-align: center; margin: 6px 0 0; font: 400 0.95rem var(--body); letter-spacing: 0.08em; }
 
-/* Diario en modo fiesta: fondo gris claro, así que título e íconos de arriba en negro. */
-:root[data-momento="fiesta"] .diario :is(.jsc-top, .jsc-head) { color: var(--text); }
-:root[data-momento="fiesta"] .diario .jsc-title { font: 400 clamp(34px, 4cqi, 56px)/1 var(--font-firma), cursive; }
-:root[data-momento="fiesta"] .diario .jsc-meta { font-family: var(--body); font-weight: 400; }
-:root[data-momento="fiesta"] .diario .jsc-chip { border-radius: 0; }
-:root[data-momento="fiesta"] .diario .jsc-chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
+/* Diario en recepción (galería): fondo gris claro, así que título e íconos de arriba en negro. */
+:root[data-momento="recepcion"] .diario :is(.jsc-top, .jsc-head) { color: var(--text); }
+:root[data-momento="recepcion"] .diario .jsc-title { font: 400 clamp(34px, 4cqi, 56px)/1 var(--font-firma), cursive; }
+:root[data-momento="recepcion"] .diario .jsc-meta { font-family: var(--body); font-weight: 400; }
+:root[data-momento="recepcion"] .diario .jsc-chip { border-radius: 0; }
+:root[data-momento="recepcion"] .diario .jsc-chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
 
 /* Botones del diario (libro / cuadrícula) sobre fondo claro: el carrusel los pinta
-   blancos para fondos oscuros; en recepción y fiesta se pintan con el color del modo. */
-:is(:root:not([data-momento]), :root[data-momento="recepcion"], :root[data-momento="fiesta"]) .diario .jsc-chip {
+   blancos para fondos oscuros; en ceremonia y recepción se pintan con el color del modo. */
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"], :root[data-momento="recepcion"]) .diario .jsc-chip {
   color: var(--accent); background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--accent);
 }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"], :root[data-momento="fiesta"]) .diario .jsc-chip:hover { background: var(--surface2); }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"], :root[data-momento="fiesta"]) .diario .jsc-chip[aria-pressed="true"] {
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"], :root[data-momento="recepcion"]) .diario .jsc-chip:hover { background: var(--surface2); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"], :root[data-momento="recepcion"]) .diario .jsc-chip[aria-pressed="true"] {
   color: var(--accent-ink); background: var(--accent); box-shadow: none;
 }
-:is(:root:not([data-momento]), :root[data-momento="recepcion"], :root[data-momento="fiesta"]) .diario .jsc-chip:focus-visible { outline-color: var(--accent); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"], :root[data-momento="recepcion"]) .diario .jsc-chip:focus-visible { outline-color: var(--accent); }
+
+/* Retos de la actividad del programa que se vive ahora (lib/cronograma.ts). */
+.ahora-programa { margin: -2px 0 8px; font-size: 0.85rem; color: var(--muted); }
+.ahora-programa b { color: var(--text); font-weight: 600; }
+.chip.ahora:not([aria-pressed="true"]) { border-color: var(--accent); border-style: dashed; }
+.momento-auto { margin: 10px 0 0; font-size: 0.85rem; color: var(--muted); }

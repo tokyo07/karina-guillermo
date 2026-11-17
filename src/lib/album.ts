@@ -13,7 +13,6 @@ export const MOMENTOS = [
   { id: "ceremonia", label: "Ceremonia" },
   { id: "recepcion", label: "Recepción" },
   { id: "fiesta", label: "Fiesta" },
-  { id: "horaloca", label: "Hora loca" },
 ] as const;
 export type Momento = (typeof MOMENTOS)[number]["id"];
 
@@ -55,24 +54,13 @@ export const AMBIENTES: Record<Momento, { retos: string[]; lede: string; aviso?:
     ],
     lede: "¡Ahora sí, a la pista! Sube lo más divertido de la noche.",
   },
-  horaloca: {
-    retos: [
-      "El disfraz más loco",
-      "Los novios con sombrero o antifaz",
-      "El trencito de baile",
-      "Lluvia de luces y papelitos",
-      "Tu mejor cara de fiesta",
-      "El que no se cansa de bailar",
-    ],
-    lede: "¡Llegó la hora loca! Luces, disfraces y el baile de los que quedan en pie.",
-  },
 };
 
-/** Momentos con la portada de firma manuscrita (FirmaFiesta). */
-export const conFirma = (m: Momento) => m === "fiesta" || m === "horaloca";
+/** Momentos con la portada de firma manuscrita (FirmaFiesta); la ceremonia usa la de la invitación. */
+export const conFirma = (m: Momento) => m === "recepcion" || m === "fiesta";
 
-/** Momento que se usa mientras no se sabe el real (es el diseño original). */
-export const MOMENTO_INICIAL: Momento = "recepcion";
+/** Momento que se usa mientras no se sabe el real (el aspecto de la invitación). */
+export const MOMENTO_INICIAL: Momento = "ceremonia";
 
 export const MAX_LADO = 1600;
 export const CALIDAD_JPEG = 0.82;

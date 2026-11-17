@@ -72,7 +72,7 @@ for (const f of fotos) {
     const { px, w, h } = desdeFoto(f, v.filtro);
     const m = medir(px, w, h);
     if (v.nombre === "original") huellas.push({ f, h: m.huella });
-    fila(v.nombre, m, juzgar(m, v.momento ?? "recepcion"), v.espera, v.tolera);
+    fila(v.nombre, m, juzgar(m, v.momento ?? "ceremonia"), v.espera, v.tolera);
   }
 }
 
@@ -80,7 +80,7 @@ console.log("\nSintéticas");
 for (const s of SINTETICAS) {
   const { px, w, h } = sintetica(s.fuente);
   const m = medir(px, w, h);
-  fila(s.nombre, m, juzgar(m, s.momento ?? "recepcion"), s.espera);
+  fila(s.nombre, m, juzgar(m, s.momento ?? "ceremonia"), s.espera);
 }
 
 console.log("\nRepetidas (recorte del 4 % y leve cambio de brillo de cada foto contra su original)");
@@ -88,7 +88,7 @@ for (const { f, h } of huellas) {
   const { px, w, h: alto } = desdeFoto(f, "crop=iw*0.96:ih*0.96,eq=brightness=0.04");
   const m = medir(px, w, alto);
   const d = distancia(h, m.huella);
-  const motivo = juzgar(m, "recepcion", [h]);
+  const motivo = juzgar(m, "ceremonia", [h]);
   const ok = motivo === "repetida";
   if (!ok) fallas++;
   console.log(`${ok ? "  " : "✗ "}${f.padEnd(48)} distancia ${d} → ${motivo ?? "ok"}`);

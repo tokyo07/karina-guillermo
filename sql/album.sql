@@ -26,7 +26,7 @@ create table if not exists public.fotos (
   ancho integer not null check (ancho between 1 and 4000),
   alto integer not null check (alto between 1 and 4000),
   nombre text not null check (char_length(nombre) between 1 and 40),
-  momento text not null check (momento in ('ceremonia', 'recepcion', 'fiesta', 'horaloca')),
+  momento text not null check (momento in ('ceremonia', 'recepcion', 'fiesta')),
   reto text check (reto is null or char_length(reto) <= 80),
   oculta boolean not null default false,
   creada_en timestamptz not null default now()
@@ -78,15 +78,21 @@ insert into public.album_ajustes (id) values (true) on conflict (id) do nothing;
 -- etiqueta que se propone al subir.
 alter table public.album_ajustes
   add column if not exists momento_actual text not null default 'ceremonia';
+-- Cuándo se eligió el momento a mano. El programa de la boda (src/lib/cronograma.ts)
+-- cambia el ambiente solo a su hora, salvo que alguien lo haya elegido después.
+alter table public.album_ajustes add column if not exists momento_fijado_en timestamptz;
 
--- Momentos válidos (fotos y ajustes). "horaloca" se agregó después: se
--- reemplazan los checks para que una base ya creada también lo acepte.
+-- Momentos válidos: ceremonia, recepción y fiesta. Hubo un cuarto ("horaloca")
+-- que se unió a la fiesta: se pasa a "fiesta" y se reemplazan los checks para
+-- que una base ya creada quede igual que una nueva.
 alter table public.fotos drop constraint if exists fotos_momento_check;
-alter table public.fotos add constraint fotos_momento_check
-  check (momento in ('ceremonia', 'recepcion', 'fiesta', 'horaloca'));
 alter table public.album_ajustes drop constraint if exists album_ajustes_momento_actual_check;
+update public.fotos set momento = 'fiesta' where momento = 'horaloca';
+update public.album_ajustes set momento_actual = 'fiesta' where momento_actual = 'horaloca';
+alter table public.fotos add constraint fotos_momento_check
+  check (momento in ('ceremonia', 'recepcion', 'fiesta'));
 alter table public.album_ajustes add constraint album_ajustes_momento_actual_check
-  check (momento_actual in ('ceremonia', 'recepcion', 'fiesta', 'horaloca'));
+  check (momento_actual in ('ceremonia', 'recepcion', 'fiesta'));
 
 -- ─────────────────────────── permisos ───────────────────────────
 -- Supabase da por defecto todos los privilegios de las tablas nuevas a anon y
@@ -282,10 +288,10 @@ begin
   if not public.es_novio() then
     raise exception 'solo_novios' using errcode = '42501';
   end if;
-  if p_momento is null or p_momento not in ('ceremonia', 'recepcion', 'fiesta', 'horaloca') then
+  if p_momento is null or p_momento not in ('ceremonia', 'recepcion', 'fiesta') then
     raise exception 'momento_invalido' using errcode = '22023';
   end if;
-  update public.album_ajustes set momento_actual = p_momento where id;
+  update public.album_ajustes set momento_actual = p_momento, momento_fijado_en = now() where id;
   return p_momento;
 end;
 $$;

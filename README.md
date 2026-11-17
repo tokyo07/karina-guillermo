@@ -125,17 +125,21 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
 
 ### Operación
 
-- **Ambiente por momento:** en el panel, "¿Qué se vive ahora?" cambia entre
-  Ceremonia, Recepción, Fiesta y Hora loca. Recepción repite la portada de la
-  invitación (marfil, terracota, marco con ramas y foto en arco). Fiesta usa el estilo galería (gris
-  claro, naranja atardecer, menú `[subir]` en Jost); Hora loca, la noche
-  morada con luces ámbar y rosa. Las dos abren con la firma manuscrita de los
-  novios que se escribe sola. Todos los teléfonos cambian solos (al instante
-  por Realtime, o en menos de 30 s): colores, retos, texto de bienvenida y el
-  momento que se propone al subir. En Ceremonia se pide apagar flash y sonido.
-  Recepción es el diseño original. Si `album.sql` se corrió antes de este
-  cambio, volver a correrlo completo (es idempotente) para crear
-  `momento_actual` y `fijar_momento()`.
+- **Ambiente por momento:** tres momentos, cada uno con su estilo:
+  **Ceremonia** = la portada de la invitación (marfil, terracota, marco con
+  ramas y foto en arco; pide apagar flash y sonido), **Recepción** = estilo
+  galería (gris claro, naranja atardecer, menú `[subir]` en Jost) y **Fiesta** =
+  noche morada con luces ámbar y rosa. Recepción y Fiesta abren con la firma
+  manuscrita de los novios que se escribe sola. Todos los teléfonos cambian
+  solos (al instante por Realtime, o en menos de 30 s): colores, retos, texto
+  de bienvenida y el momento que se propone al subir.
+- **Programa de la boda** (`src/lib/cronograma.ts`): a su hora el momento
+  cambia solo, por si nadie toca el panel (Ceremonia 5:00 p. m., Recepción
+  6:45 p. m., Fiesta 8:00 p. m.). Lo elegido a mano en el panel manda hasta el
+  siguiente cambio del programa. Además, mientras dura cada actividad (brindis,
+  mariachis y pastel, parranda vallenata, hora loca de cierre…) sus retos
+  aparecen primero al subir. Para probarlo en desarrollo: `/album?hora=2026-12-19T22:15`.
+  Si `album.sql` se corrió antes, volver a correrlo completo (es idempotente).
 - **Filtro de calidad:** antes de subir, el teléfono mide cada foto
   (`src/lib/calidad.ts`): borrosa o movida, casi negra, casi blanca, "lisa"
   (pared, techo, bolsillo) o casi igual a otra que ese teléfono ya subió. Una

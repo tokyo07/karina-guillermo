@@ -1,6 +1,6 @@
 import { NOVIOS } from "@/lib/album";
 
-// Portada del modo recepción: la misma de la invitación (public/index.html).
+// Portada de la ceremonia: la misma de la invitación (public/index.html).
 // Marco doble terracota con ramas en dos esquinas, nombres en Great Vibes y la
 // foto de los novios en arco. Los dibujos son los símbolos de la invitación.
 
@@ -46,7 +46,7 @@ export function Corazon() {
   );
 }
 
-export default function PortadaRecepcion() {
+export default function PortadaInvitacion() {
   return (
     <div className="pr-hero">
       <div className="pr-foto">

@@ -16,6 +16,7 @@ import {
   type Momento,
 } from "@/lib/album";
 import { ETIQUETA_MOTIVO, type Motivo } from "@/lib/calidad";
+import { ZONA_HORARIA, horaCorta, siguienteCambio } from "@/lib/cronograma";
 import { useMomento } from "./Ambiente";
 import { AvisoEstado, useToast } from "./Comun";
 
@@ -232,7 +233,8 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
 
 /** Cambia el ambiente de todos los teléfonos: colores, retos y momento propuesto al subir. */
 function MomentoActual({ avisar }: { avisar: (m: string) => void }) {
-  const { momento, aplicar } = useMomento();
+  const { momento, aplicar, ahora } = useMomento();
+  const sigue = ahora ? siguienteCambio(ahora) : null;
   const [enviando, setEnviando] = useState<Momento | null>(null);
 
   async function fijar(m: Momento) {
@@ -248,7 +250,10 @@ function MomentoActual({ avisar }: { avisar: (m: string) => void }) {
   return (
     <div className="panel momento-panel">
       <h3>¿Qué se vive ahora?</h3>
-      <p>Cambia el ambiente del álbum en todos los teléfonos: colores, retos y el momento de las fotos nuevas.</p>
+      <p>
+        Cambia el ambiente del álbum en todos los teléfonos: colores, retos y el momento de las fotos nuevas. Lo que
+        elijas se mantiene hasta el siguiente cambio del programa.
+      </p>
       <div className="chips" role="group" aria-label="Momento actual de la boda">
         {MOMENTOS.map((m) => (
           <button
@@ -263,6 +268,12 @@ function MomentoActual({ avisar }: { avisar: (m: string) => void }) {
           </button>
         ))}
       </div>
+      {sigue && (
+        <p className="momento-auto">
+          Automático: pasa a <b>{etiquetaMomento(sigue.momento)}</b> a las {horaCorta(sigue.desde)}
+          {sigue.desde - ahora > 86_400_000 ? ` del ${new Date(sigue.desde).toLocaleDateString("es-EC", { day: "numeric", month: "long", timeZone: ZONA_HORARIA })}` : ""}.
+        </p>
+      )}
     </div>
   );
 }
