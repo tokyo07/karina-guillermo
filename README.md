@@ -124,6 +124,26 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
    `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
    `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`.
 
+### Sitio aparte solo para el álbum (opcional)
+
+El mismo repositorio puede publicarse como un **segundo proyecto de Vercel**
+que sea solo el álbum (por ejemplo `album-karina-guillermo.vercel.app` o
+`album.tudominio.com`), sin tocar el proyecto de la invitación:
+
+1. Vercel → **Add New… → Project** → importar este mismo repositorio. Nombre,
+   por ejemplo, `album-karina-guillermo`.
+2. En **Environment Variables**, las cuatro del álbum (Supabase y Cloudinary)
+   y además `SOLO_ALBUM` = `1`. Con esa variable, `/` redirige a `/album`
+   (conservando `?invitado=Nombre`) y la invitación no se ve en ese sitio.
+3. **Deploy**. Luego **Settings → Environments → Production → Branch
+   Tracking** (o *Settings → Git → Production Branch*, según la versión del
+   panel): poner la rama del álbum (hoy `feat/album-fotos`) y volver a publicar.
+4. Opcional: **Settings → Domains** para un subdominio propio.
+5. Imprimir el QR desde el panel **del sitio nuevo** (usa la dirección del sitio).
+
+El proyecto de la invitación no cambia. Supabase y Cloudinary no necesitan
+nada extra: los dos sitios usan la misma base y la misma nube.
+
 ### Operación
 
 - **Ambiente por momento:** tres momentos, cada uno con su estilo:
