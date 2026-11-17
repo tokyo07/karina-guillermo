@@ -132,11 +132,20 @@ function TunnelCard({
   const baseY = card.sin * stage.height * card.ry;
   const pan = stage.isMobile ? 20 : 45;
 
+  // Perspectiva calculada a mano (proyección), no con translateZ + perspective de CSS:
+  // WebKit (Safari y Chrome en iPhone) aplana el 3D con overflow:hidden y las fotos
+  // quedaban todas del mismo tamaño, amontonadas al centro. La cuenta es la misma
+  // que hace el navegador —escala = P / (P − z), y la posición se escala igual—,
+  // así que en computadora se ve idéntico y en cualquier celular también.
+  const P = stage.isMobile ? 900 : 1200;
   const transform = useTransform([progress, pointer.x, pointer.y], ([p, px, py]: number[]) => {
     const t = still ? 0.55 : Math.min(1, Math.max(0, local(p)));
     // Una pasada: acelera al acercarse, como si la cámara avanzara hacia ellas.
     const z = farZ + (nearZ - farZ) * (flyMs ? Math.pow(t, 1.6) : t);
-    return `translate3d(calc(-50% + ${baseX - px * pan}px), calc(-50% + ${baseY - py * pan}px), ${z}px) rotateZ(${card.rotZ}deg)`;
+    const s = P / Math.max(P - z, 1);
+    const x = (baseX - px * pan) * s;
+    const y = (baseY - py * pan) * s;
+    return `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${s}) rotate(${card.rotZ}deg)`;
   });
   const opacity = useTransform(progress, (p) => {
     const t = local(p);
@@ -265,7 +274,7 @@ export default function PerspectiveTunnelHero({
     <div
       ref={ref}
       className={"pth-root" + (className ? " " + className : "")}
-      style={{ height, perspective: stage?.isMobile ? "900px" : "1200px" }}
+      style={{ height }}
     >
       <style>{CSS}</style>
       <div className="pth-dots" aria-hidden="true" />
@@ -309,7 +318,7 @@ export default function PerspectiveTunnelHero({
 
 // Paleta por defecto: la de la invitación. Se puede cambiar con las variables --pth-*.
 const CSS = `
-.pth-root{position:relative;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;
+.pth-root{position:relative;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;
   background:var(--pth-bg,#f8f1e5);color:var(--pth-ink,#46291d);user-select:none;-webkit-user-select:none}
 .pth-dots{position:absolute;inset:0;pointer-events:none;opacity:.7;
   background-image:radial-gradient(var(--pth-dot,#d6bb93) 1px,transparent 1px);background-size:28px 28px;
@@ -318,7 +327,7 @@ const CSS = `
 .pth-ring{position:absolute;border-radius:50%;pointer-events:none}
 .pth-ring-a{width:48vmin;height:48vmin;border:1px solid var(--pth-ring,rgba(168,97,66,.22))}
 .pth-ring-b{width:76vmin;height:76vmin;border:1px dashed var(--pth-ring2,rgba(168,97,66,.28))}
-.pth-plane{position:absolute;inset:0;pointer-events:none;transform-style:preserve-3d}
+.pth-plane{position:absolute;inset:0;pointer-events:none}
 .pth-card{position:absolute;left:50%;top:50%;aspect-ratio:4/5;will-change:transform,opacity;pointer-events:auto}
 .pth-card-in{position:relative;width:100%;height:100%;overflow:hidden;border-radius:16px;background:var(--pth-card,#ecdcc6);
   box-shadow:0 24px 50px -12px rgba(70,41,29,.35);outline:1px solid rgba(70,41,29,.12);outline-offset:-1px;transition:outline-color .5s,box-shadow .5s}
