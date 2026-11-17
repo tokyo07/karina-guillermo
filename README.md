@@ -150,6 +150,12 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
   (nitidez, exposición y estructura que mide el teléfono al subir), una sola
   foto por ráfaga de casi iguales y el mejor 30 % del álbum (mín. 6, máx. 50).
   La presentación de bienvenida suma las 4 mejores entre las fotos de los novios.
+- **Bingo de retos** (`src/lib/bingo.ts`): cada momento tiene un cartón de
+  3×2 con sus 6 retos. Tocar una casilla elige el reto de la próxima foto y
+  subirla lo tacha. Insignias: Primera foto, ¡Línea! (una fila de 3), Testigo de
+  honor / Alma de la mesa / Leyenda de la pista (cartón lleno de cada momento),
+  Cazador de momentos (un reto en cada momento) y Paparazzi (10 fotos). Se
+  guarda en cada teléfono (`localStorage`), sin cuentas ni base de datos.
 - **Filtro de calidad:** antes de subir, el teléfono mide cada foto
   (`src/lib/calidad.ts`): borrosa o movida, casi negra, casi blanca, "lisa"
   (pared, techo, bolsillo) o casi igual a otra que ese teléfono ya subió. Una

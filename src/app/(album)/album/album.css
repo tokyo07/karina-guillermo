@@ -381,3 +381,25 @@ dialog.viewer::backdrop { background: rgba(32, 13, 6, 0.95); }
 .queridas img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
 .queridas .puesto { position: absolute; top: 6px; left: 6px; min-width: 26px; height: 26px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font: 700 0.8rem/1 var(--body); padding: 0 6px; }
 .queridas .dato { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 5px; background: linear-gradient(transparent, rgba(30, 12, 6, 0.75)); color: #fff; font-size: 0.72rem; }
+
+/* Bingo de retos (SubirFotos + lib/bingo.ts): cartón 3×2 e insignias. Usa las variables del tema. */
+.bingo { border: 1.5px solid var(--accent); padding: 10px; background: var(--bg); }
+.bingo-head { display: flex; justify-content: space-between; align-items: baseline; margin: 0 2px 8px; font: 600 0.82rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.bingo-carton { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.bingo-casilla {
+  position: relative; min-height: 78px; padding: 8px 6px; display: flex; align-items: center; justify-content: center; text-align: center;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 400 0.8rem/1.25 var(--body);
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.bingo-casilla[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); transform: scale(0.98); }
+.bingo-casilla.hecha { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.bingo-casilla.hecha span { opacity: 0.85; }
+.bingo-casilla.hecha[aria-pressed="true"] { outline: 2px solid var(--text); outline-offset: 1px; }
+.bingo-check { position: absolute; top: 3px; right: 6px; font-style: normal; font-weight: 700; font-size: 0.85rem; }
+.insignias { margin-top: 12px; }
+.insignias-titulo { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 6px; }
+.insignias ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.insignias li { font-size: 0.75rem; padding: 4px 9px; border: 1px dashed var(--line); color: var(--muted); border-radius: 40px; }
+.insignias li.ganada { border-style: solid; border-color: var(--accent); color: var(--accent); font-weight: 600; animation: insignia 0.5s ease-out; }
+@keyframes insignia { from { transform: scale(0.6); opacity: 0; } }
+:root[data-momento="recepcion"] :is(.bingo, .bingo-casilla, .insignias li) { border-radius: 0; }

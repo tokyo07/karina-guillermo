@@ -23,6 +23,7 @@ import {
   type Momento,
 } from "@/lib/album";
 import { ETIQUETA_MOTIVO, juzgar, type Medidas, type Motivo } from "@/lib/calidad";
+import { catalogo, ganadas, leerEstado, registrarFoto, ESTADO_VACIO, type EstadoBingo } from "@/lib/bingo";
 import { actividadActual } from "@/lib/cronograma";
 import { useMomento } from "./Ambiente";
 import FirmaFiesta from "./FirmaFiesta";
@@ -54,6 +55,11 @@ const ETIQUETA: Record<Item["estado"], string> = {
   error: "",
 };
 
+/** Cartón de bingo de cada momento: sus 6 retos generales (3×2). */
+const CARTONES = Object.fromEntries(MOMENTOS.map((m) => [m.id, AMBIENTES[m.id].retos]));
+const INSIGNIAS = catalogo(CARTONES);
+const CLAVE_BINGO = "album:bingo";
+
 const esImagen = (f: File) => f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name);
 const pausa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -74,6 +80,11 @@ export default function SubirFotos() {
   const reto = retos.includes(retoElegido) ? retoElegido : "";
   const [toast, avisar] = useToast();
   const [items, setItems] = useState<Item[]>([]);
+  // Bingo de retos: lo que este teléfono ya tachó y las fotos que subió (lib/bingo.ts).
+  const [bingo, setBingo] = useState<EstadoBingo>(ESTADO_VACIO);
+  const bingoRef = useRef<EstadoBingo>(ESTADO_VACIO);
+  const tachados = new Set(bingo.hechos);
+  const conseguidas = ganadas(CARTONES, bingo);
   /** Ids que ya tienen una subida corriendo (evita lanzarlas dos veces). */
   const enCurso = useRef(new Set<string>());
   const miniaturas = useRef(new Set<string>());
@@ -84,8 +95,25 @@ export default function SubirFotos() {
   // Nombre: ?invitado=Nombre (máx. 40) o el que quedó guardado en este teléfono.
   useEffect(() => {
     const q = (new URLSearchParams(location.search).get("invitado") || "").trim().slice(0, MAX_NOMBRE);
-    queueMicrotask(() => setNombre(q || local.get("album:nombre") || ""));
+    const guardado = leerEstado(local.get(CLAVE_BINGO));
+    bingoRef.current = guardado;
+    queueMicrotask(() => {
+      setNombre(q || local.get("album:nombre") || "");
+      setBingo(guardado);
+    });
   }, []);
+
+  /** Una foto quedó subida: tacha su reto y avisa si ganó insignias. */
+  const anotarEnBingo = useCallback(
+    (reto: string) => {
+      const { estado, nuevas } = registrarFoto(CARTONES, bingoRef.current, reto || null);
+      bingoRef.current = estado;
+      local.set(CLAVE_BINGO, JSON.stringify(estado));
+      setBingo(estado);
+      if (nuevas.length) avisar(`★ Nueva insignia: ${nuevas.map((i) => i.nombre).join(" · ")}`);
+    },
+    [avisar]
+  );
 
   // Liberar las miniaturas locales al salir.
   useEffect(() => {
@@ -136,6 +164,7 @@ export default function SubirFotos() {
         // 23505 = ya estaba registrada (un intento anterior llegó pero se perdió la respuesta).
         if (error && error.code !== "23505") throw error;
         actualizar(it.id, { estado: "lista" });
+        anotarEnBingo(it.reto);
       } catch (e) {
         const intentos = it.intentos + 1;
         if (errorDefinitivo(e)) {
@@ -150,7 +179,7 @@ export default function SubirFotos() {
         }
       }
     },
-    [actualizar]
+    [actualizar, anotarEnBingo]
   );
 
   // Cola: hasta EN_PARALELO subidas a la vez; cada cambio de estado libera lugar.
@@ -246,22 +275,64 @@ export default function SubirFotos() {
             Reto para esta foto <small>(opcional)</small>
           </span>
           {deAhora.length > 0 && actividad && (
-            <p className="ahora-programa">
-              Ahora: <b>{actividad.nombre}</b>
-            </p>
+            <>
+              <p className="ahora-programa">
+                Ahora: <b>{actividad.nombre}</b>
+              </p>
+              <div className="chips" role="group" aria-label="Retos de ahora" style={{ marginBottom: 12 }}>
+                {deAhora.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    className="chip ahora"
+                    aria-pressed={reto === r}
+                    onClick={() => setReto(reto === r ? "" : r)}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
-          <div className="chips" role="group" aria-label="Retos">
-            {retos.map((r) => (
-              <button
-                key={r}
-                type="button"
-                className={`chip${deAhora.includes(r) ? " ahora" : ""}`}
-                aria-pressed={reto === r}
-                onClick={() => setReto(reto === r ? "" : r)}
-              >
-                {r}
-              </button>
-            ))}
+          {/* Bingo: el cartón del momento. Tocar elige el reto de la próxima foto; subirla lo tacha. */}
+          <div className="bingo">
+            <div className="bingo-head">
+              <span>Bingo de la {etiquetaMomento(momento).toLowerCase()}</span>
+              <span>
+                {ambiente.retos.filter((r) => tachados.has(r)).length}/{ambiente.retos.length}
+              </span>
+            </div>
+            <div className="bingo-carton" role="group" aria-label={`Cartón de bingo: ${etiquetaMomento(momento)}`}>
+              {ambiente.retos.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  className={`bingo-casilla${tachados.has(r) ? " hecha" : ""}`}
+                  aria-pressed={reto === r}
+                  aria-label={`${r}${tachados.has(r) ? " (ya lo tienes)" : ""}`}
+                  onClick={() => setReto(reto === r ? "" : r)}
+                >
+                  <span>{r}</span>
+                  {tachados.has(r) && (
+                    <i className="bingo-check" aria-hidden="true">
+                      ✓
+                    </i>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="insignias" aria-label={`Insignias: ${conseguidas.size} de ${INSIGNIAS.length}`}>
+            <span className="insignias-titulo">
+              Tus insignias {conseguidas.size}/{INSIGNIAS.length}
+            </span>
+            <ul>
+              {INSIGNIAS.map((i) => (
+                <li key={i.id} className={conseguidas.has(i.id) ? "ganada" : ""} title={i.detalle}>
+                  {conseguidas.has(i.id) ? "★" : "☆"} {i.nombre}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
