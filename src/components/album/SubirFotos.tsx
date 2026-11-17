@@ -10,7 +10,7 @@ import {
   AMBIENTES,
   MOMENTOS,
   cloudinaryListo,
-  comprimir,
+  prepararFoto,
   conFirma,
   errorDefinitivo,
   etiquetaMomento,
@@ -133,14 +133,14 @@ export default function SubirFotos() {
       let calidad = it.calidad;
       try {
         if (!subida) {
-          const { blob, medidas } = await comprimir(it.file);
+          const { blob, medidas, nombre: archivo } = await prepararFoto(it.file);
           if (!calidad) {
             // Filtro de calidad: una foto dudosa sube igual, pero espera la revisión de los novios.
             calidad = { medidas, motivo: medidas ? juzgar(medidas, it.momento, huellasPrevias()) : null };
             if (medidas) recordarHuella(medidas.huella);
             actualizar(it.id, { calidad });
           }
-          subida = await subirACloudinary(blob);
+          subida = await subirACloudinary(blob, archivo);
           actualizar(it.id, { subida }); // si falla Supabase, el reintento no vuelve a subir la imagen
         }
         const base = {

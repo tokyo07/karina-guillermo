@@ -10,6 +10,7 @@ import {
   etiquetaMomento,
   guardarArchivo,
   nombreArchivo,
+  urlDescarga,
   urlFoto,
   useFotos,
   type Foto,
@@ -390,7 +391,7 @@ function DescargaZip({
       for (let i = 0; i < fotos.length; i++) {
         setEstado(`Preparando ${i + 1} de ${fotos.length}…`);
         try {
-          const r = await fetch(urlFoto(fotos[i].public_id));
+          const r = await fetch(urlDescarga(fotos[i].public_id));
           if (!r.ok) throw new Error(String(r.status));
           zip.file(`${String(i + 1).padStart(3, "0")}-${nombreArchivo(fotos[i])}.jpg`, await r.blob());
           ok++;

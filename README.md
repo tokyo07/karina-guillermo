@@ -115,7 +115,8 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
      ```
 3. **Cloudinary → Settings → Upload → Upload presets → Add**:
    - Signing mode: **Unsigned**. Nombre: `boda_album`.
-   - Asset folder: `boda`. Allowed formats: `jpg`.
+   - Asset folder: `boda`. Allowed formats: `jpg`, `heic`, `heif` (las HEIC que
+     el celular no puede comprimir se suben tal cual y Cloudinary las convierte).
    - Incoming transformation: `c_limit,w_1600,h_1600` (tope aunque alguien
      salte la compresión del navegador).
    - Desactivar *Use filename* / dejar *Unique filename* activo.
@@ -174,6 +175,9 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
 - Límite por teléfono: 60 fotos/hora (`album_ajustes.max_subidas_por_hora`).
 - Al día siguiente: descargar el .zip desde el panel **y** exportar la carpeta
   `boda` desde Cloudinary (copia de respaldo).
+
+Antes de la boda: seguir [`docs/pruebas-antes-de-la-boda.md`](./docs/pruebas-antes-de-la-boda.md)
+(pruebas en iPhone y Android, configuración de Vercel y Cloudinary).
 
 ### Riesgos conocidos
 

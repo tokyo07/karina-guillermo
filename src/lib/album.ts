@@ -116,12 +116,23 @@ export function urlFoto(publicId: string, ancho?: 480 | 1600): string {
   return `https://res.cloudinary.com/${NUBE}/image/upload/${t}${ruta}`;
 }
 
-export async function subirACloudinary(blob: Blob): Promise<{ publicId: string; ancho: number; alto: number }> {
+/** JPG para descargar (el .zip): convierte también las que se subieron en HEIC. */
+export function urlDescarga(publicId: string): string {
+  const ruta = publicId.split("/").map(encodeURIComponent).join("/");
+  return `https://res.cloudinary.com/${NUBE}/image/upload/f_jpg,q_auto:best/${ruta}`;
+}
+
+export async function subirACloudinary(
+  blob: Blob,
+  nombre = "foto.jpg"
+): Promise<{ publicId: string; ancho: number; alto: number }> {
   if (!NUBE || !PRESET) throw new Error("cloudinary_sin_configurar");
   const fd = new FormData();
-  fd.append("file", blob, "foto.jpg");
+  fd.append("file", blob, nombre);
   fd.append("upload_preset", PRESET);
   const r = await fetch(`https://api.cloudinary.com/v1_1/${NUBE}/image/upload`, { method: "POST", body: fd });
+  // Una HEIC sin comprimir que Cloudinary rechaza: el preset no admite ese formato.
+  if (!r.ok && r.status === 400 && /\.(heic|heif)$/i.test(nombre)) throw new Error("cloudinary_formato");
   if (!r.ok) throw new Error(`cloudinary_${r.status}`);
   const j = (await r.json()) as { public_id: string; width: number; height: number };
   return { publicId: j.public_id, ancho: j.width, alto: j.height };
@@ -157,6 +168,23 @@ export function huellasPrevias(): string[] {
 }
 export function recordarHuella(h: string) {
   local.set(CLAVE_HUELLAS, JSON.stringify([h, ...huellasPrevias()].slice(0, 150)));
+}
+
+export const esHeic = (f: File) => /hei[cf]/i.test(f.type) || /\.(heic|heif)$/i.test(f.name);
+
+/**
+ * Comprime y mide; si el navegador no puede leer la foto y es HEIC (Android con
+ * fotos de Samsung, Chrome en computadora…), la manda tal cual para que
+ * Cloudinary la convierta. Sin medidas: esa foto no pasa por el filtro de calidad.
+ */
+export async function prepararFoto(file: File): Promise<{ blob: Blob; medidas: Medidas | null; nombre: string }> {
+  try {
+    const { blob, medidas } = await comprimir(file);
+    return { blob, medidas, nombre: "foto.jpg" };
+  } catch (e) {
+    if (!esHeic(file)) throw e;
+    return { blob: file, medidas: null, nombre: /\.(heic|heif)$/i.test(file.name) ? file.name : "foto.heic" };
+  }
 }
 
 /** Comprime y además mide la calidad de la foto (null si no se pudo medir). */
@@ -205,13 +233,15 @@ export function mensajeError(e: unknown): string {
   if (m.includes("limite_por_hora")) return "Subiste muchas fotos en poco tiempo. Espera un rato.";
   if (m.includes("cloudinary_sin_configurar") || m.includes("Faltan NEXT_PUBLIC"))
     return "El álbum todavía no está configurado.";
+  if (m.includes("cloudinary_formato"))
+    return "No pudimos leer esta foto (formato HEIC). Haz una captura de pantalla de la foto y súbela.";
   return "No se pudo subir. Toca para reintentar.";
 }
 
 /** Errores que no se arreglan reintentando. */
 export const errorDefinitivo = (e: unknown) => {
   const m = e instanceof Error ? e.message : typeof e === "object" && e && "message" in e ? String(e.message) : "";
-  return /album_cerrado|limite_por_hora|sin_configurar|Faltan NEXT_PUBLIC|public_id_invalido/.test(m);
+  return /album_cerrado|limite_por_hora|sin_configurar|Faltan NEXT_PUBLIC|public_id_invalido|cloudinary_formato/.test(m);
 };
 
 /* ───────────── datos de fotos (Supabase + Realtime) ───────────── */
