@@ -89,7 +89,7 @@ export default function Album() {
               Mural
             </button>
           </div>
-          <button className="btn ghost small" type="button" onClick={abrirProyector}>
+          <button className="btn ghost small solo-pantalla-grande" type="button" onClick={abrirProyector}>
             Modo proyector
           </button>
         </div>
