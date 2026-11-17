@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Caveat, Figtree, IBM_Plex_Mono, Sacramento } from "next/font/google";
+import { Bodoni_Moda, Caveat, Cormorant_Garamond, Figtree, Great_Vibes, Jost, Lato, Sacramento } from "next/font/google";
 import { Ambiente } from "@/components/album/Ambiente";
 import { SCRIPT_AMBIENTE } from "@/lib/ambiente";
 import Barra from "@/components/album/Barra";
@@ -24,17 +24,40 @@ const mano = Caveat({
   weight: ["600"],
 });
 
-// Modo fiesta (estilo galería): firma manuscrita y menú monoespaciado entre corchetes.
-const firma = Sacramento({
-  variable: "--font-firma",
+// Modo recepción: las fuentes de la invitación (public/index.html).
+const vibes = Great_Vibes({
+  variable: "--font-vibes",
   subsets: ["latin"],
   weight: ["400"],
 });
 
-const mono = IBM_Plex_Mono({
-  variable: "--font-mono",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  style: ["normal", "italic"],
+});
+
+const lato = Lato({
+  variable: "--font-lato",
+  subsets: ["latin"],
+  weight: ["300", "400", "700"],
+});
+
+// Modo fiesta (estilo galería): firma manuscrita y menú entre corchetes en Jost.
+// Sin precarga: solo se descargan cuando la fiesta empieza.
+const firma = Sacramento({
+  variable: "--font-firma",
+  subsets: ["latin"],
+  weight: ["400"],
+  preload: false,
+});
+
+const jost = Jost({
+  variable: "--font-jost",
   subsets: ["latin"],
   weight: ["400", "500"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -55,7 +78,7 @@ export default function AlbumLayout({ children }: LayoutProps<"/album">) {
   return (
     // suppressHydrationWarning: el script de abajo pone data-momento en <html>
     // antes de que React hidrate (ver docs/01-app/02-guides/preventing-flash-before-hydration).
-    <html lang="es" className={`${display.variable} ${cuerpo.variable} ${mano.variable} ${firma.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="es" className={`${display.variable} ${cuerpo.variable} ${mano.variable} ${firma.variable} ${jost.variable} ${vibes.variable} ${cormorant.variable} ${lato.variable}`} suppressHydrationWarning>
       <body>
         <ScriptEnLinea html={SCRIPT_AMBIENTE} />
         <Ambiente>

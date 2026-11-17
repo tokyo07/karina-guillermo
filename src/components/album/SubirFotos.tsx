@@ -27,6 +27,7 @@ import {
 import { ETIQUETA_MOTIVO, juzgar, type Medidas, type Motivo } from "@/lib/calidad";
 import { useMomento } from "./Ambiente";
 import FirmaFiesta from "./FirmaFiesta";
+import PortadaRecepcion from "./PortadaRecepcion";
 import { useToast } from "./Comun";
 
 type Item = {
@@ -203,6 +204,8 @@ export default function SubirFotos() {
       {!configurado && <div className="notice">El álbum todavía no está configurado (falta Cloudinary).</div>}
       {conFirma(actual) ? (
         <FirmaFiesta key={actual} />
+      ) : actual === "recepcion" ? (
+        <PortadaRecepcion />
       ) : (
         <div className="heroWrap">
           <div className="festones" />
