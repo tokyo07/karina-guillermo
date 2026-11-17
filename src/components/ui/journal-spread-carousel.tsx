@@ -53,6 +53,14 @@ export interface JournalSpreadCarouselProps {
   autoPlay?: number | false
   onIndexChange?: (index: number) => void
   onAction?: (action: JournalAction, index: number) => void
+  /** Which bottom buttons to show, in order. Defaults to all four. */
+  actions?: JournalAction[]
+  /** Accessible names for the bottom buttons. */
+  actionLabels?: Partial<Record<JournalAction, string>>
+  /** When set, the grid chip (top left) calls it — e.g. to switch to a grid layout. */
+  onGridView?: () => void
+  /** Show the search and menu chips (top right). They do nothing unless you wire them. */
+  showTools?: boolean
   className?: string
 }
 
@@ -283,12 +291,13 @@ function Sheet({ spread }: { spread: JournalSpread }) {
   )
 }
 
-const ACTIONS: { id: JournalAction; label: string }[] = [
-  { id: "more", label: "More options" },
-  { id: "share", label: "Share spread" },
-  { id: "delete", label: "Delete spread" },
-  { id: "add", label: "Add a page" },
-]
+const ACTION_LABELS: Record<JournalAction, string> = {
+  more: "Más opciones",
+  share: "Compartir",
+  delete: "Eliminar",
+  add: "Agregar página",
+}
+const ALL_ACTIONS: JournalAction[] = ["more", "share", "delete", "add"]
 
 export default function JournalSpreadCarousel({
   spreads,
@@ -299,6 +308,10 @@ export default function JournalSpreadCarousel({
   autoPlay = 2600,
   onIndexChange,
   onAction,
+  actions = ALL_ACTIONS,
+  actionLabels,
+  onGridView,
+  showTools = true,
   className,
 }: JournalSpreadCarouselProps) {
   const n = spreads.length
@@ -520,7 +533,8 @@ export default function JournalSpreadCarousel({
   }, [go])
 
   const current = spreads[index]
-  const pagesLabel = meta ?? n * 2 + " Pages"
+  const pagesLabel = meta ?? n * 2 + " páginas"
+  const spreadName = (s: JournalSpread | undefined, i: number) => (s?.label ?? "Página " + (i + 1)) + ", " + (i + 1) + " de " + n
 
   return (
     <div
@@ -529,17 +543,17 @@ export default function JournalSpreadCarousel({
       style={{ height }}
       tabIndex={0}
       role="region"
-      aria-roledescription="carousel"
+      aria-roledescription="carrusel"
       aria-label={title}
       onKeyDown={onKeyDown}
     >
       <style>{CSS}</style>
       <div className="jsc-top">
         <div className="jsc-group">
-          <button type="button" className="jsc-chip" aria-pressed="true" aria-label="Spread view">
+          <button type="button" className="jsc-chip" aria-pressed="true" aria-label="Vista de diario">
             <Icon name="book" />
           </button>
-          <button type="button" className="jsc-chip" aria-pressed="false" aria-label="Grid view">
+          <button type="button" className="jsc-chip" aria-pressed="false" aria-label="Vista de cuadrícula" onClick={onGridView}>
             <Icon name="grid" />
           </button>
         </div>
@@ -550,11 +564,11 @@ export default function JournalSpreadCarousel({
             {pagesLabel}
           </div>
         </div>
-        <div className="jsc-group">
-          <button type="button" className="jsc-chip" aria-label="Search">
+        <div className="jsc-group" style={showTools ? undefined : { visibility: "hidden" }} aria-hidden={!showTools}>
+          <button type="button" className="jsc-chip" aria-label="Buscar" tabIndex={showTools ? undefined : -1}>
             <Icon name="search" />
           </button>
-          <button type="button" className="jsc-chip" aria-label="Menu">
+          <button type="button" className="jsc-chip" aria-label="Menú" tabIndex={showTools ? undefined : -1}>
             <Icon name="menu" />
           </button>
         </div>
@@ -581,8 +595,8 @@ export default function JournalSpreadCarousel({
                 className="jsc-item"
                 data-i={i}
                 role="group"
-                aria-roledescription="spread"
-                aria-label={(s.label ?? "Spread " + (i + 1)) + ", " + (i + 1) + " of " + n}
+                aria-roledescription="página"
+                aria-label={spreadName(s, i)}
                 aria-hidden={i !== index}
               >
                 {s.alt ? <span className="jsc-sr">{s.alt}</span> : null}
@@ -607,15 +621,18 @@ export default function JournalSpreadCarousel({
       </div>
 
       <div className="jsc-bar">
-        {ACTIONS.map((a) => (
-          <button key={a.id} type="button" className="jsc-btn" aria-label={a.label} onClick={() => onAction?.(a.id, index)}>
-            <Icon name={a.id} />
-          </button>
-        ))}
+        {actions.map((id) => {
+          const label = actionLabels?.[id] ?? ACTION_LABELS[id]
+          return (
+            <button key={id} type="button" className="jsc-btn" aria-label={label} title={label} onClick={() => onAction?.(id, index)}>
+              <Icon name={id} />
+            </button>
+          )
+        })}
       </div>
 
       <p className="jsc-sr" aria-live="polite">
-        {current ? (current.label ?? "Spread " + (index + 1)) + ", " + (index + 1) + " of " + n : ""}
+        {current ? spreadName(current, index) : ""}
       </p>
     </div>
   )

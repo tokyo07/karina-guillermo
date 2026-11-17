@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Figtree } from "next/font/google";
+import { Bodoni_Moda, Caveat, Figtree } from "next/font/google";
 import Barra from "@/components/album/Barra";
 import "./album.css";
 
@@ -12,6 +12,13 @@ const display = Bodoni_Moda({
 const cuerpo = Figtree({
   variable: "--font-body",
   subsets: ["latin"],
+});
+
+// Letra manuscrita de las notas y pies de foto del diario (journal-spread-carousel).
+const mano = Caveat({
+  variable: "--jsc-hand",
+  subsets: ["latin"],
+  weight: ["600"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function AlbumLayout({ children }: LayoutProps<"/album">) {
   return (
-    <html lang="es" className={`${display.variable} ${cuerpo.variable}`}>
+    <html lang="es" className={`${display.variable} ${cuerpo.variable} ${mano.variable}`}>
       <body>
         <Barra />
         <main>{children}</main>

@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MOMENTOS, NOVIOS, etiquetaMomento, urlFoto, useFotos, type Foto } from "@/lib/album";
-import { AvisoEstado, IconoCorazon } from "./Comun";
+import { AvisoEstado, IconoCorazon, useToast } from "./Comun";
+import DiarioAlbum from "./DiarioAlbum";
 
 const ROTACION_MS = 7000;
 
 export default function Album() {
   const [filtro, setFiltro] = useState<string>("todas");
+  // "Ver el álbum" abre el diario; el mural en columnas queda como vista alternativa.
+  const [vista, setVista] = useState<"diario" | "mural">("diario");
+  const [toast, avisar] = useToast();
   const [frescas, setFrescas] = useState<Set<string>>(new Set());
   const [visor, setVisor] = useState<{ lista: Foto[]; i: number } | null>(null);
   const [proyector, setProyector] = useState(false);
@@ -44,9 +48,19 @@ export default function Album() {
                 : ""}
           </p>
         </div>
-        <button className="btn ghost small" type="button" onClick={abrirProyector}>
-          Modo proyector
-        </button>
+        <div className="head-acciones">
+          <div className="chips" role="group" aria-label="Vista">
+            <button type="button" className="chip" aria-pressed={vista === "diario"} onClick={() => setVista("diario")}>
+              Diario
+            </button>
+            <button type="button" className="chip" aria-pressed={vista === "mural"} onClick={() => setVista("mural")}>
+              Mural
+            </button>
+          </div>
+          <button className="btn ghost small" type="button" onClick={abrirProyector}>
+            Modo proyector
+          </button>
+        </div>
       </div>
 
       <div className="chips" role="group" aria-label="Filtrar por momento" style={{ marginBottom: 18 }}>
@@ -63,7 +77,16 @@ export default function Album() {
         ))}
       </div>
 
-      {lista.length > 0 ? (
+      {vista === "diario" ? (
+        estado === "listo" && (
+          <DiarioAlbum
+            fotos={lista}
+            onAbrir={(i) => setVisor({ lista, i })}
+            onMural={() => setVista("mural")}
+            avisar={avisar}
+          />
+        )
+      ) : lista.length > 0 ? (
         <div className="wall">
           {lista.map((f, i) => (
             <figure
@@ -123,6 +146,7 @@ export default function Album() {
           onSalir={salirProyector}
         />
       )}
+      {toast}
     </section>
   );
 }
