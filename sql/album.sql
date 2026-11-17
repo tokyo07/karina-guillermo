@@ -26,7 +26,7 @@ create table if not exists public.fotos (
   ancho integer not null check (ancho between 1 and 4000),
   alto integer not null check (alto between 1 and 4000),
   nombre text not null check (char_length(nombre) between 1 and 40),
-  momento text not null check (momento in ('ceremonia', 'recepcion', 'fiesta')),
+  momento text not null check (momento in ('ceremonia', 'recepcion', 'fiesta', 'horaloca')),
   reto text check (reto is null or char_length(reto) <= 80),
   oculta boolean not null default false,
   creada_en timestamptz not null default now()
@@ -77,8 +77,16 @@ insert into public.album_ajustes (id) values (true) on conflict (id) do nothing;
 -- panel). Define el ambiente de todos los teléfonos: colores, retos y la
 -- etiqueta que se propone al subir.
 alter table public.album_ajustes
-  add column if not exists momento_actual text not null default 'ceremonia'
-  check (momento_actual in ('ceremonia', 'recepcion', 'fiesta'));
+  add column if not exists momento_actual text not null default 'ceremonia';
+
+-- Momentos válidos (fotos y ajustes). "horaloca" se agregó después: se
+-- reemplazan los checks para que una base ya creada también lo acepte.
+alter table public.fotos drop constraint if exists fotos_momento_check;
+alter table public.fotos add constraint fotos_momento_check
+  check (momento in ('ceremonia', 'recepcion', 'fiesta', 'horaloca'));
+alter table public.album_ajustes drop constraint if exists album_ajustes_momento_actual_check;
+alter table public.album_ajustes add constraint album_ajustes_momento_actual_check
+  check (momento_actual in ('ceremonia', 'recepcion', 'fiesta', 'horaloca'));
 
 -- ─────────────────────────── permisos ───────────────────────────
 -- Supabase da por defecto todos los privilegios de las tablas nuevas a anon y
@@ -274,7 +282,7 @@ begin
   if not public.es_novio() then
     raise exception 'solo_novios' using errcode = '42501';
   end if;
-  if p_momento is null or p_momento not in ('ceremonia', 'recepcion', 'fiesta') then
+  if p_momento is null or p_momento not in ('ceremonia', 'recepcion', 'fiesta', 'horaloca') then
     raise exception 'momento_invalido' using errcode = '22023';
   end if;
   update public.album_ajustes set momento_actual = p_momento where id;

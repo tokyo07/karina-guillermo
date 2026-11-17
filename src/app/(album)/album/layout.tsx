@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Caveat, Figtree } from "next/font/google";
+import { Bodoni_Moda, Caveat, Figtree, IBM_Plex_Mono, Sacramento } from "next/font/google";
 import { Ambiente } from "@/components/album/Ambiente";
 import { SCRIPT_AMBIENTE } from "@/lib/ambiente";
 import Barra from "@/components/album/Barra";
@@ -24,6 +24,19 @@ const mano = Caveat({
   weight: ["600"],
 });
 
+// Modo fiesta (estilo galería): firma manuscrita y menú monoespaciado entre corchetes.
+const firma = Sacramento({
+  variable: "--font-firma",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
+const mono = IBM_Plex_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
+
 export const metadata: Metadata = {
   title: "Álbum de boda de Karina y Guillermo",
   description: "Sube tus fotos de la boda de Karina y Guillermo y mira las de todos.",
@@ -42,7 +55,7 @@ export default function AlbumLayout({ children }: LayoutProps<"/album">) {
   return (
     // suppressHydrationWarning: el script de abajo pone data-momento en <html>
     // antes de que React hidrate (ver docs/01-app/02-guides/preventing-flash-before-hydration).
-    <html lang="es" className={`${display.variable} ${cuerpo.variable} ${mano.variable}`} suppressHydrationWarning>
+    <html lang="es" className={`${display.variable} ${cuerpo.variable} ${mano.variable} ${firma.variable} ${mono.variable}`} suppressHydrationWarning>
       <body>
         <ScriptEnLinea html={SCRIPT_AMBIENTE} />
         <Ambiente>

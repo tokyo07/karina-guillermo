@@ -13,6 +13,7 @@ import {
   NOVIOS,
   cloudinaryListo,
   comprimir,
+  conFirma,
   errorDefinitivo,
   etiquetaMomento,
   huellasPrevias,
@@ -25,6 +26,7 @@ import {
 } from "@/lib/album";
 import { ETIQUETA_MOTIVO, juzgar, type Medidas, type Motivo } from "@/lib/calidad";
 import { useMomento } from "./Ambiente";
+import FirmaFiesta from "./FirmaFiesta";
 import { useToast } from "./Comun";
 
 type Item = {
@@ -199,17 +201,21 @@ export default function SubirFotos() {
   return (
     <section>
       {!configurado && <div className="notice">El álbum todavía no está configurado (falta Cloudinary).</div>}
-      <div className="heroWrap">
-        <div className="festones" />
-        <div className="hero">
-          <h1>
-            <span>{NOVIOS.a}</span>
-            <i>&amp;</i>
-            <span>{NOVIOS.b}</span>
-          </h1>
-          <p className="date">{FECHA}</p>
+      {conFirma(actual) ? (
+        <FirmaFiesta key={actual} />
+      ) : (
+        <div className="heroWrap">
+          <div className="festones" />
+          <div className="hero">
+            <h1>
+              <span>{NOVIOS.a}</span>
+              <i>&amp;</i>
+              <span>{NOVIOS.b}</span>
+            </h1>
+            <p className="date">{FECHA}</p>
+          </div>
         </div>
-      </div>
+      )}
       <p className="lede">{AMBIENTES[actual].lede}</p>
       {AMBIENTES[actual].aviso && <p className="aviso-momento">{AMBIENTES[actual].aviso}</p>}
 

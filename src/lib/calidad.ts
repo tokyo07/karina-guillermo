@@ -46,7 +46,7 @@ export const UMBRALES = {
   nitidez: 25,
   /** Estructura por debajo de esto: lisa. */
   estructura: 12,
-  /** Brillo medio y fracción de oscuros para "oscura". En la fiesta se tolera más oscuridad. */
+  /** Brillo medio y fracción de oscuros para "oscura". En la fiesta y la hora loca se tolera más oscuridad. */
   oscura: { brillo: 30, oscuros: 0.8 },
   oscuraFiesta: { brillo: 16, oscuros: 0.92 },
   /** "Quemada": casi todo blanco, o muy clara y sin contraste. */
@@ -170,7 +170,7 @@ export function distancia(a: string, b: string): number {
  * `previas`: huellas de fotos que este teléfono ya subió.
  */
 export function juzgar(m: Medidas, momento: string, previas: readonly string[] = []): Motivo | null {
-  const oscura = momento === "fiesta" ? UMBRALES.oscuraFiesta : UMBRALES.oscura;
+  const oscura = momento === "fiesta" || momento === "horaloca" ? UMBRALES.oscuraFiesta : UMBRALES.oscura;
   if (m.brillo < oscura.brillo && m.oscuros > oscura.oscuros) return "oscura";
   const q = UMBRALES.quemada;
   if (m.claros > q.claros || (m.brillo > q.brillo && m.contraste < q.contraste)) return "quemada";

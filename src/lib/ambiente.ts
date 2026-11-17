@@ -4,4 +4,4 @@
 export const CLAVE_AMBIENTE = "album:ambiente";
 
 /** Corre antes del primer pintado: pone data-momento en <html> con el último momento conocido. */
-export const SCRIPT_AMBIENTE = `try{var m=localStorage.getItem("${CLAVE_AMBIENTE}");if(m==="ceremonia"||m==="recepcion"||m==="fiesta")document.documentElement.dataset.momento=m}catch(e){}`;
+export const SCRIPT_AMBIENTE = `try{var m=localStorage.getItem("${CLAVE_AMBIENTE}");if(m==="ceremonia"||m==="recepcion"||m==="fiesta"||m==="horaloca")document.documentElement.dataset.momento=m}catch(e){}`;

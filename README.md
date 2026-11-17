@@ -126,7 +126,10 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
 ### Operación
 
 - **Ambiente por momento:** en el panel, "¿Qué se vive ahora?" cambia entre
-  Ceremonia, Recepción y Fiesta. Todos los teléfonos cambian solos (al instante
+  Ceremonia, Recepción, Fiesta y Hora loca. Fiesta usa el estilo galería (gris
+  claro, azul eléctrico, menú `[subir]` monoespaciado); Hora loca, la noche
+  morada con luces ámbar y rosa. Las dos abren con la firma manuscrita de los
+  novios que se escribe sola. Todos los teléfonos cambian solos (al instante
   por Realtime, o en menos de 30 s): colores, retos, texto de bienvenida y el
   momento que se propone al subir. En Ceremonia se pide apagar flash y sonido.
   Recepción es el diseño original. Si `album.sql` se corrió antes de este

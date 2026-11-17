@@ -5,7 +5,7 @@ import { getSupabase } from "@/lib/supabase";
 import { MOMENTO_INICIAL, REFRESCO_MS, esMomento, local, type Momento } from "@/lib/album";
 import { CLAVE_AMBIENTE } from "@/lib/ambiente";
 
-// Ambiente de la boda según el momento (ceremonia, recepción, fiesta).
+// Ambiente de la boda según el momento (ceremonia, recepción, fiesta, hora loca).
 // El momento lo fijan los novios o el moderador desde el panel; acá se lee de
 // Supabase, se escucha por Realtime (con un refresco periódico de respaldo) y se
 // aplica como `data-momento` en <html>, que es lo que cambia la paleta en album.css.
