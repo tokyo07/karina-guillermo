@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MOMENTOS, NOVIOS, esVisible, etiquetaMomento, marcarVistas, urlFoto, useFotos, type Foto } from "@/lib/album";
+import { loMejor } from "@/lib/mejores";
 import { masQueridas, queridasAhora } from "@/lib/ranking";
 import { AvisoEstado, IconoCorazon, useToast } from "./Comun";
 import DiarioAlbum from "./DiarioAlbum";
@@ -12,7 +13,8 @@ const ROTACION_MS = 7000;
 export default function Album() {
   const [filtro, setFiltro] = useState<string>("todas");
   // "Más queridas": promedio bayesiano de corazones sobre vistas (lib/ranking.ts).
-  const [orden, setOrden] = useState<"recientes" | "queridas">("recientes");
+  // "Lo mejor": amor + calidad, una por ráfaga, el mejor 30 % (lib/mejores.ts).
+  const [orden, setOrden] = useState<"recientes" | "queridas" | "mejor">("recientes");
   // "Ver el álbum" abre el diario; el mural en columnas queda como vista alternativa.
   const [vista, setVista] = useState<"diario" | "mural">("diario");
   const [toast, avisar] = useToast();
@@ -36,7 +38,8 @@ export default function Album() {
   };
 
   const filtradas = fotos.filter((f) => esVisible(f) && (filtro === "todas" || f.momento === filtro));
-  const lista = orden === "queridas" ? masQueridas(filtradas) : filtradas;
+  const lista =
+    orden === "queridas" ? masQueridas(filtradas) : orden === "mejor" ? loMejor(filtradas) : filtradas;
   const mural = useRef<HTMLDivElement>(null);
 
   // Mural: cuenta como vista la foto que entra a la pantalla.
@@ -65,7 +68,9 @@ export default function Album() {
             {estado === "cargando"
               ? "Cargando fotos…"
               : hayDatos
-                ? `${lista.length} ${lista.length === 1 ? "foto" : "fotos"} compartidas por los invitados`
+                ? orden === "mejor"
+                  ? `Lo mejor de la noche: ${lista.length} de ${filtradas.length} fotos`
+                  : `${lista.length} ${lista.length === 1 ? "foto" : "fotos"} compartidas por los invitados`
                 : ""}
           </p>
         </div>
@@ -104,6 +109,9 @@ export default function Album() {
           </button>
           <button type="button" className="chip" aria-pressed={orden === "queridas"} onClick={() => setOrden("queridas")}>
             ♥ Más queridas
+          </button>
+          <button type="button" className="chip" aria-pressed={orden === "mejor"} onClick={() => setOrden("mejor")}>
+            ★ Lo mejor
           </button>
         </div>
       </div>

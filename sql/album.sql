@@ -215,7 +215,8 @@ begin
 end;
 $$;
 
--- Lista para el mural con el conteo de corazones y si este dispositivo ya
+-- Lista para el mural con el conteo de corazones, las vistas, las medidas de
+-- calidad (para "Lo mejor", lib/mejores.ts) y si este dispositivo ya
 -- dio corazón. Los invitados solo reciben las visibles (ni ocultas ni por
 -- revisar); los novios, todas. Cambió el tipo de retorno: se borra y se crea.
 drop function if exists public.listar_fotos(uuid);
@@ -231,6 +232,7 @@ returns table (
   oculta boolean,
   revisar boolean,
   motivo text,
+  calidad jsonb,
   creada_en timestamptz,
   corazones bigint,
   vistas bigint,
@@ -241,7 +243,7 @@ stable
 security definer
 set search_path = ''
 as $$
-  select f.id, f.public_id, f.ancho, f.alto, f.nombre, f.momento, f.reto, f.oculta, f.revisar, f.motivo, f.creada_en,
+  select f.id, f.public_id, f.ancho, f.alto, f.nombre, f.momento, f.reto, f.oculta, f.revisar, f.motivo, f.calidad, f.creada_en,
          (select count(*) from public.corazones c where c.foto_id = f.id),
          (select count(*) from public.vistas v where v.foto_id = f.id),
          exists (select 1 from public.corazones c

@@ -110,6 +110,7 @@ export type Database = {
           oculta: boolean;
           revisar: boolean;
           motivo: string | null;
+          calidad: Json | null;
           creada_en: string;
           corazones: number;
           vistas: number;

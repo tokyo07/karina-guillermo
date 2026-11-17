@@ -227,6 +227,8 @@ export type Foto = {
   /** Dudosa según el filtro de calidad: espera la revisión de los novios. */
   revisar: boolean;
   motivo: string | null;
+  /** Medidas del filtro de calidad (null en fotos de antes del filtro). */
+  calidad?: Partial<Medidas> | null;
   creada_en: string;
   corazones: number;
   /** Teléfonos que la vieron (para el ranking "Más queridas"). */

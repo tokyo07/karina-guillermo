@@ -4,15 +4,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import PerspectiveTunnelHero, { type TunnelImage } from "@/components/ui/perspective-tunnel-hero";
 import { FECHA, NOVIOS, esVisible, local, urlFoto, type Foto } from "@/lib/album";
-import { queridasAhora } from "@/lib/ranking";
+import { loMejor } from "@/lib/mejores";
 import { getSupabase } from "@/lib/supabase";
 
 // Presentación del álbum: las fotos de los novios se acercan a la pantalla y se
 // desvanecen; cuando se agotan aparecen los nombres y el botón para entrar.
 // Es la bienvenida: se muestra en cada carga de la página (también al refrescar).
 // Al moverse dentro del álbum (Subir ↔ Álbum ↔ Novios) no se repite.
-// Entre las fotos de los novios aparecen las de los invitados más queridas en
-// este momento (ranking "ahora" de lib/ranking.ts).
+// Entre las fotos de los novios aparecen las mejores de los invitados
+// ("Lo mejor": corazones + calidad, una por ráfaga; lib/mejores.ts).
 
 const FOTOS: TunnelImage[] = [
   "/images/beso.jpg",
@@ -58,8 +58,8 @@ async function pedirDestacadas(): Promise<TunnelImage[]> {
       vistas: Number(f.vistas ?? 0),
       revisar: f.revisar ?? false,
     }))
-    .filter((f) => esVisible(f) && f.corazones > 0);
-  return queridasAhora(fotos, Date.now())
+    .filter(esVisible);
+  return loMejor(fotos)
     .slice(0, DESTACADAS)
     .map((f) => ({
       src: urlFoto(f.public_id, 1600),
