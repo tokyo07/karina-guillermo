@@ -17,6 +17,8 @@ import {
   type Momento,
 } from "@/lib/album";
 import { ETIQUETA_MOTIVO, type Motivo } from "@/lib/calidad";
+import { PARAM_SUBIR } from "@/lib/ambiente";
+import { cargarFuentes, dibujarTarjeta } from "@/lib/tarjetaQR";
 import { masQueridas } from "@/lib/ranking";
 import { ZONA_HORARIA, horaCorta, siguienteCambio } from "@/lib/cronograma";
 import { useMomento } from "./Ambiente";
@@ -167,7 +169,7 @@ function Panel({ email, onSalir }: { email: string; onSalir: () => void }) {
       <div className="grid2">
         <div className="panel">
           <h3>Código QR</h3>
-          <p>Imprímelo en las mesas o proyéctalo en la entrada. Lleva directo a Subir.</p>
+          <p>Para las mesas y la entrada. Al escanearlo se abre directo el formulario para subir fotos.</p>
           <TarjetaQR avisar={avisar} />
         </div>
         <div className="panel">
@@ -319,56 +321,62 @@ function MomentoActual({ avisar }: { avisar: (m: string) => void }) {
   );
 }
 
+/** Tarjeta imprimible con el QR que lleva directo al formulario de subir (lib/tarjetaQR.ts). */
 function TarjetaQR({ avisar }: { avisar: (m: string) => void }) {
   const [url, setUrl] = useState("");
+  const [listo, setListo] = useState(false);
   const lienzo = useRef<HTMLCanvasElement>(null);
+  const textos = { a: NOVIOS.a, b: NOVIOS.b, fecha: "19 · 12 · 2026" };
 
   useEffect(() => {
-    queueMicrotask(() => setUrl(`${location.origin}/album`));
+    queueMicrotask(() => setUrl(`${location.origin}/album?${PARAM_SUBIR}`));
   }, []);
 
   useEffect(() => {
     if (!url || !lienzo.current) return;
     let cancelado = false;
-    import("qrcode").then(({ default: QR }) => {
+    cargarFuentes().then(() => {
       if (cancelado || !lienzo.current) return;
-      QR.toCanvas(lienzo.current, url, {
-        width: 220,
-        margin: 1,
-        errorCorrectionLevel: "M",
-        color: { dark: "#78462fff", light: "#ffffffff" },
-      }).catch(() => avisar("No se pudo generar el QR."));
+      try {
+        dibujarTarjeta(lienzo.current, url, textos, 0.6);
+        setListo(true);
+      } catch {
+        avisar("No se pudo generar el QR.");
+      }
     });
     return () => {
       cancelado = true;
     };
+    // textos es constante; solo cambia la dirección.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, avisar]);
 
+  function descargar() {
+    const c = document.createElement("canvas");
+    dibujarTarjeta(c, url, textos, 1.5); // 1500×2100 px: 5×7 pulgadas a 300 ppp
+    c.toBlob((b) => (b ? guardarArchivo(b, "tarjeta-qr-album-boda.png") : avisar("No se pudo guardar.")), "image/png");
+  }
+
+  const esLocal = /localhost|127\.0\.0\.1/.test(url);
   return (
     <>
-      <div className="qr-card">
-        <div className="festones" />
-        <div className="qr">
-          <canvas ref={lienzo} aria-label={`Código QR que abre ${url}`} />
-        </div>
-        <div className="nm">
-          {NOVIOS.a} y {NOVIOS.b}
-        </div>
-        <div className="tx">Escanea y comparte tu mirada</div>
+      <div className="qr-tarjeta">
+        <canvas ref={lienzo} aria-label={`Tarjeta con el código QR que abre ${url}`} />
       </div>
       <label className="field">
-        <span>Enlace público del álbum</span>
+        <span>Enlace del QR (lleva directo a subir fotos)</span>
         <input type="text" value={url} onChange={(e) => setUrl(e.target.value.trim())} spellCheck={false} />
       </label>
-      <button
-        className="btn ghost small"
-        type="button"
-        onClick={() =>
-          lienzo.current?.toBlob((b) => (b ? guardarArchivo(b, "qr-album-boda.png") : avisar("Genera el QR primero.")))
-        }
-      >
-        Guardar QR como imagen
+      {esLocal && (
+        <p className="error">
+          Este enlace es de tu computadora: genera la tarjeta desde el sitio publicado para que funcione en los
+          celulares.
+        </p>
+      )}
+      <button className="btn" type="button" onClick={descargar} disabled={!listo}>
+        Descargar tarjeta para imprimir
       </button>
+      <p className="hint">PNG de 1500×2100 px: 5×7 pulgadas (13×18 cm) en buena calidad.</p>
     </>
   );
 }

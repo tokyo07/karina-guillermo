@@ -53,7 +53,8 @@ Las fotos de prueba se pueden ocultar después desde el panel.
 ## 5. Panel de los novios
 
 - [ ] Entrar con el correo y la contraseña.
-- [ ] **Guardar QR como imagen** y escanearlo con otro celular: abre `/album`.
+- [ ] Desde el panel **del sitio publicado**, **Descargar tarjeta para imprimir**; imprimirla y
+      escanearla con iPhone y Android: abre directo el formulario para subir (sin presentación).
 - [ ] **Descargar todo (.zip)** desde una computadora: el archivo abre y las
       fotos (también las HEIC) vienen en JPG.
 - [ ] **Ocultar** una foto: desaparece del álbum en el otro celular.

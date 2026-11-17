@@ -103,6 +103,12 @@ export default function IntroAlbum({ modo = "bienvenida", alRevelar, saliendo = 
   const [bola, setBola] = useState(0);
 
   useEffect(() => {
+    // Desde el QR (?subir): directo al formulario, sin bienvenida.
+    if (!viaje && document.documentElement.hasAttribute("data-subir")) {
+      marcarVista();
+      queueMicrotask(() => setEstado("oculto"));
+      return;
+    }
     if (yaMostrada && !viaje) return;
     if (viaje) marcarVista(); // después de un viaje, la bienvenida ya no se repite
     let listo = false;
@@ -149,7 +155,10 @@ export default function IntroAlbum({ modo = "bienvenida", alRevelar, saliendo = 
   return (
     <div
       className={
-        "intro-album" + (fiesta ? " intro-fiesta" : "") + (estado === "saliendo" || saliendo ? " saliendo" : "")
+        "intro-album" +
+        (viaje ? " intro-viaje" : "") +
+        (fiesta ? " intro-fiesta" : "") +
+        (estado === "saliendo" || saliendo ? " saliendo" : "")
       }
       role="dialog"
       aria-label="Presentación del álbum"

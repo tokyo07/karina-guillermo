@@ -85,6 +85,7 @@ export default function SubirFotos() {
   const [toast, avisar] = useToast();
   const verAlbum = useVerAlbum();
   const exitoRef = useRef<HTMLDivElement>(null);
+  const formulario = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<Item[]>([]);
   // Bingo de retos: lo que este teléfono ya tachó y las fotos que subió (lib/bingo.ts).
   const [bingo, setBingo] = useState<EstadoBingo>(ESTADO_VACIO);
@@ -97,6 +98,23 @@ export default function SubirFotos() {
   const inNombre = useRef<HTMLInputElement>(null);
   const inCamara = useRef<HTMLInputElement>(null);
   const inGaleria = useRef<HTMLInputElement>(null);
+
+  // Desde el QR (?subir): la pantalla baja sola hasta el formulario. El navegador
+  // a veces descarta el desplazamiento suave mientras la portada anima, así que
+  // si al segundo intento el formulario sigue abajo, se salta sin animación.
+  useEffect(() => {
+    if (!document.documentElement.hasAttribute("data-subir")) return;
+    const bajar = (behavior: ScrollBehavior) => {
+      const f = formulario.current;
+      if (f && f.getBoundingClientRect().top > 120) f.scrollIntoView({ behavior, block: "start" });
+    };
+    const t1 = setTimeout(() => bajar("smooth"), 450);
+    const t2 = setTimeout(() => bajar("auto"), 1400);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
 
   // Nombre: ?invitado=Nombre (máx. 40) o el que quedó guardado en este teléfono.
   useEffect(() => {
@@ -250,7 +268,7 @@ export default function SubirFotos() {
       <p className="lede">{AMBIENTES[actual].lede}</p>
       {AMBIENTES[actual].aviso && <p className="aviso-momento">{AMBIENTES[actual].aviso}</p>}
 
-      <div className="card">
+      <div className="card form-subir" ref={formulario}>
         <label className="field">
           <span>Tu nombre</span>
           <input

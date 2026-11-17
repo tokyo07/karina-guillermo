@@ -139,7 +139,10 @@ que sea solo el álbum (por ejemplo `album-karina-guillermo.vercel.app` o
    Tracking** (o *Settings → Git → Production Branch*, según la versión del
    panel): poner la rama del álbum (hoy `feat/album-fotos`) y volver a publicar.
 4. Opcional: **Settings → Domains** para un subdominio propio.
-5. Imprimir el QR desde el panel **del sitio nuevo** (usa la dirección del sitio).
+5. Imprimir el QR desde el panel **del sitio nuevo** (usa la dirección del sitio):
+   *Descargar tarjeta para imprimir* da un PNG de 1500×2100 px (5×7 pulgadas a
+   300 ppp) con el estilo de la invitación. El QR lleva a `/album?subir`, que
+   abre directo el formulario para subir fotos, sin la presentación.
 
 El proyecto de la invitación no cambia. Supabase y Cloudinary no necesitan
 nada extra: los dos sitios usan la misma base y la misma nube.
