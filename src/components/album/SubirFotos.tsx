@@ -235,7 +235,7 @@ export default function SubirFotos() {
   return (
     <section>
       {!configurado && <div className="notice">El álbum todavía no está configurado (falta Cloudinary).</div>}
-      {conFirma(actual) ? <FirmaFiesta key={actual} /> : <PortadaInvitacion />}
+      {conFirma(actual) ? <FirmaFiesta key={actual} bolas={actual === "fiesta"} /> : <PortadaInvitacion />}
       <p className="lede">{AMBIENTES[actual].lede}</p>
       {AMBIENTES[actual].aviso && <p className="aviso-momento">{AMBIENTES[actual].aviso}</p>}
 

@@ -129,7 +129,9 @@ Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
   **Ceremonia** = la portada de la invitación (marfil, terracota, marco con
   ramas y foto en arco; pide apagar flash y sonido), **Recepción** = estilo
   galería (gris claro, naranja atardecer, menú `[subir]` en Jost) y **Fiesta** =
-  noche morada con luces ámbar y rosa. Recepción y Fiesta abren con la firma
+  noche morada con luces ámbar y rosa, con bolas de espejo que giran
+  (`BolaEspejo.tsx`, canvas sin librerías). En la fiesta, la presentación de
+  bienvenida también es de noche, con una bola gigante que crece detrás de las fotos. Recepción y Fiesta abren con la firma
   manuscrita de los novios que se escribe sola. Todos los teléfonos cambian
   solos (al instante por Realtime, o en menos de 30 s): colores, retos, texto
   de bienvenida y el momento que se propone al subir.

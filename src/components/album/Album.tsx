@@ -6,6 +6,8 @@ import { MOMENTOS, NOVIOS, esVisible, etiquetaMomento, marcarVistas, urlFoto, us
 import { loMejor } from "@/lib/mejores";
 import { masQueridas, queridasAhora } from "@/lib/ranking";
 import { AvisoEstado, IconoCorazon, useToast } from "./Comun";
+import { useMomento } from "./Ambiente";
+import BolaEspejo from "./BolaEspejo";
 import DiarioAlbum from "./DiarioAlbum";
 
 const ROTACION_MS = 7000;
@@ -18,6 +20,7 @@ export default function Album() {
   // "Ver el álbum" abre el diario; el mural en columnas queda como vista alternativa.
   const [vista, setVista] = useState<"diario" | "mural">("diario");
   const [toast, avisar] = useToast();
+  const { momento } = useMomento();
   const [frescas, setFrescas] = useState<Set<string>>(new Set());
   const [visor, setVisor] = useState<{ lista: Foto[]; i: number } | null>(null);
   const [proyector, setProyector] = useState(false);
@@ -63,7 +66,10 @@ export default function Album() {
       <AvisoEstado estado={estado} />
       <div className="head">
         <div>
-          <h2>El álbum de todos</h2>
+          <h2>
+            El álbum de todos
+            {momento === "fiesta" && <BolaEspejo tamano={52} velocidad={0.1} className="bola-titulo" />}
+          </h2>
           <p>
             {estado === "cargando"
               ? "Cargando fotos…"

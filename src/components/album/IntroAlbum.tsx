@@ -6,6 +6,8 @@ import PerspectiveTunnelHero, { type TunnelImage } from "@/components/ui/perspec
 import { FECHA, NOVIOS, esVisible, local, urlFoto, type Foto } from "@/lib/album";
 import { loMejor } from "@/lib/mejores";
 import { getSupabase } from "@/lib/supabase";
+import { useMomento } from "./Ambiente";
+import BolaEspejo from "./BolaEspejo";
 
 // Presentación del álbum: las fotos de los novios se acercan a la pantalla y se
 // desvanecen; cuando se agotan aparecen los nombres y el botón para entrar.
@@ -80,6 +82,10 @@ export default function IntroAlbum() {
   const [estado, setEstado] = useState<"mostrar" | "saliendo" | "oculto">(() => (yaMostrada ? "oculto" : "mostrar"));
   // null mientras se espera el ranking (la presentación arranca cuando llega o a los ESPERA_MS).
   const [fotos, setFotos] = useState<TunnelImage[] | null>(null);
+  // En la fiesta: fondo de noche y una bola de espejo gigante que se expande detrás de las fotos.
+  const { momento } = useMomento();
+  const fiesta = momento === "fiesta";
+  const [bola, setBola] = useState(0);
 
   useEffect(() => {
     if (yaMostrada) return;
@@ -93,6 +99,7 @@ export default function IntroAlbum() {
     const arrancar = (d: TunnelImage[]) => {
       if (listo) return;
       listo = true;
+      setBola(Math.round(Math.min(640, Math.min(window.innerWidth, window.innerHeight) * 0.9)));
       setFotos(mezclar([...d]));
     };
     const t = setTimeout(() => arrancar(previas), ESPERA_MS);
@@ -125,10 +132,15 @@ export default function IntroAlbum() {
 
   return (
     <div
-      className={"intro-album" + (estado === "saliendo" ? " saliendo" : "")}
+      className={"intro-album" + (fiesta ? " intro-fiesta" : "") + (estado === "saliendo" ? " saliendo" : "")}
       role="dialog"
       aria-label="Presentación del álbum"
     >
+      {fiesta && fotos && bola > 0 && (
+        <div className="intro-bola">
+          <BolaEspejo tamano={bola} velocidad={0.05} puntos={320} />
+        </div>
+      )}
       {fotos && (
         <PerspectiveTunnelHero
           images={fotos}
