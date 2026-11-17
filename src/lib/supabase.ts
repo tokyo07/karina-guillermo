@@ -9,10 +9,13 @@ export function getSupabase() {
   if (client) return client;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  // Supabase nombra la clave pública de dos formas según dónde se copie:
+  // "anon" (clave JWT, nombre clásico) o "publishable" (sb_publishable_…,
+  // el que da hoy el botón Connect). Sirve cualquiera de las dos.
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) {
     throw new Error(
-      "Faltan NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY. Copiá .env.example a .env.local y completá los valores de tu proyecto Supabase."
+      "Faltan NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY. Copiá .env.example a .env.local y completá los valores de tu proyecto Supabase."
     );
   }
   client = createClient<Database>(url, key);

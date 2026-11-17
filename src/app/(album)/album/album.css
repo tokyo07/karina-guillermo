@@ -1,0 +1,570 @@
+/* Álbum de boda — estilos portados del prototipo aprobado (album-boda.html).
+   Paleta de la invitación; modo oscuro automático con las mismas variables. */
+
+:root {
+  --terra: #a86142; --terra-deep: #78462f; --clay: #cf7a4c; --sand: #ecdcc6;
+  --kraft: #d6bb93; --cream: #f8f1e5; --ink: #46291d; --sage: #8b987c;
+  --bg: #ecdcc6; --surface: #f8f1e5; --surface2: #f0dcc8; --text: #46291d; --muted: #6b4a38;
+  --line: #d6bb93; --accent: #a86142; --accent-ink: #f8f1e5; --bar: #78462f; --bar-ink: #f8f1e5;
+  --ok: #a86142; --bad: #a94b24; --date: #78462f;
+  --shadow: 0 12px 34px rgba(70, 41, 29, 0.16);
+  --display: var(--font-display), "Didot", "Bodoni 72", Georgia, serif;
+  --body: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #3a1e12; --surface: #4b2a1b; --surface2: #5a3524; --text: #f8f1e5; --muted: #d6bb93;
+    --line: #6e4630; --accent: #cf7a4c; --accent-ink: #2e160c; --bar: #2a140b;
+    --ok: #cf7a4c; --bad: #cf7a4c; --date: #d6bb93;
+    --shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+    color-scheme: dark;
+  }
+}
+
+/* ── Ambiente por momento ──
+   <html data-momento="…"> lo pone Ambiente.tsx con el momento que fijan los
+   novios en el panel (o el programa, a su hora). Tres temas:
+     ceremonia → la invitación · recepción → galería · fiesta → noche con luces. */
+
+/* Ceremonia: la invitación (public/index.html). Marfil, terracota #B4533A,
+   Great Vibes para los nombres, Cormorant Garamond para títulos y Lato para el
+   texto. También es el aspecto mientras no se sabe el momento. Siempre claro. */
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) {
+  --terra: #B4533A; --terra-deep: #8f3f2b; --clay: #B4533A; --kraft: #E1BAB0; --cream: #FFFCFA; --ink: #B4533A;
+  --bg: #FFFCFA; --surface: #FFFCFA; --surface2: #FBF5F3; --text: #B4533A; --muted: #a0634f;
+  --line: #E1BAB0; --accent: #B4533A; --accent-ink: #FFFCFA; --bar: #FFFCFA; --bar-ink: #B4533A; --bar-muted: #B4533A;
+  --ok: #B4533A; --bad: #9c2f1c; --date: #B4533A;
+  --shadow: none;
+  --display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --body: var(--font-lato), "Lato", system-ui, sans-serif;
+  --diario-bg: #F6E9E4;
+  color-scheme: light;
+}
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) body { font-weight: 300; }
+/* Barra como la de la invitación: clara, monograma en Great Vibes, enlaces en versalitas espaciadas. */
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .bar { border-bottom: 1px solid #F3DDD7; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) body::before { background: var(--bar); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .mono { font: 400 1.7rem/1 var(--font-vibes), cursive; letter-spacing: 0; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .mono b { color: inherit; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .nav a { font: 400 0.72rem var(--body); letter-spacing: 0.18em; text-transform: uppercase; border-bottom: 1px solid transparent; padding: 8px 10px; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .nav a[aria-current="page"] { border-bottom-color: var(--accent); }
+/* Tarjetas y botones finos, con las líneas de la invitación. */
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) :is(.card, .panel, .stat) { border: 1.5px solid var(--accent); border-radius: 0; position: relative; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .card::after { content: ""; position: absolute; inset: 6px; border: 1px solid var(--line); pointer-events: none; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .card > * { position: relative; z-index: 1; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .btn { font: 700 0.75rem var(--body); letter-spacing: 0.2em; text-transform: uppercase; padding: 14px 26px; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .btn.small { font-size: 0.68rem; padding: 10px 18px; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .chip { border-color: var(--line); font-weight: 400; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .head h2 { font: 400 2.4rem/1.05 var(--font-vibes), cursive; }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) :is(.panel h3, .empty h3) { font: 400 1.7rem/1.15 var(--display); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .lede { font-family: var(--display); font-style: italic; font-size: 1.2rem; color: var(--text); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .diario :is(.jsc-top, .jsc-head) { color: var(--text); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .diario .jsc-title { font: 400 clamp(34px, 4cqi, 54px)/1 var(--font-vibes), cursive; }
+
+/* Portada de ceremonia (PortadaInvitacion): marco con ramas y foto en arco. */
+.pr-ill { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.pr-hero { display: grid; gap: 64px; align-items: center; padding: 40px 6px 10px; color: var(--accent); }
+.pr-foto { position: relative; justify-self: center; width: min(320px, 86%); }
+.pr-foto img { display: block; width: 100%; aspect-ratio: 3 / 4.3; object-fit: cover; object-position: center 30%; border-radius: 220px 220px 6px 6px; }
+.pr-foto::after { content: ""; position: absolute; inset: -12px; border: 1px solid var(--line); border-radius: 230px 230px 10px 10px; pointer-events: none; }
+.pr-marco { position: relative; border: 1.5px solid var(--accent); padding: 50px 22px; text-align: center; background: var(--bg); margin: 0 14px; }
+.pr-marco::after { content: ""; position: absolute; inset: 8px; border: 1px solid var(--line); pointer-events: none; }
+.pr-rama { position: absolute; width: 120px; height: 120px; pointer-events: none; }
+.pr-rama.tl { top: -46px; left: -26px; }
+.pr-rama.br { bottom: -46px; right: -26px; transform: rotate(180deg); }
+.pr-eyebrow { margin: 0; font: 400 0.75rem var(--font-lato), sans-serif; letter-spacing: 0.3em; text-transform: uppercase; }
+.pr-marco h1 { margin: 0.1em 0 0; font: 400 clamp(3rem, 14vw, 5rem)/1 var(--font-vibes), cursive; }
+.pr-amp { display: block; font: italic 400 0.5em/1.3 var(--font-cormorant), serif; }
+.pr-divisor { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 18px auto 26px; }
+.pr-divisor::before, .pr-divisor::after { content: ""; width: 60px; height: 1px; background: var(--line); }
+.pr-divisor svg { width: 22px; height: 22px; }
+.pr-fecha { margin: 0; font: 400 0.8rem var(--font-lato), sans-serif; letter-spacing: 0.25em; text-transform: uppercase; }
+@media (min-width: 860px) {
+  .pr-hero { grid-template-columns: 1.05fr 0.95fr; gap: 60px; padding: 60px 0 20px; }
+  .pr-foto { order: 1; width: min(400px, 100%); }
+  .pr-marco { padding: 60px 40px; margin: 0; }
+  .pr-rama { width: 170px; height: 170px; }
+  .pr-rama.tl { top: -64px; left: -70px; }
+  .pr-rama.br { bottom: -64px; right: -70px; }
+}
+
+/* Fiesta: noche, morado oscuro con luces ámbar, rosa y lila. Siempre oscuro.
+   Usa la misma firma manuscrita en la portada. */
+:root[data-momento="fiesta"] {
+  --terra: #e2577a; --clay: #f0a24b; --kraft: #7a5384;
+  --bg: #1a1020; --surface: #26182e; --surface2: #33203d; --text: #f8ecf2; --muted: #c9a9c0;
+  --line: #4a2f55; --accent: #f0a24b; --accent-ink: #1a1020; --bar: #120a17; --bar-ink: #f8ecf2; --bar-muted: #d9b8d0;
+  --ok: #f0a24b; --bad: #ff7a8a; --date: #f0a24b;
+  --shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+  --diario-bg: radial-gradient(120% 80% at 50% 35%, #4a2a5a 0%, #2a1734 55%, #140a1a 100%);
+  color-scheme: dark;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(240, 162, 75, 0.22) 0, transparent 22%),
+    radial-gradient(circle at 85% 10%, rgba(226, 87, 122, 0.2) 0, transparent 20%),
+    radial-gradient(circle at 70% 75%, rgba(240, 162, 75, 0.14) 0, transparent 24%),
+    radial-gradient(circle at 20% 85%, rgba(170, 110, 220, 0.16) 0, transparent 22%),
+    var(--bg) fixed;
+}
+:root[data-momento="fiesta"] body { background: transparent; }
+
+/* Recepción: estilo galería. Gris claro plano, naranja atardecer (#C04A2B), menú en Jost
+   entre corchetes, esquinas rectas y firma manuscrita (Sacramento). Siempre claro. */
+:root[data-momento="recepcion"] {
+  --terra: #C04A2B; --clay: #C04A2B; --kraft: #b9b9b3;
+  --bg: #e3e3df; --surface: #ecece8; --surface2: #d8d8d3; --text: #111111; --muted: #5a5a55;
+  --line: #c4c4be; --accent: #C04A2B; --accent-ink: #ffffff; --bar: #e3e3df; --bar-ink: #111111; --bar-muted: #111111;
+  --ok: #C04A2B; --bad: #9e1c1c; --date: #111111;
+  --shadow: none;
+  --display: var(--font-firma), "Snell Roundhand", cursive;
+  --body: var(--font-jost), "Jost", system-ui, sans-serif;
+  --diario-bg: #d8d8d3;
+  color-scheme: light;
+}
+/* Todo recto y plano. */
+:root[data-momento="recepcion"] :is(.card, .panel, .stat, .chip, .btn, .q, .q img, .notice, .aviso-momento, .tile, .mod figure, .mod button, .thanks, .toast, input) { border-radius: 0; }
+:root[data-momento="recepcion"] .festones { display: none; }
+/* Menú: [subir] [álbum] [novios], el activo en caja naranja. */
+:root[data-momento="recepcion"] .bar { border-bottom: 0; }
+:root[data-momento="recepcion"] .mono { font: 400 1.9rem/1 var(--font-firma), cursive; letter-spacing: 0; }
+:root[data-momento="recepcion"] .mono b { color: inherit; }
+:root[data-momento="recepcion"] .nav { gap: 6px; }
+:root[data-momento="recepcion"] .nav a { text-transform: lowercase; font: 500 0.95rem var(--body); letter-spacing: 0.02em; padding: 4px 8px; border-bottom: 0; color: var(--text); }
+:root[data-momento="recepcion"] .nav a::before { content: "["; }
+:root[data-momento="recepcion"] .nav a::after { content: "]"; }
+:root[data-momento="recepcion"] .nav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); }
+/* Títulos en firma; los chips y botones, en Jost. */
+:root[data-momento="recepcion"] .head h2 { font: 400 2.8rem/1 var(--display); }
+:root[data-momento="recepcion"] :is(.panel h3, .empty h3) { font: 400 2.1rem/1.1 var(--display); }
+:root[data-momento="recepcion"] .chip { border-color: var(--text); font-size: 0.85rem; }
+:root[data-momento="recepcion"] .btn.ghost { border-color: var(--text); }
+:root[data-momento="recepcion"] .card, :root[data-momento="recepcion"] .panel { border-color: var(--line); }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; background: var(--bg); scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; min-height: 100%; background: var(--bg); color: var(--text);
+  font: 400 16px/1.55 var(--body); -webkit-font-smoothing: antialiased;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  transition: background-color 0.6s ease, color 0.6s ease;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--bar);
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* barra */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bar); color: var(--bar-ink); }
+.bar-in { max-width: 1000px; margin: 0 auto; padding: 8px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mono { font: italic 500 1.5rem/1 var(--display); letter-spacing: 0.02em; color: var(--bar-ink); text-decoration: none; }
+.mono b { color: var(--kraft); font-weight: 500; padding: 0 0.12em; }
+.nav { display: flex; gap: 2px; }
+.nav a { color: var(--bar-muted, #e7c9a1); text-decoration: none; padding: 8px 12px; font: 500 0.95rem var(--body); border-bottom: 2px solid transparent; }
+.nav a[aria-current="page"] { color: var(--bar-ink); border-bottom-color: var(--clay); }
+.bar :focus-visible { outline-color: var(--cream); }
+.notice { background: var(--terra); color: var(--cream); font-size: 0.85rem; text-align: center; padding: 6px 16px; border-radius: 6px; margin-bottom: 18px; }
+
+main { max-width: 1000px; margin: 0 auto; padding: 0 18px 80px; }
+.festones { height: 22px; background: radial-gradient(circle at 14px 0, var(--terra) 13px, transparent 14px) 0 0 / 28px 22px repeat-x; }
+
+/* portada */
+.heroWrap { max-width: 480px; margin: 0 auto; }
+.hero { position: relative; background: var(--surface); text-align: center; padding: 70px 28px 36px; overflow: hidden; border-radius: 0 0 4px 4px; box-shadow: var(--shadow); }
+.hero::before {
+  content: ""; position: absolute; top: -6px; left: -6px; width: 150px; height: 150px;
+  background: url("/images/jazmin-esquina.png") center / contain no-repeat; pointer-events: none;
+}
+.hero h1 { margin: 0; font: italic 500 clamp(2.5rem, 12vw, 3.6rem)/1.02 var(--display); letter-spacing: -0.01em; }
+.hero h1 span { display: block; }
+.hero h1 i { display: block; font-size: 0.5em; color: var(--clay); line-height: 1.5; font-weight: 400; }
+.date { margin: 14px 0 0; font: 400 0.95rem var(--body); letter-spacing: 0.04em; color: var(--date); }
+.lede { max-width: 34ch; margin: 26px auto 0; text-align: center; color: var(--muted); font-size: 1.05rem; }
+.aviso-momento { max-width: 40ch; margin: 14px auto 0; padding: 10px 16px; text-align: center; font-size: 0.92rem; color: var(--text); background: var(--surface2); border: 1px solid var(--line); border-radius: 40px; }
+
+/* tarjetas y controles */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 24px 22px; margin: 26px auto 0; max-width: 560px; box-shadow: var(--shadow); }
+.field { display: block; margin-bottom: 20px; }
+.field > span, .legend { display: block; font: 600 0.92rem var(--body); margin-bottom: 8px; }
+.legend small { font-weight: 400; color: var(--muted); }
+input[type="text"], input[type="email"], input[type="password"] { width: 100%; padding: 12px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--kraft); background: transparent; border-radius: 40px; padding: 8px 14px; font-size: 0.92rem; color: var(--text); transition: background 0.15s, border-color 0.15s; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.actions { display: grid; gap: 10px; margin-top: 6px; }
+.btn { display: inline-block; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); padding: 13px 18px; border-radius: 40px; font: 600 1rem var(--body); text-align: center; text-decoration: none; }
+.btn.ghost { background: transparent; color: var(--text); border-color: var(--kraft); }
+.btn.small { padding: 9px 16px; font-size: 0.9rem; }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.hint { color: var(--muted); font-size: 0.88rem; margin: 12px 0 0; }
+.error { color: var(--bad); font-weight: 600; font-size: 0.92rem; margin: 10px 0 0; }
+
+.queue { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 8px; }
+.q { display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.q img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+.q .st { font-size: 0.88rem; color: var(--muted); }
+.q.done .st { color: var(--ok); font-weight: 600; }
+.q.fail .st { color: var(--bad); font-weight: 600; }
+.q.fail.retryable { cursor: pointer; }
+.bar-load { height: 3px; border-radius: 2px; background: var(--line); overflow: hidden; margin-top: 6px; }
+.bar-load::after { content: ""; display: block; height: 100%; width: 40%; background: var(--clay); animation: slide 1.1s ease-in-out infinite; }
+@keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(280%); } }
+.thanks { margin-top: 16px; padding: 14px; border-radius: 6px; background: var(--surface2); text-align: center; }
+.thanks a { color: var(--accent); font-weight: 600; }
+
+/* álbum */
+.pg { padding-top: 30px; }
+.head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+.head h2 { margin: 0; font: italic 500 2rem/1.1 var(--display); }
+.head p { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
+.wall { columns: 2 150px; column-gap: 10px; }
+@media (min-width: 720px) { .wall { columns: 3 200px; column-gap: 14px; } }
+.tile { position: relative; break-inside: avoid; margin: 0 0 10px; border-radius: 4px; overflow: hidden; background: var(--surface2); cursor: zoom-in; }
+@media (min-width: 720px) { .tile { margin-bottom: 14px; } }
+.tile img { display: block; width: 100%; height: auto; }
+.tile .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 10px 8px; background: linear-gradient(transparent, rgba(60, 20, 8, 0.78)); color: #f8f1e5; font-size: 0.82rem; display: flex; justify-content: space-between; align-items: end; gap: 8px; }
+.tile.fresh { outline: 3px solid var(--clay); outline-offset: -3px; animation: fresh 2.4s ease-out forwards; }
+@keyframes fresh { to { outline-color: transparent; } }
+.heart { display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; color: inherit; padding: 4px 2px; font-size: 0.85rem; }
+.heart svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.heart[aria-pressed="true"] svg { fill: #cf7a4c; stroke: #cf7a4c; }
+.empty { text-align: center; padding: 60px 16px; color: var(--muted); }
+.empty h3 { font: italic 500 1.6rem/1.2 var(--display); color: var(--text); margin: 0 0 8px; }
+
+dialog.viewer { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh; color: #f8f1e5; }
+dialog.viewer::backdrop { background: rgba(32, 13, 6, 0.95); }
+.v-wrap { height: 100%; display: grid; grid-template-rows: auto 1fr auto; padding: env(safe-area-inset-top, 0px) 12px env(safe-area-inset-bottom, 0px); }
+.v-top, .v-bot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 4px; }
+.v-img { min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; }
+.v-img img { max-width: 100%; max-height: 100%; object-fit: contain; border: 1px solid rgba(214, 187, 147, 0.55); padding: 5px; border-radius: 2px; }
+.v-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(42, 20, 11, 0.65); border: 1px solid rgba(255, 255, 255, 0.25); color: #fff; width: 44px; height: 44px; border-radius: 50%; font-size: 1.3rem; }
+.v-nav.prev { left: 2px; }
+.v-nav.next { right: 2px; }
+.v-btn { background: transparent; border: 1px solid rgba(255, 255, 255, 0.35); color: #f8f1e5; border-radius: 40px; padding: 8px 16px; font: 500 0.9rem var(--body); }
+.v-cap strong { font: italic 500 1.3rem/1.1 var(--display); }
+.v-cap div { opacity: 0.75; font-size: 0.88rem; }
+
+.proj { position: fixed; inset: 0; z-index: 50; background: #2a140b; color: #f8f1e5; display: grid; grid-template-rows: 1fr auto; }
+.proj-stage { display: flex; align-items: center; justify-content: center; padding: 3vmin; min-height: 0; }
+.proj-stage img { max-width: 100%; max-height: 100%; object-fit: contain; border: 1px solid #d6bb93; padding: 8px; animation: aparecer 0.5s ease-out; }
+@keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+.proj-foot { display: flex; justify-content: space-between; align-items: end; padding: 0 4vmin 3vmin; gap: 16px; }
+.proj-name { font: italic 500 clamp(1.8rem, 4.6vw, 3.4rem)/1.1 var(--display); }
+.proj-meta { color: #d6bb93; font-size: clamp(1rem, 1.8vw, 1.4rem); }
+.proj-new { display: inline-block; margin-left: 14px; font: 600 0.8rem var(--body); background: #cf7a4c; color: #2a140b; padding: 4px 12px; border-radius: 999px; vertical-align: middle; }
+.proj-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 14px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; border-radius: 40px; padding: 8px 16px; font: 500 0.85rem var(--body); }
+.proj-empty { margin: auto; text-align: center; font: italic 500 2.2rem var(--display); }
+
+/* novios */
+.grid2 { display: grid; gap: 22px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 22px; }
+.panel h3 { margin: 0 0 4px; font: italic 500 1.5rem/1.2 var(--display); }
+.panel p { color: var(--muted); margin: 0 0 14px; font-size: 0.95rem; }
+.qr-card { position: relative; text-align: center; padding: 0 20px 20px; background: #f8f1e5; color: #46291d; margin: 6px auto 16px; max-width: 300px; border-radius: 0 0 4px 4px; overflow: hidden; box-shadow: var(--shadow); }
+.qr-card::before { content: ""; position: absolute; top: 14px; left: -10px; width: 90px; height: 90px; background: url("/images/jazmin-esquina.png") center / contain no-repeat; pointer-events: none; }
+.qr-card .festones { margin: 0 -20px 20px; }
+.qr-card .nm { font: italic 500 1.5rem/1.1 var(--display); margin: 16px 0 8px; }
+.qr-card .tx { font: 500 0.85rem var(--body); color: #78462f; }
+.qr { display: flex; justify-content: center; background: #fff; padding: 10px; border-radius: 6px; width: fit-content; margin: 0 auto; }
+.qr canvas { max-width: 100%; height: auto; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 18px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px; text-align: center; }
+.stat b { display: block; font: 500 1.9rem/1.1 var(--display); color: var(--accent); }
+.stat span { font-size: 0.82rem; color: var(--muted); }
+.top { margin: 8px 0 0; padding-left: 20px; color: var(--muted); }
+.mod { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 14px; }
+.mod figure { margin: 0; position: relative; border-radius: 4px; overflow: hidden; background: var(--surface2); }
+.mod img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.mod figure.off img { opacity: 0.25; filter: grayscale(1); }
+.mod button { position: absolute; left: 6px; right: 6px; bottom: 6px; background: rgba(42, 20, 11, 0.82); color: #f8f1e5; border: 0; border-radius: 40px; padding: 5px; font: 500 0.78rem var(--body); }
+.momento-panel { margin-bottom: 18px; }
+.momento-panel .chip { padding: 10px 18px; }
+.login { max-width: 420px; }
+.sesion { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--muted); font-size: 0.9rem; margin-bottom: 18px; }
+
+.head-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* diario (DiarioAlbum): carrusel de páginas con la paleta y tipografías del álbum */
+.diario {
+  margin: 0 -18px; border-radius: 6px; overflow: hidden;
+  --jsc-bg: var(--diario-bg, radial-gradient(120% 80% at 50% 35%, #8a4d33 0%, #6b3a26 55%, #4a271a 100%));
+  --jsc-font: var(--font-display), Georgia, serif;
+}
+@media (min-width: 720px) { .diario { margin: 0; } }
+
+/* presentación de entrada (IntroAlbum): cubre todo, incluida la barra */
+.intro-album {
+  position: fixed; inset: 0; z-index: 60; background: var(--cream);
+  --pth-bg: var(--cream); --pth-display: var(--display); --pth-body: var(--body);
+  /* Siempre en la paleta clara, también con el sistema en modo oscuro. */
+  --text: var(--ink); --accent: var(--terra); --accent-ink: var(--cream); color-scheme: light;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.intro-album.saliendo { opacity: 0; transform: scale(1.04); pointer-events: none; }
+.intro-acciones { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 11px 18px; border-radius: 40px; font-size: 0.92rem; z-index: 100; max-width: 90vw; text-align: center; box-shadow: var(--shadow); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* filtro de calidad: aviso en la cola de subida y cola "Por revisar" del panel */
+.q .st.revisa { color: var(--muted); font-weight: 400; font-style: italic; }
+.mod figure .motivo { position: absolute; left: 6px; right: 6px; top: 6px; background: rgba(42, 20, 11, 0.78); color: #f8f1e5; border-radius: 4px; padding: 3px 6px; font: 500 0.72rem/1.25 var(--body); }
+.mod .acciones { position: absolute; left: 6px; right: 6px; bottom: 6px; display: flex; gap: 4px; }
+.mod .acciones button { position: static; flex: 1; }
+.mod .acciones button.si { background: var(--accent); color: var(--accent-ink); }
+
+/* Portada con firma (FirmaFiesta, en recepción y fiesta): foto central, fotos que se dispersan y firma que se escribe sola. */
+.firma-fiesta { padding-top: 18px; }
+.ff-escena { position: relative; height: clamp(360px, 108vw, 560px); max-width: 760px; margin: 0 auto; }
+.ff-foto {
+  position: absolute; left: 50%; top: 50%; width: min(48%, 300px); aspect-ratio: 3 / 4; object-fit: cover;
+  transform: translate(-50%, -50%); animation: ff-aparece 0.7s ease-out both;
+}
+.ff-flota { position: absolute; object-fit: cover; aspect-ratio: 3 / 4; animation: ff-dispersa 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.ff-flota.f1 { width: 19%; left: 2%; top: 4%; --dx: 140%; --dy: 120%; animation-delay: 0.05s; }
+.ff-flota.f2 { width: 15%; right: 4%; top: 12%; --dx: -150%; --dy: 110%; animation-delay: 0.12s; }
+.ff-flota.f3 { width: 17%; left: 6%; bottom: 3%; --dx: 130%; --dy: -120%; animation-delay: 0.18s; }
+.ff-flota.f4 { width: 14%; right: 9%; bottom: 8%; --dx: -160%; --dy: -130%; animation-delay: 0.24s; }
+@keyframes ff-dispersa { from { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.35); } to { opacity: 1; transform: none; } }
+@keyframes ff-aparece { from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); } }
+
+/* La firma: blanca, gruesa y redonda (Sacramento con trazo), escrita de izquierda a derecha. */
+.ff-firma {
+  position: absolute; inset: 0; margin: 0; pointer-events: none;
+  color: #fff; font: 400 clamp(4.4rem, 21vw, 9.5rem)/0.9 var(--font-firma), cursive;
+  -webkit-text-stroke: 0.028em #fff; filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.1));
+}
+.ff-firma span { position: absolute; white-space: nowrap; animation: ff-escribe 1.6s cubic-bezier(0.55, 0.1, 0.4, 1) both; }
+.ff-firma .l1 { left: 4%; top: 22%; animation-delay: 0.6s; }
+.ff-firma .l2 { right: 2%; top: 50%; animation-delay: 1.8s; animation-duration: 2s; }
+@keyframes ff-escribe { from { clip-path: inset(-20% 100% -20% 0); } to { clip-path: inset(-20% -5% -20% 0); } }
+.ff-fecha { text-align: center; margin: 6px 0 0; font: 400 0.95rem var(--body); letter-spacing: 0.08em; }
+
+/* Diario en recepción (galería): fondo gris claro, así que título e íconos de arriba en negro. */
+:root[data-momento="recepcion"] .diario :is(.jsc-top, .jsc-head) { color: var(--text); }
+:root[data-momento="recepcion"] .diario .jsc-title { font: 400 clamp(34px, 4cqi, 56px)/1 var(--font-firma), cursive; }
+:root[data-momento="recepcion"] .diario .jsc-meta { font-family: var(--body); font-weight: 400; }
+:root[data-momento="recepcion"] .diario .jsc-chip { border-radius: 0; }
+:root[data-momento="recepcion"] .diario .jsc-chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
+
+/* Botones del diario (libro / cuadrícula) sobre fondo claro: el carrusel los pinta
+   blancos para fondos oscuros; en ceremonia y recepción se pintan con el color del modo. */
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"], :root[data-momento="recepcion"]) .diario .jsc-chip {
+  color: var(--accent); background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"], :root[data-momento="recepcion"]) .diario .jsc-chip:hover { background: var(--surface2); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"], :root[data-momento="recepcion"]) .diario .jsc-chip[aria-pressed="true"] {
+  color: var(--accent-ink); background: var(--accent); box-shadow: none;
+}
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"], :root[data-momento="recepcion"]) .diario .jsc-chip:focus-visible { outline-color: var(--accent); }
+
+/* Retos de la actividad del programa que se vive ahora (lib/cronograma.ts). */
+.ahora-programa { margin: -2px 0 8px; font-size: 0.85rem; color: var(--muted); }
+.ahora-programa b { color: var(--text); font-weight: 600; }
+.chip.ahora:not([aria-pressed="true"]) { border-color: var(--accent); border-style: dashed; }
+.momento-auto { margin: 10px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+/* Fila de filtros del álbum: momento y orden ("Recientes" / "Más queridas"). */
+.filtros { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-bottom: 18px; }
+
+/* Panel: las más queridas (ranking). */
+.queridas { list-style: none; margin: 14px 0 16px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.queridas li { position: relative; overflow: hidden; background: var(--surface2); }
+.queridas img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.queridas .puesto { position: absolute; top: 6px; left: 6px; min-width: 26px; height: 26px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font: 700 0.8rem/1 var(--body); padding: 0 6px; }
+.queridas .dato { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 5px; background: linear-gradient(transparent, rgba(30, 12, 6, 0.75)); color: #fff; font-size: 0.72rem; }
+
+/* Bingo de retos (SubirFotos + lib/bingo.ts): cartón 3×2 e insignias. Usa las variables del tema. */
+.bingo { border: 1.5px solid var(--accent); padding: 10px; background: var(--bg); }
+.bingo-head { display: flex; justify-content: space-between; align-items: baseline; margin: 0 2px 8px; font: 600 0.82rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.bingo-carton { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.bingo-casilla {
+  position: relative; min-height: 78px; padding: 8px 6px; display: flex; align-items: center; justify-content: center; text-align: center;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 400 0.8rem/1.25 var(--body);
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.bingo-casilla[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); transform: scale(0.98); }
+.bingo-casilla.hecha { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.bingo-casilla.hecha span { opacity: 0.85; }
+.bingo-casilla.hecha[aria-pressed="true"] { outline: 2px solid var(--text); outline-offset: 1px; }
+.bingo-check { position: absolute; top: 3px; right: 6px; font-style: normal; font-weight: 700; font-size: 0.85rem; }
+.insignias { margin-top: 12px; }
+.insignias-titulo { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 6px; }
+.insignias ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.insignias li { font-size: 0.75rem; padding: 4px 9px; border: 1px dashed var(--line); color: var(--muted); border-radius: 40px; }
+.insignias li.ganada { border-style: solid; border-color: var(--accent); color: var(--accent); font-weight: 600; animation: insignia 0.5s ease-out; }
+@keyframes insignia { from { transform: scale(0.6); opacity: 0; } }
+:root[data-momento="recepcion"] :is(.bingo, .bingo-casilla, .insignias li) { border-radius: 0; }
+
+/* Bolas de espejo del tema fiesta (BolaEspejo). */
+.bola-espejo { display: inline-flex; flex-direction: column; align-items: center; pointer-events: none; }
+.bola-espejo canvas { display: block; filter: drop-shadow(0 0 14px rgba(240, 162, 75, 0.35)); }
+.bola-hilo { display: block; width: 1px; background: linear-gradient(rgba(248, 236, 242, 0.1), rgba(248, 236, 242, 0.6)); }
+.ff-techo { position: relative; height: 128px; max-width: 760px; margin: -18px auto 0; }
+.ff-techo .bola-espejo { position: absolute; top: 0; }
+.ff-techo .b1 { left: 10%; }
+.ff-techo .b2 { left: 46%; }
+.ff-techo .b3 { right: 10%; }
+.bola-titulo { vertical-align: middle; margin-left: 10px; }
+
+/* Bienvenida en la fiesta: noche y una bola de espejo gigante que crece mientras
+   pasan las fotos (≈10 s, lo que dura la presentación) y queda como malla de fondo. */
+.intro-album.intro-fiesta {
+  --pth-bg: transparent; --pth-card: #26182e; --pth-ink: #f8ecf2; --pth-muted: #c9a9c0;
+  --pth-accent: #f0a24b; --pth-accent-ink: #f0a24b; --pth-dot: rgba(248, 236, 242, 0.14);
+  --pth-glow: rgba(240, 162, 75, 0.2); --pth-ring: rgba(240, 162, 75, 0.25); --pth-ring2: rgba(226, 87, 122, 0.32);
+  --text: #f8ecf2; --accent: #f0a24b; --accent-ink: #1a1020; --kraft: #7a5384; color-scheme: dark;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(240, 162, 75, 0.22) 0, transparent 22%),
+    radial-gradient(circle at 85% 10%, rgba(226, 87, 122, 0.2) 0, transparent 20%),
+    radial-gradient(circle at 70% 75%, rgba(240, 162, 75, 0.14) 0, transparent 24%),
+    radial-gradient(circle at 20% 85%, rgba(170, 110, 220, 0.16) 0, transparent 22%),
+    #1a1020;
+}
+.intro-fiesta .pth-root { position: relative; z-index: 1; }
+.intro-fiesta .btn.ghost { color: var(--text); border-color: var(--kraft); }
+.intro-bola { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; pointer-events: none; z-index: 0; }
+.intro-bola .bola-espejo { animation: bola-expande 10s cubic-bezier(0.55, 0, 0.35, 1) both; will-change: transform, opacity; }
+/* Sin drop-shadow en la gigante: recalcular el desenfoque de un lienzo que se agranda
+   en cada cuadro bajaba la página a 1 cuadro por segundo. El halo va fijo detrás. */
+.intro-bola canvas { filter: none; }
+.intro-bola::before { content: ""; position: absolute; width: 90vmin; height: 90vmin; border-radius: 50%; background: radial-gradient(circle, rgba(240, 162, 75, 0.16) 0, rgba(226, 87, 122, 0.08) 45%, transparent 70%); }
+@keyframes bola-expande {
+  0% { transform: scale(0.18); opacity: 0; }
+  12% { opacity: 0.95; }
+  70% { transform: scale(1.15); opacity: 0.85; }
+  100% { transform: scale(2.3); opacity: 0.32; }
+}
+
+/* ── Ajustes para celulares (auditoría responsive) ──
+   Objetivos táctiles de al menos 44×44 px (guía de Apple/Google), nada que
+   produzca scroll horizontal a 320 px y filtros en una sola fila deslizable. */
+
+/* Menú y monograma: 44 px de alto para tocar con el dedo. */
+.bar-in { padding-top: 0; padding-bottom: 0; }
+.mono, .nav a { min-height: 44px; display: inline-flex; align-items: center; }
+.chip { min-height: 44px; }
+.btn.small { min-height: 44px; }
+.v-btn { min-height: 44px; }
+
+/* Corazón: el área táctil crece sin cambiar cómo se ve. */
+.heart { min-width: 44px; min-height: 44px; justify-content: flex-end; margin: -8px -4px -8px 0; padding: 4px; }
+
+/* Botones del diario (libro, cuadrícula, subir, ver, compartir). */
+.diario :is(.jsc-chip, .jsc-btn) { width: 44px; height: 44px; }
+
+/* Moderación del panel: miniaturas más grandes para que el botón quepa cómodo. */
+.mod { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+.mod button, .mod .acciones button { min-height: 40px; }
+
+/* Bingo: columnas que se encogen y palabras largas que se cortan. */
+.bingo-carton { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bingo-casilla { overflow-wrap: anywhere; hyphens: auto; }
+
+/* Bola de espejo junto al título: en la misma línea. */
+.head h2 { display: flex; align-items: center; flex-wrap: nowrap; gap: 8px; }
+.bola-titulo { margin-left: 0; flex: none; }
+
+@media (max-width: 719px) {
+  /* Sin proyector en el celular. */
+  .solo-pantalla-grande { display: none; }
+  /* Filtros del álbum: cada grupo en una fila que se desliza de costado. */
+  /* nowrap: con wrap, en columna cada fila toma el ancho de su contenido y empuja la página. */
+  .filtros { flex-direction: column; flex-wrap: nowrap; gap: 8px; }
+  .filtros > .chips { min-width: 0; }
+  .filtros .chips, .head-acciones .chips {
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    margin: 0 -18px; padding: 0 18px; scroll-padding: 0 18px;
+  }
+  .filtros .chips::-webkit-scrollbar, .head-acciones .chips::-webkit-scrollbar { display: none; }
+  .filtros .chip, .head-acciones .chip { flex: none; white-space: nowrap; }
+}
+
+@media (max-width: 380px) {
+  .bar-in { padding-left: 12px; padding-right: 12px; gap: 6px; }
+  .nav a { padding-left: 8px; padding-right: 8px; }
+  .card { padding: 20px 14px; }
+  .bingo { padding: 8px; }
+  .bingo-carton { gap: 4px; }
+  .bingo-casilla { font-size: 0.76rem; padding: 6px 4px; min-height: 72px; }
+  .head h2 { font-size: 1.75rem; }
+  .bola-titulo canvas { width: 40px !important; height: 40px !important; }
+  /* Recepción (galería): corchetes y logo más grandes; se achican para caber. */
+  :root[data-momento="recepcion"] .mono { font-size: 1.55rem; }
+  :root[data-momento="recepcion"] .nav { gap: 0; }
+  :root[data-momento="recepcion"] .nav a { font-size: 0.86rem; padding-left: 5px; padding-right: 5px; }
+  :root[data-momento="recepcion"] .head h2 { font-size: 2.3rem; }
+  /* Ceremonia: versalitas espaciadas, un poco menos de espacio. */
+  :is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .nav a { letter-spacing: 0.12em; padding-left: 7px; padding-right: 7px; }
+}
+
+/* Tarjeta de "foto subida" (SubirFotos): visible, con el botón grande a "Ver el álbum". */
+.exito {
+  margin-top: 18px; padding: 22px 18px 18px; text-align: center; color: var(--text);
+  background: var(--surface2); border: 2px solid var(--accent); border-radius: 14px;
+  animation: exito-entra 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.exito-check {
+  width: 54px; height: 54px; margin: 0 auto 10px; display: grid; place-items: center; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink); font: 700 1.6rem/1 var(--body);
+}
+.exito h3 { margin: 0 0 6px; font: italic 500 1.7rem/1.15 var(--display); overflow-wrap: anywhere; }
+.exito p { margin: 0 0 14px; }
+.exito-btn { display: block; width: 100%; min-height: 54px; font-size: 1.05rem; }
+.exito-nota { margin: 10px 0 0 !important; font-size: 0.85rem; color: var(--muted); }
+@keyframes exito-entra { from { opacity: 0; transform: translateY(10px) scale(0.96); } }
+:root[data-momento="recepcion"] .exito { border-radius: 0; }
+:root[data-momento="recepcion"] .exito-check { border-radius: 0; }
+:root[data-momento="recepcion"] .exito h3 { font: 400 2.3rem/1 var(--display); }
+:is(:root:not([data-momento]), :root[data-momento="ceremonia"]) .exito h3 { font: 400 2.2rem/1.1 var(--font-vibes), cursive; }
+
+/* Presentación camino al álbum: en vez de botones, un aviso suave. */
+.intro-abriendo { margin: 6px 0 0; font-size: 0.95rem; letter-spacing: 0.08em; opacity: 0.8; animation: abriendo 1.2s ease-in-out infinite alternate; }
+@keyframes abriendo { from { opacity: 0.45; } to { opacity: 0.9; } }
+
+/* Mensaje para los novios: campo del formulario y cómo se ve en el álbum. */
+.mensaje-input {
+  width: 100%; padding: 12px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg);
+  color: var(--text); font: 400 16px/1.4 var(--body); resize: vertical; min-height: 64px;
+}
+:root[data-momento="recepcion"] .mensaje-input { border-radius: 0; }
+.field .contador { display: block; text-align: right; font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+.field > span small { font-weight: 400; color: var(--muted); }
+.tile .cap .cap-texto { display: flex; flex-direction: column; min-width: 0; }
+.tile .cap .cap-mensaje { font-style: italic; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.v-cap .v-mensaje { margin-top: 4px; font-style: italic; opacity: 0.95; }
+.proj-mensaje { font: italic 400 clamp(1rem, 2vw, 1.5rem) var(--display); color: #f8f1e5; margin-top: 4px; }
+.mod figure .mensaje-mod { position: absolute; left: 6px; right: 6px; top: 6px; background: rgba(42, 20, 11, 0.82); color: #f8f1e5; border-radius: 4px; padding: 3px 6px; font: italic 400 0.72rem/1.25 var(--body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Llegada desde el QR (?subir): sin bienvenida, ni un instante. El "viaje" de
+   "Ver el álbum" sí se muestra. */
+:root[data-subir] .intro-album:not(.intro-viaje) { display: none; }
+.form-subir { scroll-margin-top: 64px; }
+
+/* Tarjeta del QR en el panel (se dibuja en canvas, lib/tarjetaQR.ts). */
+.qr-tarjeta { margin: 6px auto 16px; max-width: 360px; box-shadow: 0 10px 30px rgba(70, 41, 29, 0.22); }
+.qr-tarjeta canvas { display: block; width: 100%; height: auto; }
+
+/* Portada con firma en celulares: en pantallas angostas las fotos flotantes caían
+   sobre las letras de la firma. Se reparten en bandas: fotos arriba y abajo,
+   firma al medio, y la escena es un poco más alta. */
+@media (max-width: 480px) {
+  .ff-escena { height: clamp(420px, 132vw, 560px); }
+  .ff-foto { width: 50%; }
+  .ff-flota { width: 17%; }
+  .ff-flota.f1 { left: 2%; top: 0; }
+  .ff-flota.f2 { right: 2%; left: auto; top: 3%; }
+  .ff-flota.f3 { left: 3%; bottom: 0; top: auto; }
+  .ff-flota.f4 { right: 3%; left: auto; bottom: 3%; top: auto; }
+  .ff-firma { font-size: clamp(3.4rem, 17vw, 5.2rem); }
+  .ff-firma .l1 { left: 5%; top: 29%; }
+  .ff-firma .l2 { right: 3%; top: 49%; }
+}

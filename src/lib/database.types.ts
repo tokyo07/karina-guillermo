@@ -37,9 +37,102 @@ export type Database = {
         };
         Relationships: [];
       };
+      // Álbum (sql/album.sql). Escrito a mano siguiendo la migración;
+      // regenerar con `supabase gen types typescript` cuando esté aplicada.
+      fotos: {
+        Row: {
+          id: string;
+          public_id: string;
+          ancho: number;
+          alto: number;
+          nombre: string;
+          momento: string;
+          reto: string | null;
+          oculta: boolean;
+          revisar: boolean;
+          motivo: string | null;
+          calidad: Json | null;
+          mensaje: string | null;
+          creada_en: string;
+        };
+        Insert: never;
+        Update: {
+          oculta?: boolean;
+          revisar?: boolean;
+        };
+        Relationships: [];
+      };
+      novios: {
+        Row: { user_id: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      album_ajustes: {
+        Row: {
+          id: boolean;
+          subidas_abiertas: boolean;
+          max_subidas_por_hora: number;
+          momento_actual: string;
+          momento_fijado_en: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      es_novio: { Args: Record<string, never>; Returns: boolean };
+      subir_foto: {
+        Args: {
+          p_public_id: string;
+          p_ancho: number;
+          p_alto: number;
+          p_nombre: string;
+          p_momento: string;
+          p_reto: string | null;
+          p_dispositivo: string;
+          p_motivo?: string | null;
+          p_calidad?: Json | null;
+          p_mensaje?: string | null;
+        };
+        Returns: string;
+      };
+      listar_fotos: {
+        Args: { p_dispositivo?: string | null };
+        Returns: {
+          id: string;
+          public_id: string;
+          ancho: number;
+          alto: number;
+          nombre: string;
+          momento: string;
+          reto: string | null;
+          oculta: boolean;
+          revisar: boolean;
+          motivo: string | null;
+          calidad: Json | null;
+          mensaje: string | null;
+          creada_en: string;
+          corazones: number;
+          vistas: number;
+          mi_corazon: boolean;
+        }[];
+      };
+      alternar_corazon: {
+        Args: { p_foto: string; p_dispositivo: string };
+        Returns: { mi_corazon: boolean; corazones: number }[];
+      };
+      registrar_vistas: {
+        Args: { p_fotos: string[]; p_dispositivo: string };
+        Returns: number;
+      };
+      fijar_momento: {
+        Args: { p_momento: string };
+        Returns: string;
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

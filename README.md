@@ -84,6 +84,137 @@ src/
 sql/schema.sql            # tabla `rsvps` + políticas de RLS
 ```
 
+## Qué se publica en cada ruta
+
+| Ruta | Qué es |
+|---|---|
+| `/` | **La invitación oficial**: `public/index.html` (HTML estático). `next.config.ts` la sirve en `/` y conserva `?invitado=Nombre`. Su RSVP va a Google Apps Script + Formspree. |
+| `/album` | Subir fotos (destino del QR). Acepta `?invitado=Nombre`. |
+| `/album/fotos` | Mural de todos, visor y modo proyector. |
+| `/album/novios` | Panel con login: QR, estadísticas, moderación y descarga .zip. |
+
+`src/app/(invitacion)/page.tsx` (la versión React de la invitación) queda en el
+repo pero no se publica: la regla de `next.config.ts` tiene prioridad sobre ella.
+
+## Álbum de fotos
+
+Fotos en **Cloudinary** (con miniaturas automáticas por URL) y datos en
+**Supabase** (quién subió, momento, corazones, ocultas, login de los novios).
+
+### Configuración (una sola vez)
+
+1. **Supabase → SQL editor**: pegar y correr [`sql/album.sql`](./sql/album.sql).
+2. **Supabase → Authentication**:
+   - Users → *Add user* con el correo de los novios (*Auto Confirm User*).
+   - Sign In / Providers → desactivar *Allow new users to sign up*.
+   - Correr en el SQL editor (con el correo real):
+     ```sql
+     insert into public.novios (user_id)
+     select id from auth.users where email = 'CORREO_DE_LOS_NOVIOS'
+     on conflict do nothing;
+     ```
+3. **Cloudinary → Settings → Upload → Upload presets → Add**:
+   - Signing mode: **Unsigned**. Nombre: `boda_album`.
+   - Asset folder: `boda`. Allowed formats: `jpg`, `heic`, `heif` (las HEIC que
+     el celular no puede comprimir se suben tal cual y Cloudinary las convierte).
+   - Incoming transformation: `c_limit,w_1600,h_1600` (tope aunque alguien
+     salte la compresión del navegador).
+   - Desactivar *Use filename* / dejar *Unique filename* activo.
+4. Variables en `.env.local` y en **Vercel → Settings → Environment Variables**:
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`.
+
+### Sitio aparte solo para el álbum (opcional)
+
+El mismo repositorio puede publicarse como un **segundo proyecto de Vercel**
+que sea solo el álbum (por ejemplo `album-karina-guillermo.vercel.app` o
+`album.tudominio.com`), sin tocar el proyecto de la invitación:
+
+1. Vercel → **Add New… → Project** → importar este mismo repositorio. Nombre,
+   por ejemplo, `album-karina-guillermo`.
+2. En **Environment Variables**, las cuatro del álbum (Supabase y Cloudinary)
+   y además `SOLO_ALBUM` = `1`. Con esa variable, `/` redirige a `/album`
+   (conservando `?invitado=Nombre`) y la invitación no se ve en ese sitio.
+3. **Deploy**. Luego **Settings → Environments → Production → Branch
+   Tracking** (o *Settings → Git → Production Branch*, según la versión del
+   panel): poner la rama del álbum (hoy `feat/album-fotos`) y volver a publicar.
+4. Opcional: **Settings → Domains** para un subdominio propio.
+5. Imprimir el QR desde el panel **del sitio nuevo** (usa la dirección del sitio):
+   *Descargar tarjeta para imprimir* da un PNG de 1500×2100 px (5×7 pulgadas a
+   300 ppp) con el estilo de la invitación. El QR lleva a `/album?subir`, que
+   abre directo el formulario para subir fotos, sin la presentación.
+
+El proyecto de la invitación no cambia. Supabase y Cloudinary no necesitan
+nada extra: los dos sitios usan la misma base y la misma nube.
+
+### Operación
+
+- **Ambiente por momento:** tres momentos, cada uno con su estilo:
+  **Ceremonia** = la portada de la invitación (marfil, terracota, marco con
+  ramas y foto en arco; pide apagar flash y sonido), **Recepción** = estilo
+  galería (gris claro, naranja atardecer, menú `[subir]` en Jost) y **Fiesta** =
+  noche morada con luces ámbar y rosa, con bolas de espejo que giran
+  (`BolaEspejo.tsx`, canvas sin librerías). En la fiesta, la presentación de
+  bienvenida también es de noche, con una bola gigante que crece detrás de las fotos. Recepción y Fiesta abren con la firma
+  manuscrita de los novios que se escribe sola. Todos los teléfonos cambian
+  solos (al instante por Realtime, o en menos de 30 s): colores, retos, texto
+  de bienvenida y el momento que se propone al subir.
+- **Programa de la boda** (`src/lib/cronograma.ts`): a su hora el momento
+  cambia solo, por si nadie toca el panel (Ceremonia 5:00 p. m., Recepción
+  6:45 p. m., Fiesta 8:00 p. m.). Lo elegido a mano en el panel manda hasta el
+  siguiente cambio del programa. Además, mientras dura cada actividad (brindis,
+  mariachis y pastel, parranda vallenata, hora loca de cierre…) sus retos
+  aparecen primero al subir. Para probarlo en desarrollo: `/album?hora=2026-12-19T22:15`.
+  Si `album.sql` se corrió antes, volver a correrlo completo (es idempotente).
+- **Ranking por corazones** (`src/lib/ranking.ts`): cada teléfono registra
+  qué fotos vio (una vista por foto y teléfono). "♥ Más queridas" en el álbum y
+  en el panel ordena por *promedio bayesiano* de corazones sobre vistas, así las
+  fotos que subieron temprano no ganan solo por antigüedad. Desde el panel se
+  descargan las 30 más queridas.
+- **Lo mejor de la noche** (`src/lib/mejores.ts`): "★ Lo mejor" en el álbum
+  elige solo las mejores: puntaje = 60 % corazones/vistas + 40 % calidad
+  (nitidez, exposición y estructura que mide el teléfono al subir), una sola
+  foto por ráfaga de casi iguales y el mejor 30 % del álbum (mín. 6, máx. 50).
+  La presentación de bienvenida suma las 4 mejores entre las fotos de los novios.
+- **Mensaje para los novios:** al subir, el invitado puede dejar un mensaje
+  opcional (hasta 140 caracteres) que acompaña a esas fotos. Se ve en el mural,
+  la foto ampliada, la nota del diario y el proyector; en el panel se ve sobre
+  cada foto para moderarlo (ocultar la foto oculta también su mensaje).
+- **Bingo de retos** (`src/lib/bingo.ts`): cada momento tiene un cartón de
+  3×2 con sus 6 retos. Tocar una casilla elige el reto de la próxima foto y
+  subirla lo tacha. Insignias: Primera foto, ¡Línea! (una fila de 3), Testigo de
+  honor / Alma de la mesa / Leyenda de la pista (cartón lleno de cada momento),
+  Cazador de momentos (un reto en cada momento) y Paparazzi (10 fotos). Se
+  guarda en cada teléfono (`localStorage`), sin cuentas ni base de datos.
+- **Filtro de calidad:** antes de subir, el teléfono mide cada foto
+  (`src/lib/calidad.ts`): borrosa o movida, casi negra, casi blanca, "lisa"
+  (pared, techo, bolsillo) o casi igual a otra que ese teléfono ya subió. Una
+  foto dudosa sube igual pero queda **por revisar**: los invitados no la ven
+  hasta que los novios o el moderador la muestren desde "Por revisar" en el
+  panel. Los umbrales son permisivos a propósito (en la fiesta se tolera más
+  oscuridad). Para ajustarlos: `node scripts/calibrar-calidad.mjs` (necesita
+  ffmpeg) prueba el filtro con las fotos de `public/`. Las medidas de cada foto
+  quedan en `fotos.calidad` para revisar umbrales con fotos reales.
+- **Moderador:** se da de alta igual que los novios (paso 2 de Configuración),
+  con su propio correo; entra al mismo panel.
+- Cerrar las subidas después de la boda:
+  `update public.album_ajustes set subidas_abiertas = false;`
+- Límite por teléfono: 60 fotos/hora (`album_ajustes.max_subidas_por_hora`).
+- Al día siguiente: descargar el .zip desde el panel **y** exportar la carpeta
+  `boda` desde Cloudinary (copia de respaldo).
+
+Antes de la boda: seguir [`docs/pruebas-antes-de-la-boda.md`](./docs/pruebas-antes-de-la-boda.md)
+(pruebas en iPhone y Android, configuración de Vercel y Cloudinary).
+
+### Riesgos conocidos
+
+- El preset *unsigned* permite que alguien con el cloud name suba imágenes a
+  Cloudinary sin pasar por el álbum (no aparecen en el mural, pero gastan
+  cuota). Mitigación: borrar o desactivar el preset al cerrar el álbum.
+- El .zip se arma en el navegador: con cientos de fotos usar una computadora,
+  no el celular.
+- Probar antes del evento en iPhone real (fotos HEIC) y con 20+ subidas a la vez.
+
 ## Pendiente / a completar
 
 - **Número de WhatsApp real**: el botón "Confirmar por WhatsApp" en
